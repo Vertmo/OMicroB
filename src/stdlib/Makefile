@@ -4,7 +4,8 @@ MODULES :=                                                       \
   std_exit pervasives char bytes bytesLabels string stringLabels \
   list listLabels map array arrayLabels uchar sys buffer random  \
   complex gc int32 int64 obj hashtbl set moreLabels queue sort   \
-  stack stdLabels camlinternalOO avr microBit liquidCrystal
+  stack stdLabels camlinternalOO circuits avr microBit					 \
+	liquidCrystal
 
 MLS  := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)

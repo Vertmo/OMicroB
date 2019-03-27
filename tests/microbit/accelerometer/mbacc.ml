@@ -1,5 +1,5 @@
 (* https://github.com/lancaster-university/microbit-samples/blob/master/source/examples/accelerometer/main.cpp *)
-open MicroBit
+open Screen
 
 let pixel_of_g g =
   if g < -750 then 0
@@ -14,6 +14,6 @@ let _ =
     and y = pixel_of_g (Accelerometer.y ()) in
 
     clear_screen ();
-    write_pixel x y HIGH;
+    set_pixel x y HIGH;
     delay 10;
   done

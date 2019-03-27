@@ -522,11 +522,13 @@ let ccall arch ooid prim args =
       match prim with
       | "caml_avr_set_bit" | "caml_avr_clear_bit" | "caml_avr_read_bit" | "caml_avr_delay"
       | "caml_avr_write_register" | "caml_avr_read_register"
+      | "caml_avr_analog_write" | "caml_avr_analog_read"
       | "caml_avr_serial_init" | "caml_avr_serial_write" | "caml_avr_serial_read"
       | "caml_debug_trace" | "caml_debug_tracei"
       | "caml_random_init" | "caml_random_bits" | "caml_random_bool"
       | "caml_microbit_print_string" | "caml_microbit_print_int"
       | "caml_microbit_write_pixel" | "caml_microbit_print_image" | "caml_microbit_clear_screen"
+      | "caml_microbit_button_is_pressed"
       | "caml_microbit_digital_write" | "caml_microbit_digital_read"
       | "caml_microbit_analog_write" | "caml_microbit_analog_read"
       | "caml_microbit_serial_send_char" | "caml_microbit_serial_read_char"

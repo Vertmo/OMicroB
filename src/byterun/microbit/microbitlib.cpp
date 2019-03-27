@@ -49,11 +49,11 @@ int microbit_digital_read(int p) {
 }
 
 void microbit_analog_write(int p, int l) {
-  uBit.io.pin[p].setAnalogValue(l*4);
+  uBit.io.pin[p].setAnalogValue(l);
 }
 
 int microbit_analog_read(int p) {
-  return uBit.io.pin[p].getAnalogValue()/4;
+  return uBit.io.pin[p].getAnalogValue();
 }
 
 /******************************************************************************/

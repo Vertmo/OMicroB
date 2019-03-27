@@ -70,6 +70,7 @@ let simul            = ref false
 let flash            = ref false
 let verbose          = ref false
 let local            = ref false
+let circuitppx       = ref false
 
 let stack_size       = ref None
 let heap_size        = ref None
@@ -135,6 +136,9 @@ let spec =
                                    exit 0),
        " List available devices\n");
 
+      ("-circuitppx", Arg.Set circuitppx,
+       " Use the circuit extensions points\n");
+
       ("-stack-size", Arg.Int (fun sz -> stack_size := Some sz),
        Printf.sprintf "<word-nb> Set stack size (default: %d)" default_stack_size);
       ("-heap-size", Arg.Int (fun sz -> heap_size := Some sz),
@@ -150,7 +154,7 @@ let spec =
       ("-no-flash-heap", Arg.Set no_flash_heap,
        " Do not use flash to store immutable data from the heap known at compile time");
       ("-no-flash-globals", Arg.Set no_flash_globals,
-       " Do not use flash to store immutable entries of the global data table");
+       " Do not use flash to store immutable entries of the global data table\n");
 
       ("-mlopt", Arg.String (fun opt -> mlopts := opt :: !mlopts),
        "<option> Pass the given option to the OCaml compiler");
@@ -372,6 +376,12 @@ let ppx_options =
   if arch <> Some 16 then []
   else if local then [ "-ppx"; Filename.concat (Filename.concat Config.builddir "bin") "h15ppx" ]
   else [ "-ppx"; Filename.concat Config.bindir "h15ppx" ]
+
+let ppx_options = ppx_options@(
+    if not !circuitppx then []
+    else if local then [ "-ppx"; Filename.concat (Filename.concat Config.builddir "bin") "circuitppx" ]
+    else [ "-ppx"; Filename.concat Config.bindir "circuitppx" ]
+  )
 
 let () =
   if sudo && not flash then error "the option -sudo is meaningless without -flash"
@@ -601,9 +611,10 @@ let () =
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
-    let cmd = cmd @ (if (!default_config.typeD = AVR)
-                     then [ "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ]
-                     else []) in
+    let cmd = cmd @ (match !default_config.typeD with
+        | AVR -> [ "-open"; "Avr";
+                   "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ]
+        | MICROBIT -> [ "-open"; "MicroBit"]) in
     run ~vars cmd;
 
     let cmd = [ Config.ocamlclean; output_path; "-o"; output_path ] in
@@ -874,7 +885,7 @@ let () =
 let available_arm_elf = !available_arm_elf
 
 (******************************************************************************)
-(* Compile a .arm.elf into a .hex targetting microbit TODO *)
+(* Compile a .arm.elf into a .hex targetting microbit *)
 
 let () =
   if !default_config.typeD = MICROBIT && available_arm_elf <> None &&

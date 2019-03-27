@@ -1,4 +1,4 @@
-open MicroBit
+open Screen
 
 let arrow_of_heading h =
   if h >= 338 || h < 23 then [(2, 0);(2, 1)] (* N *)
@@ -13,7 +13,7 @@ let arrow_of_heading h =
 let _ =
   while true do
     clear_screen ();
-    write_pixel 2 2 HIGH;
-    List.iter (fun (x, y) -> write_pixel x y HIGH)(arrow_of_heading (Compass.heading ()));
+    set_pixel 2 2 HIGH;
+    List.iter (fun (x, y) -> set_pixel x y HIGH)(arrow_of_heading (Compass.heading ()));
     delay 10;
   done
