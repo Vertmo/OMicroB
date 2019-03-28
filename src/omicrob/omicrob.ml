@@ -70,6 +70,7 @@ let simul            = ref false
 let flash            = ref false
 let verbose          = ref false
 let local            = ref false
+let circuitppx       = ref false
 
 let stack_size       = ref None
 let heap_size        = ref None
@@ -102,103 +103,106 @@ let () =
 
 let spec =
   Arg.align (
-  [
-    ("-c", Arg.Set compile_only,
-     " Compile only");
-    ("-i", Arg.Set infer_interf,
-     " Print inferred interface of a .ml file");
-    ("-o", Arg.String (fun path -> output_files := path :: !output_files),
-     "<file> Set output file");
-    ("-n", Arg.Unit (fun () -> just_print := true; verbose := true),
-     " Just print commands, do not execute them");
-    ("-v", Arg.Set verbose,
-     " Be verbose, print executed commands");
-  ] @ (
-    if Sys.file_exists Config.builddir then [
-      ("-local", Arg.Set local,
-       " Use the OMicroB build directory instead of installation directory")
-    ] else []
-  ) @ [
-    ("-trace", Arg.Set_int trace,
-     " Set verbosity of traces: print informations about execution at runtime (default: 0)");
-    ("-sudo", Arg.Set sudo,
-     " Use sudo when flashing the micro-controller with avrdude");
-    ("-simul", Arg.Set simul,
-     " Execute the program in simulation mode on the computer");
-    ("-flash", Arg.Set flash,
-     " Transfer the program to the micro-controller with avrdude\n");
+    [
+      ("-c", Arg.Set compile_only,
+       " Compile only");
+      ("-i", Arg.Set infer_interf,
+       " Print inferred interface of a .ml file");
+      ("-o", Arg.String (fun path -> output_files := path :: !output_files),
+       "<file> Set output file");
+      ("-n", Arg.Unit (fun () -> just_print := true; verbose := true),
+       " Just print commands, do not execute them");
+      ("-v", Arg.Set verbose,
+       " Be verbose, print executed commands");
+    ] @ (
+      if Sys.file_exists Config.builddir then [
+        ("-local", Arg.Set local,
+         " Use the OMicroB build directory instead of installation directory")
+      ] else []
+    ) @ [
+      ("-trace", Arg.Set_int trace,
+       " Set verbosity of traces: print informations about execution at runtime (default: 0)");
+      ("-sudo", Arg.Set sudo,
+       " Use sudo when flashing the micro-controller with avrdude");
+      ("-simul", Arg.Set simul,
+       " Execute the program in simulation mode on the computer");
+      ("-flash", Arg.Set flash,
+       " Transfer the program to the micro-controller with avrdude\n");
 
-    ("-device", Arg.String set_config,
-     "<device-name> Set the device to compile for; see -list-devices");
-    ("-list-devices", Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
-                                   (Device_config.all_config_names ());
-                                 exit 0),
-     " List available devices\n");
+      ("-device", Arg.String set_config,
+       "<device-name> Set the device to compile for; see -list-devices");
+      ("-list-devices", Arg.Unit (fun _ -> List.iter (fun n -> Printf.printf "%s\n" n)
+                                     (Device_config.all_config_names ());
+                                   exit 0),
+       " List available devices\n");
 
-    ("-stack-size", Arg.Int (fun sz -> stack_size := Some sz),
-     Printf.sprintf "<word-nb> Set stack size (default: %d)" default_stack_size);
-    ("-heap-size", Arg.Int (fun sz -> heap_size := Some sz),
-     Printf.sprintf "<word-nb> Set heap size (default: %d)" default_heap_size);
-    ("-gc", Arg.String (fun s -> gc := Some s),
-     Printf.sprintf "<gc-algo> Set garbage collector algorithm Stop&Copy or Mark&Compact (default: %s)" default_gc);
-    ("-arch", Arg.Int (fun n -> arch := Some n),
-     Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %d)\n" default_arch);
-    ("-no-clean-interpreter", Arg.Set no_clean_interp,
-     " Do not remove unused VM instructions, compile and link all of them");
-    ("-no-shortcut-initialization", Arg.Set no_shortcut_init,
-     " Do not improve starting time by evaluating the program initialization at compile time");
-    ("-no-flash-heap", Arg.Set no_flash_heap,
-     " Do not use flash to store immutable data from the heap known at compile time");
-    ("-no-flash-globals", Arg.Set no_flash_globals,
-     " Do not use flash to store immutable entries of the global data table");
+      ("-circuitppx", Arg.Set circuitppx,
+       " Use the circuit extensions points\n");
 
-    ("-mlopt", Arg.String (fun opt -> mlopts := opt :: !mlopts),
-     "<option> Pass the given option to the OCaml compiler");
-    ("-mlopts", Arg.String (fun opts -> mlopts := List.rev (split opts ',') @ !mlopts),
-     "<opt1,opt2,...> Pass the given options to the OCaml compiler");
-    ("-cxxopt", Arg.String (fun opt -> cxxopts := opt :: !cxxopts),
-     "<option> Pass the given option to the C compiler");
-    ("-cxxopts", Arg.String (fun opts -> cxxopts := List.rev (split opts ',') @ !cxxopts),
-     "<opt1,opt2,...> Pass the given options to the C compiler");
-    ("-avrcxxopt", Arg.String (fun opt -> avrcxxopts := opt :: !avrcxxopts),
-     "<option> Pass the given option to the AVR C++ compiler");
-    ("-avrcxxopts", Arg.String (fun opts -> avrcxxopts := List.rev (split opts ',') @ !avrcxxopts),
-     "<opt1,opt2,...> Pass the given options to the AVR C++ compiler");
-    ("-avrobjcopt", Arg.String (fun opt -> avrobjcopts := opt :: !avrobjcopts),
-     "<option> Pass the given option to the AVR objcopy tool");
-    ("-avrobjcopts", Arg.String (fun opts -> avrobjcopts := List.rev (split opts ',') @ !avrobjcopts),
-     "<opt1,opt2,...> Pass the given options to the AVR objcopy tool");
-    ("-avrdudeopt", Arg.String (fun opt -> avrdudeopts := opt :: !avrdudeopts),
-     "<option> Pass the given option to the avrdude flashing program");
-    ("-avrdudeopts", Arg.String (fun opts -> avrdudeopts := List.rev (split opts ',') @ !avrdudeopts),
-     "<opt1,opt2,...> Pass the given options to the avrdude flashing program\n");
+      ("-stack-size", Arg.Int (fun sz -> stack_size := Some sz),
+       Printf.sprintf "<word-nb> Set stack size (default: %d)" default_stack_size);
+      ("-heap-size", Arg.Int (fun sz -> heap_size := Some sz),
+       Printf.sprintf "<word-nb> Set heap size (default: %d)" default_heap_size);
+      ("-gc", Arg.String (fun s -> gc := Some s),
+       Printf.sprintf "<gc-algo> Set garbage collector algorithm Stop&Copy or Mark&Compact (default: %s)" default_gc);
+      ("-arch", Arg.Int (fun n -> arch := Some n),
+       Printf.sprintf "<bit-nb> Set virtual machine architecture (default: %d)\n" default_arch);
+      ("-no-clean-interpreter", Arg.Set no_clean_interp,
+       " Do not remove unused VM instructions, compile and link all of them");
+      ("-no-shortcut-initialization", Arg.Set no_shortcut_init,
+       " Do not improve starting time by evaluating the program initialization at compile time");
+      ("-no-flash-heap", Arg.Set no_flash_heap,
+       " Do not use flash to store immutable data from the heap known at compile time");
+      ("-no-flash-globals", Arg.Set no_flash_globals,
+       " Do not use flash to store immutable entries of the global data table\n");
 
-    ("-where", Arg.Unit (fun () -> Printf.printf "%s\n%!" (if !local then Filename.concat Config.builddir "lib" else Config.libdir); exit 0),
-     " Print location of standard library and exit");
-    ("-ocaml", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocaml; exit 0),
-     " Print location of OCaml toplevel and exit");
-    ("-ocamlc", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocamlc; exit 0),
-     " Print location of OCaml bytecode compiler and exit");
-    ("-ocamlclean", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocamlclean; exit 0),
-     " Print location of ocamlclean and exit");
-    ("-bc2c", Arg.Unit (fun () -> Printf.printf "%s\n%!" (if !local then Filename.concat (Filename.concat Config.builddir "bin") "bc2c" else Filename.concat Config.bindir "bc2c"); exit 0),
-     " Print location of bc2c and exit");
-    ("-cxx", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.cxx; exit 0),
-     " Print location of C compiler and exit");
-    ("-avr-c++", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avr_cxx; exit 0),
-     " Print location of AVR C++ compiler and exit");
-    ("-avr-objcopy", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avr_objcopy; exit 0),
-     " Print location of avr-objcopy and exit");
-    ("-avrdude", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avrdude; exit 0),
-     " Print location of avrdude and exit\n");
+      ("-mlopt", Arg.String (fun opt -> mlopts := opt :: !mlopts),
+       "<option> Pass the given option to the OCaml compiler");
+      ("-mlopts", Arg.String (fun opts -> mlopts := List.rev (split opts ',') @ !mlopts),
+       "<opt1,opt2,...> Pass the given options to the OCaml compiler");
+      ("-cxxopt", Arg.String (fun opt -> cxxopts := opt :: !cxxopts),
+       "<option> Pass the given option to the C compiler");
+      ("-cxxopts", Arg.String (fun opts -> cxxopts := List.rev (split opts ',') @ !cxxopts),
+       "<opt1,opt2,...> Pass the given options to the C compiler");
+      ("-avrcxxopt", Arg.String (fun opt -> avrcxxopts := opt :: !avrcxxopts),
+       "<option> Pass the given option to the AVR C++ compiler");
+      ("-avrcxxopts", Arg.String (fun opts -> avrcxxopts := List.rev (split opts ',') @ !avrcxxopts),
+       "<opt1,opt2,...> Pass the given options to the AVR C++ compiler");
+      ("-avrobjcopt", Arg.String (fun opt -> avrobjcopts := opt :: !avrobjcopts),
+       "<option> Pass the given option to the AVR objcopy tool");
+      ("-avrobjcopts", Arg.String (fun opts -> avrobjcopts := List.rev (split opts ',') @ !avrobjcopts),
+       "<opt1,opt2,...> Pass the given options to the AVR objcopy tool");
+      ("-avrdudeopt", Arg.String (fun opt -> avrdudeopts := opt :: !avrdudeopts),
+       "<option> Pass the given option to the avrdude flashing program");
+      ("-avrdudeopts", Arg.String (fun opts -> avrdudeopts := List.rev (split opts ',') @ !avrdudeopts),
+       "<opt1,opt2,...> Pass the given options to the avrdude flashing program\n");
 
-    ("-version", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.version; exit 0),
-     " Print version and exit");
-    ("-help", Arg.Unit (fun () -> !help ()),
-     " Print list of options and exit");
-    ("--help", Arg.Unit (fun () -> !help ()),
-     "");
-  ])
+      ("-where", Arg.Unit (fun () -> Printf.printf "%s\n%!" (if !local then Filename.concat Config.builddir "lib" else Config.libdir); exit 0),
+       " Print location of standard library and exit");
+      ("-ocaml", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocaml; exit 0),
+       " Print location of OCaml toplevel and exit");
+      ("-ocamlc", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocamlc; exit 0),
+       " Print location of OCaml bytecode compiler and exit");
+      ("-ocamlclean", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.ocamlclean; exit 0),
+       " Print location of ocamlclean and exit");
+      ("-bc2c", Arg.Unit (fun () -> Printf.printf "%s\n%!" (if !local then Filename.concat (Filename.concat Config.builddir "bin") "bc2c" else Filename.concat Config.bindir "bc2c"); exit 0),
+       " Print location of bc2c and exit");
+      ("-cxx", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.cxx; exit 0),
+       " Print location of C compiler and exit");
+      ("-avr-c++", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avr_cxx; exit 0),
+       " Print location of AVR C++ compiler and exit");
+      ("-avr-objcopy", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avr_objcopy; exit 0),
+       " Print location of avr-objcopy and exit");
+      ("-avrdude", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.avrdude; exit 0),
+       " Print location of avrdude and exit\n");
+
+      ("-version", Arg.Unit (fun () -> Printf.printf "%s\n%!" Config.version; exit 0),
+       " Print version and exit");
+      ("-help", Arg.Unit (fun () -> !help ()),
+       " Print list of options and exit");
+      ("--help", Arg.Unit (fun () -> !help ()),
+       "");
+    ])
 
 (******************************************************************************)
 (* Documentation of command line options *)
@@ -224,16 +228,16 @@ Options:" me me me me me me me me me
 
 let error fmt =
   Printf.ksprintf (fun msg ->
-    Printf.eprintf "Error: %s\n" msg;
-    Arg.usage spec ("\n" ^ usage);
-    exit 1;
-  ) fmt
+      Printf.eprintf "Error: %s\n" msg;
+      Arg.usage spec ("\n" ^ usage);
+      exit 1;
+    ) fmt
 
 let () =
   help := (fun () ->
-    Arg.usage spec usage;
-    exit 0;
-  )
+      Arg.usage spec usage;
+      exit 0;
+    )
 
 (******************************************************************************)
 (* Parsing of input and output files *)
@@ -373,6 +377,12 @@ let ppx_options =
   else if local then [ "-ppx"; Filename.concat (Filename.concat Config.builddir "bin") "h15ppx" ]
   else [ "-ppx"; Filename.concat Config.bindir "h15ppx" ]
 
+let ppx_options = ppx_options@(
+    if not !circuitppx then []
+    else if local then [ "-ppx"; Filename.concat (Filename.concat Config.builddir "bin") "circuitppx" ]
+    else [ "-ppx"; Filename.concat Config.bindir "circuitppx" ]
+  )
+
 let () =
   if sudo && not flash then error "the option -sudo is meaningless without -flash"
 
@@ -384,10 +394,10 @@ let () =
 let is_str_need_quote str =
   try
     String.iter (fun c ->
-      match c with
-      | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' | '+' | '.' | '/' | '@' | '=' | ',' -> ()
-      | _ -> raise Exit
-    ) str;
+        match c with
+        | 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' | '-' | '+' | '.' | '/' | '@' | '=' | ',' -> ()
+        | _ -> raise Exit
+      ) str;
     false
   with Exit ->
     true
@@ -400,15 +410,15 @@ let run ?(vars=[]) strs =
   let buf = Buffer.create 16 in
   let is_first = ref true in
   List.iter (fun (name, value) ->
-    if !is_first then is_first := false else Buffer.add_char buf ' ';
-    Buffer.add_string buf (quote_if_needed name);
-    Buffer.add_char buf '=';
-    Buffer.add_string buf (quote_if_needed value);
-  ) vars;
+      if !is_first then is_first := false else Buffer.add_char buf ' ';
+      Buffer.add_string buf (quote_if_needed name);
+      Buffer.add_char buf '=';
+      Buffer.add_string buf (quote_if_needed value);
+    ) vars;
   List.iter (fun str ->
-    if !is_first then is_first := false else Buffer.add_char buf ' ';
-    Buffer.add_string buf (quote_if_needed str);
-  ) strs;
+      if !is_first then is_first := false else Buffer.add_char buf ' ';
+      Buffer.add_string buf (quote_if_needed str);
+    ) strs;
   let cmd = Buffer.contents buf in
   if verbose then Printf.eprintf "+ %s\n%!" cmd;
   if not just_print then (
@@ -454,10 +464,10 @@ let should_be_none_option opt_name opt =
 let last_src =
   let r = ref None in
   List.iter (fun path ->
-    match Filename.extension path with
-    | ".ml" | ".cmo" -> r := Some path
-    | _ -> ()
-  ) input_files;
+      match Filename.extension path with
+      | ".ml" | ".cmo" -> r := Some path
+      | _ -> ()
+    ) input_files;
   !r
 
 let input_c =
@@ -580,10 +590,10 @@ let () =
 
     let input_paths =
       List.filter (fun path ->
-        match Filename.extension path with
-        | ".mli" | ".ml" | ".cmo" | ".c" -> true
-        | _ -> false
-      ) input_files in
+          match Filename.extension path with
+          | ".mli" | ".ml" | ".cmo" | ".c" -> true
+          | _ -> false
+        ) input_files in
 
     let output_path =
       get_first_defined [
@@ -602,7 +612,10 @@ let () =
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
     let cmd = cmd @ input_paths @ [ "-o"; output_path ] in
     let cmd = cmd @ (if(!default_config.typeD = AVR)
-                     then [ "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ]
+                     then [ "-open"; "Avr";
+                            "-open"; Printf.sprintf "Avr.%s" !default_config.pins_module ]
+                     else if(!default_config.typeD = ESP8266)
+                     then [ "-open"; "Esp8266" ]
                      else []) in
     run ~vars cmd;
 
@@ -623,8 +636,8 @@ let () =
   if (
     available_byte <> None
   ) && (
-    simul || flash || no_output_requested || output_c <> None || output_elf <> None || output_avr <> None || output_hex <> None
-  ) then (
+      simul || flash || no_output_requested || output_c <> None || output_elf <> None || output_avr <> None || output_hex <> None
+    ) then (
     should_be_none_file input_avr;
     should_be_none_file input_elf;
     should_be_none_file input_hex;
@@ -653,11 +666,11 @@ let () =
     let cmd = [ bc2c ] in
     let cmd = if local then cmd @ [ "-local" ] else cmd in
     let cmd = cmd @ [
-      "-stack-size"; string_of_int stack_size;
-      "-heap-size"; string_of_int heap_size;
-      "-gc"; gc;
-      "-arch"; string_of_int arch;
-    ] in
+        "-stack-size"; string_of_int stack_size;
+        "-heap-size"; string_of_int heap_size;
+        "-gc"; gc;
+        "-arch"; string_of_int arch;
+      ] in
     let cmd = if no_clean_interp then cmd @ [ "-no-clean-interpreter" ] else cmd in
     let cmd = if no_shortcut_init then cmd @ [ "-no-shortcut-initialization" ] else cmd in
     let cmd = if no_flash_heap then cmd @ [ "-no-flash-heap" ] else cmd in
@@ -714,7 +727,8 @@ let available_elf = !available_elf
 let available_avr = ref input_avr
 
 let () =
-  if !default_config.typeD = AVR && (available_c <> None && (flash || output_avr <> None || no_output_requested)) then (
+  if !default_config.typeD = AVR && available_c <> None &&
+     (flash || output_avr <> None || output_hex <> None || no_output_requested) then (
     should_be_none_file input_avr;
     should_be_none_file input_elf;
     should_be_none_file input_hex;
@@ -753,7 +767,7 @@ let available_avr = !available_avr
 let available_hex = ref input_hex
 
 let () =
-  if !default_config.typeD = AVR && (available_avr <> None && (flash || output_hex <> None || no_output_requested)) then (
+  if !default_config.typeD = AVR && available_avr <> None && (flash || output_hex <> None || no_output_requested) then (
     should_be_none_file input_hex;
 
     let input_path =

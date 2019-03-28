@@ -1,5 +1,3 @@
-open Esp8266
-
 (* let _ =
  *   pin_mode D1 OUTPUT;
  *   while true do
@@ -28,7 +26,6 @@ open Esp8266
     (int_of_float ((r'+.m)*.255.), int_of_float ((g'+.m)*.255.), int_of_float ((b'+.m)*.255.))
 
 let _ =
-  ignore (mod_float 10. 0.);
   let r = D0 and g = D1 and b = D2 in
   while(true) do
     for h = 0 to 360 do
