@@ -1,13 +1,13 @@
-(* let%component MyRGBLed = Circuits.MakeRGBLed(
- *     redPin = PIN0;
- *     greenPin = PIN1;
- *     bluePin = PIN2) *) (* Pins for microbit*)
-
 let%component MyRGBLed = Circuits.MakeRGBLed(
-    redPin = PIN3;
-    greenPin = PIN5;
-    bluePin = PIN11;
-  ) (* Pins for arduino uno *)
+    redPin = PIN0;
+    greenPin = PIN1;
+    bluePin = PIN2) (* Pins for wemos-d1-mini *)
+
+(* let%component MyRGBLed = Circuits.MakeRGBLed(
+ *     redPin = PIN3;
+ *     greenPin = PIN5;
+ *     bluePin = PIN11;
+ *   ) *) (* Pins for arduino uno *)
 
 let rgb_of_hsv (h, s, v) =
   let c = v *. s in let m = v -. c in

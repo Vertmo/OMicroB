@@ -1,6 +1,6 @@
 open Circuits
 
-let%component MyLed = MakeLed(connectedPin = PIN8)
+let%component MyLed = MakeLed(connectedPin = PIN3)
 let%component MyClock = MakeClock(period = 2000)
 let%connect Circuit = Connect(MyClock;MyLed)
 

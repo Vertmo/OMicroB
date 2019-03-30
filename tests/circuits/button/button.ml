@@ -1,6 +1,6 @@
-let%component MyLed = Circuits.MakeLed(connectedPin = PIN8)
+let%component MyLed = Circuits.MakeLed(connectedPin = PIN3)
 
-let%component MyButton = Circuits.MakeButton(connectedPin = PIN9)
+let%component MyButton = Circuits.MakeButton(connectedPin = PIN7)
 
 let _ =
   MyLed.init ();

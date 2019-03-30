@@ -9,3 +9,7 @@
 *.arm_elf
 *.combined_hex
 *.avr
+*.bin
+*.d
+*.esp_elf
+*.esp_o

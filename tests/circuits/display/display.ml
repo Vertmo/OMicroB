@@ -2,8 +2,8 @@
 
 (* Use an external, LiquidCrystal type screen *)
 let%component MyDisp = LiquidCrystal.MakeLCD(
-    rsPin = PIN12;
-    enablePin = PIN11;
+    rsPin = PIN7;
+    enablePin = PIN6;
     d4Pin = PIN5;
     d5Pin = PIN4;
     d6Pin = PIN3;
