@@ -35,10 +35,14 @@ int avr_millis();
 void esp8266_pin_mode(uint8_t p, uint8_t m);
 void esp8266_digital_write(uint8_t p, uint8_t l);
 uint8_t esp8266_digital_read(uint8_t p);
-void esp8266_analog_write(uint8_t p, uint8_t l);
-uint8_t esp8266_analog_read(uint8_t p);
+void esp8266_analog_write(uint8_t p, int l);
+int esp8266_analog_read(uint8_t p);
 void esp8266_delay(int ms);
 int esp8266_millis();
+
+/******************************************************************************/
+
+void esp8266_serial_init();
 void esp8266_serial_write_char(char c);
 char esp8266_serial_read_char();
 

@@ -5,7 +5,7 @@
 (*                    Basile Pesin, Sorbonne Université                        *)
 (*******************************************************************************)
 
-type pin = D0 | D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | A0
+type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7 | PIN8 | PINA0
 
 (** Pin modes *)
 type mode = INPUT | OUTPUT | INPUT_PULLUP
@@ -22,5 +22,10 @@ val analog_read: pin -> int
 external delay: int -> unit = "caml_esp8266_delay" [@@noalloc]
 external millis: unit -> int = "caml_esp8266_millis" [@@noalloc]
 
-val serial_write: string -> unit
-val serial_read: unit -> string
+module Serial: sig
+  val init: unit -> unit
+  val write: string -> unit
+  val read: unit -> string
+end
+
+module MCUConnection: Circuits.MCUConnection with type pin = pin with type mode = mode with type level = level

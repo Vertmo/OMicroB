@@ -591,12 +591,13 @@ uint8_t esp8266_digital_read(uint8_t _p) {
   return 0;
 }
 
-void esp8266_analog_write(uint8_t p, uint8_t level) {
+void esp8266_analog_write(uint8_t p, int level) {
   printf("Wrote %d to pin %d\n", level, p);
 }
 
-uint8_t esp8266_analog_read(uint8_t _p) {
-  return 0;
+int esp8266_analog_read(uint8_t p) {
+  printf("analog_read %d\n", p);
+  return 1023;
 }
 
 void esp8266_delay(int ms) {
@@ -607,6 +608,10 @@ int esp8266_millis() {
   printf("millis()\n");
   return 0;
 }
+
+/******************************************************************************/
+
+void esp8266_serial_init() {}
 
 void esp8266_serial_write_char(char c) {
   printf("%c", c);

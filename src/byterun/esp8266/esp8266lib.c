@@ -25,11 +25,11 @@ uint8_t esp8266_digital_read(uint8_t pin) {
   return digitalRead(get_pin_addr(pin));
 }
 
-void esp8266_analog_write(uint8_t pin, uint8_t level) {
+void esp8266_analog_write(uint8_t pin, int level) {
   analogWrite(get_pin_addr(pin), level);
 }
 
-uint8_t esp8266_analog_read(uint8_t pin) {
+int esp8266_analog_read(uint8_t pin) {
   return analogRead(get_pin_addr(pin));
 }
 
@@ -39,6 +39,10 @@ void esp8266_delay(int ms) {
 
 int esp8266_millis() {
   return millis();
+}
+
+void esp8266_serial_init() {
+  Serial.begin(9600);
 }
 
 void esp8266_serial_write_char(char c) {

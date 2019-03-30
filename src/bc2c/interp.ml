@@ -528,7 +528,7 @@ let ccall arch ooid prim args =
       | "caml_random_init" | "caml_random_bits" | "caml_random_bool"
       | "caml_esp8266_pin_mode" | "caml_esp8266_digital_write" | "caml_esp8266_digital_read"
       | "caml_esp8266_analog_write" | "caml_esp8266_analog_read"
-      | "caml_esp8266_serial_write_char" | "caml_esp8266_serial_read_char"
+      | "caml_esp8266_serial_init" | "caml_esp8266_serial_write_char" | "caml_esp8266_serial_read_char"
       | "caml_esp8266_delay" | "caml_esp8266_millis" -> ()
       | _ ->
         let print_arg arg =
