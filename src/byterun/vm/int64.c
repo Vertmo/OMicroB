@@ -13,7 +13,7 @@
 #define Int64_val(v) (Is_int(v) ? (int64_t) Int_val(v) : ((int64_t) Field(v, 1)))
 #endif
 
-static value value_of_int64(int64_t n) {
+PROGMEM static value value_of_int64(int64_t n) {
 #if OCAML_VIRTUAL_ARCH == 16
   if (-0x4000 <= n && n <= 0x3FFF) {
     return Val_int(n);

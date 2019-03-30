@@ -42,7 +42,7 @@ PROGMEM extern void * const ocaml_primitives[];
 /******************************************************************************/
 /* Read tools for program memory */
 
-static inline void *get_primitive(uint8_t prim_ind) {
+PROGMEM static inline void *get_primitive(uint8_t prim_ind) {
 #ifdef __AVR__
   return (void *) pgm_read_word_near(ocaml_primitives + prim_ind);
 #else
@@ -50,7 +50,7 @@ static inline void *get_primitive(uint8_t prim_ind) {
 #endif
 }
 
-static inline value read_flash_global_data_1B(uint8_t glob_ind) {
+PROGMEM static inline value read_flash_global_data_1B(uint8_t glob_ind) {
 #ifdef __AVR__
 #if OCAML_VIRTUAL_ARCH == 16
   return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
@@ -66,7 +66,7 @@ static inline value read_flash_global_data_1B(uint8_t glob_ind) {
 #endif
 }
 
-static inline value read_flash_global_data_2B(uint16_t glob_ind) {
+PROGMEM static inline value read_flash_global_data_2B(uint16_t glob_ind) {
 #ifdef __AVR__
 #if OCAML_VIRTUAL_ARCH == 16
   return (value) pgm_read_word_near(ocaml_flash_global_data + glob_ind);
@@ -82,7 +82,7 @@ static inline value read_flash_global_data_2B(uint16_t glob_ind) {
 #endif
 }
 
-static inline char read_byte(void) {
+PROGMEM static inline char read_byte(void) {
   char c;
 #ifdef __AVR__
   c = pgm_read_byte_near(ocaml_bytecode + pc);
@@ -93,29 +93,29 @@ static inline char read_byte(void) {
   return c;
 }
 
-static inline opcode_t read_opcode(void) {
+PROGMEM static inline opcode_t read_opcode(void) {
   return (opcode_t) read_byte();
 }
 
-static inline uint8_t read_uint8(void) {
+PROGMEM static inline uint8_t read_uint8(void) {
   return (uint8_t) read_byte();
 }
 
-static inline int8_t read_int8(void) {
+PROGMEM static inline int8_t read_int8(void) {
   return (int8_t) read_byte();
 }
 
-static inline uint16_t read_uint16(void) {
+PROGMEM static inline uint16_t read_uint16(void) {
   uint8_t n1 = read_uint8();
   uint8_t n0 = read_uint8();
   return ((uint16_t) n1 << 8) | n0;
 }
 
-static inline int16_t read_int16(void) {
+PROGMEM static inline int16_t read_int16(void) {
   return (int16_t) read_uint16();
 }
 
-static inline uint32_t read_uint32(void) {
+PROGMEM static inline uint32_t read_uint32(void) {
   uint8_t n3 = read_uint8();
   uint8_t n2 = read_uint8();
   uint8_t n1 = read_uint8();
@@ -123,11 +123,11 @@ static inline uint32_t read_uint32(void) {
   return ((uint32_t) n3 << 24) | ((uint32_t) n2 << 16) | ((uint32_t) n1 << 8) | n0;
 }
 
-static inline int32_t read_int32(void) {
+PROGMEM static inline int32_t read_int32(void) {
   return (int32_t) read_uint32();
 }
 
-static inline uint64_t read_uint64(void) {
+PROGMEM static inline uint64_t read_uint64(void) {
   uint8_t n7 = read_uint8();
   uint8_t n6 = read_uint8();
   uint8_t n5 = read_uint8();
@@ -139,21 +139,21 @@ static inline uint64_t read_uint64(void) {
   return ((uint64_t) n7 << 56) | ((uint64_t) n6 << 48) | ((uint64_t) n5 << 40) | ((uint64_t) n4 << 32) | ((uint64_t) n3 << 24) | ((uint64_t) n2 << 16) | ((uint64_t) n1 << 8) | n0;
 }
 
-static inline int64_t read_int64(void) {
+PROGMEM static inline int64_t read_int64(void) {
   return (int64_t) read_uint64();
 }
 
-static inline code_t read_ptr_1B(void) {
+PROGMEM static inline code_t read_ptr_1B(void) {
   int8_t ofs = read_int8();
   return pc - 2 + ofs;
 }
 
-static inline code_t read_ptr_2B(void) {
+PROGMEM static inline code_t read_ptr_2B(void) {
   int16_t ofs = read_int16();
   return pc - 3 + ofs;
 }
 
-static inline code_t read_ptr_4B(void) {
+PROGMEM static inline code_t read_ptr_4B(void) {
   int32_t ofs = read_int32();
   return pc - 5 + ofs;
 }
@@ -161,11 +161,11 @@ static inline code_t read_ptr_4B(void) {
 /******************************************************************************/
 /* Stack tools */
 
-static inline value peek(int n) {
+PROGMEM static inline value peek(int n) {
   return sp[n];
 }
 
-static inline void push(value x) {
+PROGMEM static inline void push(value x) {
   if(sp <= ocaml_stack) {
     caml_raise_stack_overflow();
   } else {
@@ -173,18 +173,18 @@ static inline void push(value x) {
   }
 }
 
-static inline value pop(void) {
+PROGMEM static inline value pop(void) {
   return *(sp ++);
 }
 
-static inline void pop_n(int n) {
+PROGMEM static inline void pop_n(int n) {
   sp += n;
 }
 
 /******************************************************************************/
 /* Initialization */
 
-static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, uint16_t size) {
+PROGMEM static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, uint16_t size) {
   uint16_t ind = 0;
   for (ind = 0; ind < size; ind ++) {
 #ifdef __AVR__
@@ -196,12 +196,12 @@ static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, uint1
   }
 }
 
-static inline void init_stack(void) {
+PROGMEM static inline void init_stack(void) {
   sp = ocaml_stack + OCAML_STACK_WOSIZE - OCAML_STACK_INITIAL_WOSIZE;
   copy_flash_to_ram(sp, ocaml_initial_stack, OCAML_STACK_INITIAL_WOSIZE * sizeof(value));
 }
 
-static inline void init_global_data(void) {
+PROGMEM static inline void init_global_data(void) {
 #if OCAML_NO_FLASH_GLOBALS == 0
   uint16_t ind = 0;
   for (ind = 0; ind < OCAML_RAM_GLOBDATA_NUMBER; ind ++) {
@@ -210,11 +210,11 @@ static inline void init_global_data(void) {
 #endif
 }
 
-static inline void init_static_heap(void) {
+PROGMEM static inline void init_static_heap(void) {
   copy_flash_to_ram(ocaml_ram_heap, ocaml_initial_static_heap, OCAML_STATIC_HEAP_WOSIZE * sizeof(value));
 }
 
-static inline void interp_init(void) {
+PROGMEM static inline void interp_init(void) {
   init_stack();
   init_global_data();
   init_static_heap();
@@ -227,7 +227,7 @@ static inline void interp_init(void) {
 /******************************************************************************/
 /* Interpretation */
 
-static inline void interp(void) {
+PROGMEM static inline void interp(void) {
   if (setjmp(caml_exception_jmp_buf)) {
     goto ocaml_raise;
   }

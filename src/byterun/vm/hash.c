@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "values.h"
 
-static uint32_t hash(uint32_t *count, uint32_t *limit, uint32_t h, value v) {
+PROGMEM static uint32_t hash(uint32_t *count, uint32_t *limit, uint32_t h, value v) {
   if (*count <= 1 || *limit == 0) return h;
   (*count) --;
   if (Is_block(v)) {

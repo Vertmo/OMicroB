@@ -12,7 +12,7 @@
 
 /******************************************************************************/
 
-static int8_t compare_customs(uint8_t flag, value v1, value v2) {
+PROGMEM static int8_t compare_customs(uint8_t flag, value v1, value v2) {
   if (flag == INT32_CUSTOM_FLAG) {
     return int32_compare(v1, v2);
   } else if (flag == INT64_CUSTOM_FLAG) {
@@ -27,7 +27,7 @@ static int8_t compare_customs(uint8_t flag, value v1, value v2) {
 
 #define UNORDERED 2
 
-static int8_t compare_val(value v1, value v2, bool total) {
+PROGMEM static int8_t compare_val(value v1, value v2, bool total) {
   if (v1 == v2 && total) {
     return 0;
   }

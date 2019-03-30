@@ -32,7 +32,7 @@ void gc_init(void) {
 /* all blocks reachable from it, directy or indirectly.         */
 /* The parameter p is a pointer to the last field of the block. */
 /* The entire header of the block should be the value heap+2.   */
-static void mark_block(value *p) {
+PROGMEM static void mark_block(value *p) {
   value v = *p;
   while (v != UNIQUE_MARK) {                                  /* Did go back to the root block header?   */
     if (Is_unaligned_block(v)) {                              /* Did go back to another block header?    */
@@ -49,7 +49,6 @@ static void mark_block(value *p) {
         *old_p = Val_dynamic_block(p + 1);                    /* Restore the forward pointer             */
         p = old_p - 1;                                        /* Return to the backward block            */
       }
-      
     } else if (Is_block_in_dynamic_heap(v)) {
       header_t h = Ram_hd_val(v);
       tag_t tag = Tag_hd(h);
@@ -88,7 +87,7 @@ static void mark_block(value *p) {
 /***/
 
 /* Mark as alive all blocks reachable (directly or indirectly) from the given root. */
-static void mark_root(value v) {
+PROGMEM static void mark_root(value v) {
   if (Is_block_in_dynamic_heap(v)) {
     header_t h = Ram_hd_val(v);
     if (Color_hd(h) == Color_white) {                   /* Is this block not already scanned?                        */
@@ -104,7 +103,7 @@ static void mark_root(value v) {
 /***/
 
 /* Mark all living blocks reachable from roots. */
-static void mark_roots(void) {
+PROGMEM static void mark_roots(void) {
   value *p, *end;
 
   mark_root(acc);
@@ -144,7 +143,7 @@ static void mark_roots(void) {
 /* Set tag=String and color=White to all dead block headers. */
 /* Merge consecutive dead blocks in a unique White string.   */
 /* Switch color of living blocks to White.                   */
-static void wipe_dead_blocks() {
+PROGMEM static void wipe_dead_blocks() {
   value *p = ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE;
   header_t h = *p;
   while (p < heap_ptr) {                           /* Loop over the whole heap in block order */
@@ -173,7 +172,7 @@ static void wipe_dead_blocks() {
 
 /* If (*p) is a pointer to a block, permute (*p) and (Hd_val_val(*p)) */
 /* Redden the moved header and blacken the written header.            */
-static void reverse_pointer(value *p) {
+PROGMEM static void reverse_pointer(value *p) {
   value v = *p;
   if (Is_block_in_dynamic_heap(v)) {         /* Is v point to heap?    */
     *p = Ram_hd_val(v) | Color_red;          /* Yes -> reverse pointer */
@@ -184,7 +183,7 @@ static void reverse_pointer(value *p) {
 /***/
 
 /* Reverse all roots that are pointers to blocks. */
-static void reverse_root_pointers(void) {
+PROGMEM static void reverse_root_pointers(void) {
   value *p, *end;
 
   reverse_pointer(&acc);
@@ -221,7 +220,7 @@ static void reverse_root_pointers(void) {
 /***/
 
 /* Reverse all fields of living blocks that are pointers to other blocks. */
-static void reverse_heap_pointers(void) {
+PROGMEM static void reverse_heap_pointers(void) {
   value *p = ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE;
   while (p < heap_ptr) {                                 /* Loop over the whole heap in block order                   */
     header_t h = *p;
@@ -245,7 +244,7 @@ static void reverse_heap_pointers(void) {
 /* Update fields of living blocks with new addresses. */
 /* Update by the way roots with new addresses.        */
 /* Restore headers of living blocks.                  */
-static void update_pointers(void) {
+PROGMEM static void update_pointers(void) {
   value *p = ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE;
   value *alloc_pos = p;                                       /* Initialize a "virtual allocation pointer"                                       */
   while (p < heap_ptr) {                                      /* Loop over the whole heap in block order                                         */
@@ -288,7 +287,7 @@ static void update_pointers(void) {
 /***/
 
 /* Compact living blocks to the begining of the heap. */
-static void compact_blocks(void) {
+PROGMEM static void compact_blocks(void) {
   value *p = ocaml_ram_heap + OCAML_STATIC_HEAP_WOSIZE;
   value *alloc_pos = p;                             /* Initialize an "allocation pointer"      */
   while (p < heap_ptr) {                            /* Loop over the whole heap in block order */

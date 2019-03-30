@@ -69,7 +69,7 @@ void gc_init(void) {
 
 #if defined(__PC__) && DEBUG >= 3 // DUMP STACK AND HEAP
 
-static void clean_heap(){
+PROGMEM static void clean_heap(){
   value* from = tab_heap_start[(current_heap+1)%2];
   value* to = tab_heap_end[(current_heap+1)%2];
   for(value* ptr = from ; ptr < to; ptr++){

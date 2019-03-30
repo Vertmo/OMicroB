@@ -35,7 +35,7 @@ void caml_raise_division_by_zero(void) {
 
 /******************************************************************************/
 
-static void caml_raise_exception_with_string(value exn, char const *msg) {
+PROGMEM static void caml_raise_exception_with_string(value exn, char const *msg) {
   mlsize_t msg_len = strlen(msg);
   value block;
   mlsize_t str_wosize = Wsize_bsize(msg_len) + 1;

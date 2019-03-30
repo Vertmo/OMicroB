@@ -13,7 +13,7 @@
 #define Int32_val(v) ((int32_t) Int_val(v))
 #endif
 
-static value value_of_int32(int32_t n) {
+PROGMEM static value value_of_int32(int32_t n) {
 #if OCAML_VIRTUAL_ARCH == 16
   if (-0x4000 <= n && n <= 0x3FFF) {
     return Val_int(n);
