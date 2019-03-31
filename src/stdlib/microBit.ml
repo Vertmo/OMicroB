@@ -55,13 +55,12 @@ external delay: int -> unit = "caml_microbit_delay" [@@noalloc]
 external millis : unit -> int = "caml_microbit_millis" [@@noalloc]
 
 module Screen = struct
-  type level = _level
   let init () = ()
   external print_string: string -> unit = "caml_microbit_print_string" [@@noalloc]
   external print_int: int -> unit = "caml_microbit_print_int" [@@noalloc]
   external clear_screen: unit -> unit = "caml_microbit_clear_screen" [@@noalloc]
   external unsafe_print_image: string -> unit = "caml_microbit_print_image" [@@noalloc]
-  external unsafe_set_pixel: int -> int -> level -> unit = "caml_microbit_write_pixel" [@@noalloc]
+  external unsafe_set_pixel: int -> int -> bool -> unit = "caml_microbit_write_pixel" [@@noalloc]
 
   let print_newline () = ()
 
@@ -70,7 +69,7 @@ module Screen = struct
     let s = String.concat "\n" (List.rev (List.rev_map (fun r ->
         if (List.length r) <> 5 then invalid_arg "print_image";
         String.concat "," (List.rev (List.rev_map
-                                       (fun l -> match l with LOW -> "0" | HIGH -> "255") r)
+                                       (fun l -> match l with false -> "0" | true -> "255") r)
                           )) i)) in
     unsafe_print_image (s^"\n")
 

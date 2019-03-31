@@ -13,7 +13,7 @@ let arrow_of_heading h =
 let _ =
   while true do
     clear_screen ();
-    set_pixel 2 2 HIGH;
-    List.iter (fun (x, y) -> set_pixel x y HIGH)(arrow_of_heading (Compass.heading ()));
+    set_pixel 2 2 true;
+    List.iter (fun (x, y) -> set_pixel x y true)(arrow_of_heading (Compass.heading ()));
     delay 10;
   done

@@ -26,7 +26,7 @@ external delay: int -> unit = "caml_microbit_delay" [@@noalloc]
 
 external millis: unit -> int = "caml_microbit_millis" [@@noalloc]
 
-module Screen: Circuits.Display with type level = level
+module Screen: Circuits.Display
 
 module Serial: sig
   val init: unit -> unit

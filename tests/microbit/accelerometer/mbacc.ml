@@ -14,6 +14,6 @@ let _ =
     and y = pixel_of_g (Accelerometer.y ()) in
 
     clear_screen ();
-    set_pixel x y HIGH;
+    set_pixel x y true;
     delay 10;
   done
