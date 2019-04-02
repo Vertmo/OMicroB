@@ -25,4 +25,8 @@ void avr_serial_init();
 char avr_serial_read();
 void avr_serial_write(char c);
 
+void avr_spi_init_master();
+void avr_spi_init_slave();
+char avr_spi_transmit(char c);
+
 #endif

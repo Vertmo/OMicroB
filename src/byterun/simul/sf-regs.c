@@ -570,3 +570,13 @@ char avr_serial_read(){
 void avr_serial_write(char c){
   printf("serial write(%c)\n",c);
 }
+
+/******************************************************************************/
+
+void avr_spi_init_master() {}
+void avr_spi_init_slave() {}
+
+char avr_spi_transmit(char c) {
+  printf("Emited %d\n", c);
+  return c;
+}
