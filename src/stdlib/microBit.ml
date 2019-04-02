@@ -149,3 +149,19 @@ module I2C(A: sig val address: int end) = struct
   external unsafe_read: int -> bytes = "caml_microbit_i2c_read"
   let read () = unsafe_read A.address
 end
+
+module MakeSPIMaster(SC: sig val slavePin: pin end) = struct
+  external init_master: unit -> unit = "caml_microbit_spi_init_master"
+
+  let init () =
+    digital_write SC.slavePin HIGH;
+    init_master ()
+
+  external transmit_master: char -> char = "caml_microbit_spi_transmit" [@@noalloc]
+
+  let transmit c =
+    digital_write SC.slavePin LOW;
+    let r = transmit_master c in
+    digital_write SC.slavePin HIGH;
+    r
+end

@@ -533,6 +533,7 @@ let ccall arch ooid prim args =
       | "caml_microbit_digital_write" | "caml_microbit_digital_read"
       | "caml_microbit_analog_write" | "caml_microbit_analog_read"
       | "caml_microbit_serial_send_char" | "caml_microbit_serial_read_char"
+      | "caml_microbit_spi_init_master" | "caml_microbit_spi_transmit"
       | "caml_microbit_delay" | "caml_microbit_millis"
       | "caml_microbit_accelerometer_x" | "caml_microbit_accelerometer_y" | "caml_microbit_accelerometer_z"
       | "caml_microbit_accelerometer_pitch" | "caml_microbit_accelerometer_roll"

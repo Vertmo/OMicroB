@@ -55,4 +55,7 @@ const char *microbit_radio_recv();
 void microbit_i2c_init();
 void microbit_i2c_write(int a, const char *buf, int l);
 int microbit_i2c_read(int a, char *buf);
+void microbit_spi_init();
+char microbit_spi_transmit(char c);
+
 #endif

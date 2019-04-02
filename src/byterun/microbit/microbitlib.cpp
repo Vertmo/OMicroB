@@ -137,3 +137,16 @@ int microbit_i2c_read(int a, char *buf) {
   if(res == MICROBIT_I2C_ERROR) return 0;
   return strlen(buf);
 }
+
+/******************************************************************************/
+
+SPI *spi;
+
+void microbit_spi_init() {
+  spi = new SPI(MOSI, MISO, SCK);
+  spi->format(8,0);
+}
+
+char microbit_spi_transmit(char c) {
+  return spi->write(c);
+}

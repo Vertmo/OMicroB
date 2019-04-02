@@ -679,3 +679,11 @@ void microbit_i2c_write(int a, const char *buf, int l) {}
 int microbit_i2c_read(int a, char *buf) {
   return 0;
 }
+
+/*****************************************************************************/
+
+void microbit_spi_init() {}
+char microbit_spi_transmit(char c) {
+  printf("Emited %d\n", c);
+  return c;
+}
