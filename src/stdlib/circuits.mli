@@ -189,3 +189,11 @@ module type I2C = sig
   val read: unit -> bytes
   val write: bytes -> unit
 end
+
+(*******************************************************************************)
+
+(** SPI communication *)
+module type SPI = sig
+  val init: unit -> unit
+  val transmit: char -> char
+end

@@ -24,6 +24,9 @@ void avr_serial_init();
 char avr_serial_read();
 void avr_serial_write(char c);
 
+void avr_spi_init_master();
+void avr_spi_init_slave();
+char avr_spi_transmit(char c);
 
 void microbit_print_string(char *str);
 void microbit_print_int(int i);
@@ -52,5 +55,4 @@ const char *microbit_radio_recv();
 void microbit_i2c_init();
 void microbit_i2c_write(int a, const char *buf, int l);
 int microbit_i2c_read(int a, char *buf);
-
 #endif
