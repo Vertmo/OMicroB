@@ -231,6 +231,22 @@ value caml_microbit_compass_heading() {
 #endif
 
 /******************************************************************************/
+
+value caml_microbit_radio_init() {
+  microbit_radio_init();
+  return Val_unit;
+}
+
+value caml_microbit_radio_send(value c) {
+  microbit_radio_send(Int_val(c));
+  return Val_unit;
+}
+
+value caml_microbit_radio_recv() {
+  return Val_int(microbit_radio_recv());
+}
+
+/******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 

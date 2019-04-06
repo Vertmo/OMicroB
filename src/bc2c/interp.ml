@@ -535,7 +535,8 @@ let ccall arch ooid prim args =
       | "caml_microbit_delay" | "caml_microbit_millis"
       | "caml_microbit_accelerometer_x" | "caml_microbit_accelerometer_y" | "caml_microbit_accelerometer_z"
       | "caml_microbit_accelerometer_pitch" | "caml_microbit_accelerometer_roll"
-      | "caml_microbit_compass_calibrate" | "caml_microbit_compass_heading" -> ()
+      | "caml_microbit_compass_calibrate" | "caml_microbit_compass_heading"
+      | "caml_microbit_radio_init" | "caml_microbit_radio_send" | "caml_microbit_radio_recv" -> ()
       | _ ->
         let print_arg arg =
           let buf = Buffer.create 16 in

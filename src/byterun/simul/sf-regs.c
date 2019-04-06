@@ -646,3 +646,15 @@ int microbit_accelerometer_roll() { return 0; }
 
 void microbit_compass_calibrate() {}
 int microbit_compass_heading() { return 0; }
+
+/*****************************************************************************/
+
+void microbit_radio_init() {}
+
+void microbit_radio_send(char c) {
+  printf("Sending %d by radio\n", c);
+}
+
+char microbit_radio_recv() {
+  return 0;
+}

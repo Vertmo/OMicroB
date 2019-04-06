@@ -97,3 +97,23 @@ void microbit_compass_calibrate() {
 int microbit_compass_heading() {
   return uBit.compass.heading();
 }
+
+/******************************************************************************/
+
+char *radBuffer;
+
+void microbit_radio_init() {
+  uBit.radio.enable();
+  radBuffer = (char *) malloc(32*sizeof(char));
+}
+
+void microbit_radio_send(char c) {
+  PacketBuffer b(1); b[0] = c;
+  uBit.radio.datagram.send(b);
+}
+
+char microbit_radio_recv() {
+  PacketBuffer b = uBit.radio.datagram.recv();
+  if(b.length() < 1) return 0;
+  return b[0];
+}

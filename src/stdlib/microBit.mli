@@ -59,4 +59,11 @@ module Compass: sig
   (** Heading of the device relative to magnetic north (in degrees) *)
 end
 
+(** Radio communication *)
+module Radio: sig
+  val init: unit -> unit
+  val send: char -> unit
+  val recv: unit -> char
+end
+
 module MCUConnection: Circuits.MCUConnection with type pin = pin with type level = level

@@ -107,6 +107,12 @@ module Compass = struct
   external heading: unit -> int = "caml_microbit_compass_heading" [@@noalloc]
 end
 
+module Radio = struct
+  external init: unit -> unit = "caml_microbit_radio_init"
+  external send: char -> unit = "caml_microbit_radio_send" [@@noalloc]
+  external recv: unit -> char = "caml_microbit_radio_recv" [@@noalloc]
+end
+
 module MCUConnection = struct
   type pin = _pin
   type mode = Mode
@@ -123,4 +129,3 @@ module MCUConnection = struct
   let delay = delay
   let millis = millis
 end
-
