@@ -54,8 +54,8 @@ int microbit_accelerometer_roll();
 void microbit_compass_calibrate();
 int microbit_compass_heading();
 void microbit_radio_init();
-void microbit_radio_send(char c);
-char microbit_radio_recv();
+void microbit_radio_send(char *s);
+const char *microbit_radio_recv();
 
 /******************************************************************************/
 /******************************************************************************/

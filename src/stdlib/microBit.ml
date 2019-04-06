@@ -109,8 +109,13 @@ end
 
 module Radio = struct
   external init: unit -> unit = "caml_microbit_radio_init"
-  external send: char -> unit = "caml_microbit_radio_send" [@@noalloc]
-  external recv: unit -> char = "caml_microbit_radio_recv" [@@noalloc]
+
+  external unsafe_send: string -> unit = "caml_microbit_radio_send"
+  let send s =
+    if(String.length s > 32) then invalid_arg "Radio.send";
+    unsafe_send s
+
+  external recv: unit -> string = "caml_microbit_radio_recv"
 end
 
 module MCUConnection = struct

@@ -651,10 +651,10 @@ int microbit_compass_heading() { return 0; }
 
 void microbit_radio_init() {}
 
-void microbit_radio_send(char c) {
-  printf("Sending %d by radio\n", c);
+void microbit_radio_send(char *s) {
+  printf("Sending %s by radio\n", s);
 }
 
-char microbit_radio_recv() {
-  return 0;
+const char *microbit_radio_recv() {
+  return "a";
 }

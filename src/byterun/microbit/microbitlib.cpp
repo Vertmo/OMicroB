@@ -107,13 +107,13 @@ void microbit_radio_init() {
   radBuffer = (char *) malloc(32*sizeof(char));
 }
 
-void microbit_radio_send(char c) {
-  PacketBuffer b(1); b[0] = c;
-  uBit.radio.datagram.send(b);
+void microbit_radio_send(char *s) {
+  uBit.radio.datagram.send(s);
 }
 
-char microbit_radio_recv() {
+const char *microbit_radio_recv() {
   PacketBuffer b = uBit.radio.datagram.recv();
-  if(b.length() < 1) return 0;
-  return b[0];
+  if(b.length() < 1) return "";
+  ManagedString mn = ManagedString(b);
+  return mn.toCharArray();
 }

@@ -1,7 +1,9 @@
 #ifdef __OCAML__
 #include <caml/mlvalues.h>
+#include <caml/alloc.h>
 #else
 #include "../vm/values.h"
+#include "../vm/str.h"
 #endif
 
 #include "prims.h"
@@ -237,13 +239,26 @@ value caml_microbit_radio_init() {
   return Val_unit;
 }
 
-value caml_microbit_radio_send(value c) {
-  microbit_radio_send(Int_val(c));
+value caml_microbit_radio_send(value s) {
+#ifdef __OCAML__
+  microbit_radio_send(String_val(s));
+#else
+  int n = string_length(s); int i;
+  char buf[n+1];
+  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
+  buf[n] = '\0';
+  microbit_radio_send(buf);
+#endif
   return Val_unit;
 }
 
 value caml_microbit_radio_recv() {
-  return Val_int(microbit_radio_recv());
+#ifdef __OCAML__
+  return caml_alloc_string(0);
+#else
+  const char *buf = microbit_radio_recv();
+  return copy_bytes(buf);
+#endif
 }
 
 /******************************************************************************/
