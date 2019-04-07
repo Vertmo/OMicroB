@@ -21,6 +21,7 @@
 #include "stack.c"
 #include "gc.c"
 #include "hash.c"
+#include "ints.c"
 #include "int32.c"
 #include "int64.c"
 
