@@ -12,8 +12,7 @@ let create_block ((index, _, _, _, pHash):block) (msg:string):block =
 
 (** Create the genesis block *)
 let create_genesis_block ():block =
-  let t = millis () in
-  ((char_of_int 0), (char_of_int 0), t, "genesis", my_simple_hash 0 0 t "genesis")
+  ((char_of_int 0), (char_of_int 0), 0, "genesis", my_simple_hash 0 0 0 "genesis")
 
 (** Verify the last block *)
 let is_new_block_valid ((nI, npH, nT, nD, nH):block) ((pI, _, _, _, pH):block):bool =
