@@ -257,13 +257,12 @@ value caml_microbit_radio_init() {
 
 value caml_microbit_radio_send(value s) {
 #ifdef __OCAML__
-  microbit_radio_send(String_val(s));
+  microbit_radio_send(String_val(s), string_length(s));
 #else
-  int n = string_length(s);
-  char buf[n+1];
-  memcpy(buf, Ram_string_val(s), n);
-  buf[n] = '\0';
-  microbit_radio_send(buf);
+  int n = string_length(s); int i;
+  uint8_t buf[n];
+  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
+  microbit_radio_send(buf, n);
 #endif
   return Val_unit;
 }
@@ -272,8 +271,12 @@ value caml_microbit_radio_recv() {
 #ifdef __OCAML__
   return caml_alloc_string(0);
 #else
-  const char *buf = microbit_radio_recv();
-  return copy_bytes(buf);
+  uint8_t buf[32];
+  int l = microbit_radio_recv(buf);
+  value s = create_bytes(l);
+  int i;
+  for(i = 0; i < l; i++) caml_bytes_set(s, Val_int(i), Val_int(buf[i]));
+  return s;
 #endif
 }
 

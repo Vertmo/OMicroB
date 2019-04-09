@@ -51,5 +51,5 @@ let int_of_char_list l =
 let string_of_block ((i, ph, t, d, h):block):string =
   (string_of_int (int_of_char i))^"/"^
   (string_of_int (int_of_char ph))^"/"^
-  (string_of_int t)^"/"^
-  (string_of_int (int_of_char h))^"/"^d
+  (string_of_int t)^"/"^d^"/"^
+  (string_of_int (int_of_char h))

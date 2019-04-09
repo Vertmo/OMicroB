@@ -662,12 +662,17 @@ int microbit_compass_heading() { return 0; }
 
 void microbit_radio_init() {}
 
-void microbit_radio_send(char *s) {
+void microbit_radio_send(uint8_t *s, int l) {
   printf("Sending %s by radio\n", s);
 }
 
-const char *microbit_radio_recv() {
-  return "a";
+int microbit_radio_recv(uint8_t *buf) {
+  buf[0] = 'n'; buf[1] = 1; buf[2] = 135; // index and pHash
+  buf[3] = 0; buf[4] = 0; buf[5] = 0; buf[6] = 212; // timestamp
+  buf[7] = 152; // hash
+  buf[8] = 'c'; buf[9] = 'o'; buf[10] = 'u';
+  buf[11] = 'c'; buf[12] = 'o'; buf[13] = 'u'; // data
+  return 14;
 }
 
 /*****************************************************************************/
