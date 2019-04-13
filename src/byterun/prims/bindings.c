@@ -262,6 +262,38 @@ value caml_microbit_radio_recv() {
 }
 
 /******************************************************************************/
+
+value caml_microbit_i2c_init() {
+  microbit_i2c_init();
+  return Val_unit;
+}
+
+value caml_microbit_i2c_write(value a, value s) {
+#ifdef __OCAML__
+  microbit_i2c_write(a, String_val(s), string_length(s));
+#else
+  int n = string_length(s);
+  char buf[n]; int i;
+  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
+  microbit_i2c_write(a, buf, n);
+#endif
+  return Val_unit;
+}
+
+value caml_microbit_i2c_read(value a) {
+#ifdef __OCAML__
+  return caml_alloc_string(0);
+#else
+  char buf[32];
+  int l = microbit_i2c_read(a, buf);
+  value s = create_bytes(l);
+  int i;
+  for(i = 0; i < l; i++) caml_bytes_set(s, Val_int(i), Val_int(buf[i]));
+  return s;
+#endif
+}
+
+/******************************************************************************/
 /******************************************************************************/
 /******************************************************************************/
 

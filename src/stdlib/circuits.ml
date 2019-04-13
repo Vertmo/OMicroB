@@ -188,3 +188,12 @@ module type Display = sig
   val set_pixel: int -> int -> bool -> unit
   val clear_screen: unit -> unit
 end
+
+(*******************************************************************************)
+
+(** I2C communication *)
+module type I2C = sig
+  val init: unit -> unit
+  val read: unit -> bytes
+  val write: bytes -> unit
+end

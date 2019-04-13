@@ -56,6 +56,9 @@ int microbit_compass_heading();
 void microbit_radio_init();
 void microbit_radio_send(char *s);
 const char *microbit_radio_recv();
+void microbit_i2c_init();
+void microbit_i2c_write(int a, const char *buf, int n);
+int microbit_i2c_read(int a, char *buf);
 
 /******************************************************************************/
 /******************************************************************************/

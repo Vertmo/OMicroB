@@ -134,3 +134,13 @@ module MCUConnection = struct
   let delay = delay
   let millis = millis
 end
+
+module I2C(A: sig val address: int end) = struct
+  external init: unit -> unit = "caml_microbit_i2c_init"
+
+  external unsafe_write: int -> bytes -> unit = "caml_microbit_i2c_write"
+  let write by = unsafe_write A.address by
+
+  external unsafe_read: int -> bytes = "caml_microbit_i2c_write"
+  let read () = unsafe_read A.address
+end

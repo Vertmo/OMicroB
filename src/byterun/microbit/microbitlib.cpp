@@ -117,3 +117,22 @@ const char *microbit_radio_recv() {
   ManagedString mn = ManagedString(b);
   return mn.toCharArray();
 }
+
+/******************************************************************************/
+
+MicroBitI2C *i2c = nullptr;
+
+void microbit_i2c_init() {
+  if(i2c == nullptr) i2c = new MicroBitI2C(I2C_SDA0, I2C_SCL0);
+}
+
+void microbit_i2c_write(int a, const char *buf, int l) {
+  if(i2c == nullptr) microbit_i2c_init();
+  i2c->write(a, buf, l);
+}
+
+int microbit_i2c_read(int a, char *buf) {
+  int res = i2c->read(a, buf, 32);
+  if(res == MICROBIT_I2C_ERROR) return 0;
+  return strlen(buf);
+}

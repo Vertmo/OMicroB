@@ -658,3 +658,13 @@ void microbit_radio_send(char *s) {
 const char *microbit_radio_recv() {
   return "a";
 }
+
+/*****************************************************************************/
+
+void microbit_i2c_init() {}
+
+void microbit_i2c_write(int a, const char *buf, int l) {}
+
+int microbit_i2c_read(int a, char *buf) {
+  return 0;
+}

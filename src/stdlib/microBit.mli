@@ -67,3 +67,6 @@ module Radio: sig
 end
 
 module MCUConnection: Circuits.MCUConnection with type pin = pin with type level = level
+
+(** I2C communication for the micro:bit *)
+module I2C(A: sig val address: int end): Circuits.I2C
