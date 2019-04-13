@@ -5,7 +5,7 @@ MODULES :=                                                       \
   list listLabels map array arrayLabels uchar sys buffer random  \
   complex gc int32 int64 obj hashtbl set moreLabels queue sort   \
   stack stdLabels camlinternalOO circuits avr microBit					 \
-	liquidCrystal
+	liquidCrystal ssd1306
 
 MLS  := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
