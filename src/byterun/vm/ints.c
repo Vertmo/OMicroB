@@ -2,7 +2,11 @@
 #include "values.h"
 
 static int parse_int(char *s, int l) {
+#ifndef __AVR__
   return atoi(s); // TODO this should be more faithful to ocaml's ints (in particular regarding bases)
+#else
+  return 0; // TODO
+#endif
 }
 
 value caml_int_of_string(value s) {
