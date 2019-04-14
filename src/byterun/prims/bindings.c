@@ -243,9 +243,9 @@ value caml_microbit_radio_send(value s) {
 #ifdef __OCAML__
   microbit_radio_send(String_val(s));
 #else
-  int n = string_length(s); int i;
+  int n = string_length(s);
   char buf[n+1];
-  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
+  memcpy(buf, Ram_string_val(s), n);
   buf[n] = '\0';
   microbit_radio_send(buf);
 #endif
@@ -273,8 +273,8 @@ value caml_microbit_i2c_write(value a, value s) {
   microbit_i2c_write(a, String_val(s), string_length(s));
 #else
   int n = string_length(s);
-  char buf[n]; int i;
-  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
+  char buf[n];
+  memcpy(buf, Ram_string_val(s), n);
   microbit_i2c_write(a, buf, n);
 #endif
   return Val_unit;
@@ -287,8 +287,7 @@ value caml_microbit_i2c_read(value a) {
   char buf[32];
   int l = microbit_i2c_read(a, buf);
   value s = create_bytes(l);
-  int i;
-  for(i = 0; i < l; i++) caml_bytes_set(s, Val_int(i), Val_int(buf[i]));
+  memcpy(Ram_string_val(s), buf, l);
   return s;
 #endif
 }

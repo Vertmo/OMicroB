@@ -17,6 +17,6 @@ let _ =
   Radio.init ();
   let side = loop_choose_side () in
   while true do
-    Radio.send ((string_of_side side)^(string_of_int (paddle_y_of_acc (Accelerometer.roll ()))));
+    Radio.send ((string_of_side side)^(String.make 1 (char_of_int (paddle_y_of_acc (Accelerometer.roll ())))));
     delay 5
   done

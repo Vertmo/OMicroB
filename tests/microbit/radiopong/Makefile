@@ -3,7 +3,7 @@ include ../../../etc/Makefile.conf
 all: referee.combined_hex player.combined_hex
 
 referee.combined_hex: referee.ml
-	$(BIN)/omicrob -v -device=microbit $^ -o $@ -heap-size=420
+	$(BIN)/omicrob -v -device=microbit -circuitppx $^ -o $@ -heap-size=420
 
 player.combined_hex: player.ml
 	$(BIN)/omicrob -v -device=microbit $^ -o $@ -heap-size=400
