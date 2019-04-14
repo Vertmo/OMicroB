@@ -16,7 +16,7 @@ module MakeSSD1306(I2C: Circuits.I2C) = struct
 
   let set_pos col page =
     command [|0xB0 lor page|];
-    let c1 = col land 0x0F and c2 = col lsr 3 in
+    let c1 = col land 0x0F and c2 = col lsr 4 in
     command [|0x00 lor c1|]; command [|0x10 lor c2|]
 
   let draw_screen () =
