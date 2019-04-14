@@ -61,18 +61,18 @@ let _ =
   draw_all !bCoord !leftY !rightY;
   while true do
     (* Receive new position of paddles *)
+    draw_paddle Left !leftY false;
+    draw_paddle Right !rightY false;
     let s = Radio.recv () in
     if(String.length s = 2) then (
-      draw_paddle Left !leftY false;
-      draw_paddle Right !rightY false;
       if (String.get s 0) = 'l' then (
         leftY := min 58 (max 5 (int_of_char (String.get s 1)));
       ) else if (String.get s 0) = 'r' then (
         rightY := 58 - (min 58 (max 5 (int_of_char (String.get s 1))));
       );
-      draw_paddle Left !leftY true;
-      draw_paddle Right !rightY true;
     );
+    draw_paddle Left !leftY true;
+    draw_paddle Right !rightY true;
 
     (* Update ball position *)
     draw_ball !bCoord false;

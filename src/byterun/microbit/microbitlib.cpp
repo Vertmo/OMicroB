@@ -124,6 +124,7 @@ MicroBitI2C *i2c = nullptr;
 
 void microbit_i2c_init() {
   if(i2c == nullptr) i2c = new MicroBitI2C(I2C_SDA0, I2C_SCL0);
+  i2c->frequency(400000);
 }
 
 void microbit_i2c_write(int a, const char *buf, int l) {

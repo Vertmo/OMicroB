@@ -54,6 +54,8 @@ module MakeSSD1306(I2C: Circuits.I2C) = struct
     Bytes.set screen 0 (char_of_int 0x40);
     clear_screen ()
 
+  let bytes_to_write = Bytes.make 2 (char_of_int 0x40)
+
   let set_pixel x y color =
     let page = y / 8 and shift_p = y mod 8 in
     let ind = (x + page * 128) + 1 in
@@ -62,9 +64,8 @@ module MakeSSD1306(I2C: Circuits.I2C) = struct
       else (int_of_char (Bytes.get screen ind)) land (lnot (1 lsl shift_p)) in
     Bytes.set screen ind (char_of_int b);
     set_pos x page;
-    let by = Bytes.make 2 (char_of_int 0x40) in
-    Bytes.set by 1 (char_of_int b);
-    I2C.write by
+    Bytes.set bytes_to_write 1 (char_of_int b);
+    I2C.write bytes_to_write
 
   let print_image _ = failwith "Not yet implemented"
 
