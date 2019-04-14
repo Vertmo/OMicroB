@@ -1,17 +1,15 @@
 open Chain
 
 (** Command sent or received *)
-type command = NewBlock | SendChain | SendPred
+type command = NewBlock | SendChain
 
 let char_of_command = function
   | NewBlock -> 'n'
   | SendChain -> 'c'
-  | SendPred -> 'p'
 
 let command_of_char = function
   | 'n' -> NewBlock
   | 'c' -> SendChain
-  | 'p' -> SendPred
   | _ -> invalid_arg "command_of_char"
 
 (** Translate a block to a buffer *)

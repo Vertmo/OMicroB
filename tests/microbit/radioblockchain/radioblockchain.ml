@@ -17,12 +17,11 @@ let rec loop chain =
              loop ((i, ph, t, d, h)::chain))
          else Screen.print_string "x"; loop chain)
        | SendChain -> (
-           Screen.print_string "c...";
+           Screen.print_string "c.";
            List.iter send_new_block (List.tl (List.rev chain));
-           Screen.print_string "...c";
+           Screen.print_string ".c";
            loop chain
-         )
-      | SendPred -> ()) (* TODO *)
+         ))
   | None -> (
       (* Create an eventual new block and loop again *)
       if ButtonA.is_on () && ButtonB.is_on () then (
