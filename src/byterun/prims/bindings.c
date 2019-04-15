@@ -273,9 +273,7 @@ value caml_microbit_i2c_write(value a, value s) {
   microbit_i2c_write(a, String_val(s), string_length(s));
 #else
   int n = string_length(s);
-  char buf[n];
-  memcpy(buf, Ram_string_val(s), n);
-  microbit_i2c_write(a, buf, n);
+  microbit_i2c_write(a, (const char *)Ram_string_val(s), n);
 #endif
   return Val_unit;
 }

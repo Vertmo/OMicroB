@@ -9,14 +9,14 @@ let rec loop_choose_side () =
   else if ButtonB.is_on () then Right
   else (delay 10; loop_choose_side ())
 
-let paddle_y_of_acc y =
-  if(y < 0) then 25-(int_of_float (float_of_int (y+180) /. 180. *. 64.))
-  else (int_of_float (float_of_int (180-y) /. 180. *. 64.)+32)
-
 let _ =
   Radio.init ();
   let side = loop_choose_side () in
+  let y = ref 32 in
   while true do
-    Radio.send ((string_of_side side)^(String.make 1 (char_of_int (paddle_y_of_acc (Accelerometer.roll ())))));
-    delay 5
+    if ButtonA.is_on () then (y := max (!y - 1) 5;
+                              Radio.send ((string_of_side side)^(String.make 1 (char_of_int (!y)))));
+    if ButtonB.is_on () then (y := min (!y + 1) 58;
+                              Radio.send ((string_of_side side)^(String.make 1 (char_of_int (!y)))));
+    delay 10
   done
