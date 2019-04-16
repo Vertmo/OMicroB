@@ -4,6 +4,8 @@ module Scr = Ssd1306.MakeSSD1306(I2C)
 type coord = (int * int)
 type side = Left | Right
 
+let scoreL = ref 0 and scoreR = ref 0
+
 let%component LeftLed = Circuits.MakeLed(connectedPin = PIN0)
 let%component RightLed = Circuits.MakeLed(connectedPin = PIN1)
 
@@ -36,6 +38,7 @@ let update_ball_coord (x, y) (sx, sy) ly ry =
     if ny <= ly + 6 && ny >= ly - 6 then ((nx, ny), (-sx, sy))
     else (
       LeftLed.on ();
+      scoreR := !scoreR + 1; Radio.send ("sr"^(string_of_int !scoreR));
       delay 500;
       LeftLed.off ();
       ((64, 32), (3, -3))
@@ -45,6 +48,7 @@ let update_ball_coord (x, y) (sx, sy) ly ry =
     if ny <= ry + 6 && ny >= ry - 6 then ((nx, ny), (-sx, sy))
     else (
       RightLed.on ();
+      scoreL := !scoreL + 1; Radio.send ("sl"^(string_of_int !scoreL));
       delay 500;
       RightLed.off ();
       ((64, 32), (-3, 3))
