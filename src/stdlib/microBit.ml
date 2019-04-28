@@ -141,6 +141,6 @@ module I2C(A: sig val address: int end) = struct
   external unsafe_write: int -> bytes -> unit = "caml_microbit_i2c_write"
   let write by = unsafe_write A.address by
 
-  external unsafe_read: int -> bytes = "caml_microbit_i2c_write"
+  external unsafe_read: int -> bytes = "caml_microbit_i2c_read"
   let read () = unsafe_read A.address
 end
