@@ -1,0 +1,6 @@
+*.c
+*.d
+*.arm_o
+*.esp_o
+*.esp_elf
+*.bin
