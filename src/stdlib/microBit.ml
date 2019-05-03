@@ -14,6 +14,9 @@ type pin = PIN0 | PIN1 | PIN2 | PIN3 | PIN4 | PIN5 | PIN6 | PIN7 | PIN8 | PIN9 |
          | PIN11 | PIN12 | PIN13 | PIN14 | PIN15 | PIN16 | PIN17 | PIN18 | PIN19 | PIN20
 type _pin = pin
 
+type mode = INPUT | OUTPUT
+type _mode = mode
+
 external button_is_pressed: button -> bool = "caml_microbit_button_is_pressed" [@@noalloc]
 
 module ButtonA = struct
@@ -25,6 +28,8 @@ module ButtonB = struct
   let init () = ()
   let is_on () = button_is_pressed B
 end
+
+let pin_mode _ _ = ()
 
 external digital_write: pin -> level -> unit = "caml_microbit_digital_write" [@@noalloc]
 
@@ -120,17 +125,17 @@ end
 
 module MCUConnection = struct
   type pin = _pin
-  type mode = Mode
+  type mode = _mode
   type level = _level
   let low = LOW
   let high = HIGH
-  let input_mode = Mode
-  let output_mode = Mode
+  let input_mode = INPUT
+  let output_mode = OUTPUT
   let digital_read = digital_read
   let digital_write = digital_write
   let analog_read = analog_read
   let analog_write = analog_write
-  let pin_mode _ _ = ()
+  let pin_mode = pin_mode
   let delay = delay
   let millis = millis
 end
