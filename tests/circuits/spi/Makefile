@@ -1,4 +1,4 @@
-include ../../etc/Makefile.conf
+include ../../../etc/Makefile.conf
 
 all: master.hex slave.hex
 
