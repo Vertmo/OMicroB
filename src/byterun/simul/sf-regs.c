@@ -319,7 +319,7 @@ void avr_clear_bit(uint8_t reg, uint8_t bit){
 
 int avr_millis(){
   printf("millis()\n");
-  return 0;
+  return clock()/(CLOCKS_PER_SEC/1000);
 }
 
 int avr_random(int max){
@@ -606,7 +606,7 @@ void esp8266_delay(int ms) {
 
 int esp8266_millis() {
   printf("millis()\n");
-  return 0;
+  return clock()/(CLOCKS_PER_SEC/1000);
 }
 
 /******************************************************************************/
