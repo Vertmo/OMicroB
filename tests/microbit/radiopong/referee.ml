@@ -6,8 +6,9 @@ type side = Left | Right
 
 let scoreL = ref 0 and scoreR = ref 0
 
-let%component LeftLed = Circuits.MakeLed(connectedPin = PIN0)
-let%component RightLed = Circuits.MakeLed(connectedPin = PIN1)
+let%component LeftLed = Circuits.MakeLed(connectedPin = PIN1)
+let%component RightLed = Circuits.MakeLed(connectedPin = PIN2)
+let%component SPIMaster = MakeSPIMaster(slavePin = PIN0)
 
 (** Draw or undraw one of the paddles *)
 let draw_paddle side y show =
@@ -59,7 +60,7 @@ let update_ball_coord (x, y) (sx, sy) ly ry =
 
 
 let _ =
-  Scr.init (); Radio.init ();
+  Scr.init (); Radio.init (); SPIMaster.init ();
   let bCoord = ref (64, 32) and bSpeed = ref (3, -3) in
   let leftY = ref 32 and rightY = ref 32 in
   draw_all !bCoord !leftY !rightY;
@@ -67,13 +68,11 @@ let _ =
     (* Receive new position of paddles *)
     draw_paddle Left !leftY false;
     draw_paddle Right !rightY false;
+    let s = int_of_char (SPIMaster.transmit (char_of_int !scoreL)) in
+    if(s <> 0) then leftY := 58 - (min 58 (max 5 s));
     let s = Radio.recv () in
-    if(String.length s = 2) then (
-      if (String.get s 0) = 'l' then (
-        leftY := min 58 (max 5 (int_of_char (String.get s 1)));
-      ) else if (String.get s 0) = 'r' then (
-        rightY := 58 - (min 58 (max 5 (int_of_char (String.get s 1))));
-      );
+    if(String.length s = 1) then (
+        rightY := min 58 (max 5 (int_of_char (String.get s 0)));
     );
     draw_paddle Left !leftY true;
     draw_paddle Right !rightY true;
