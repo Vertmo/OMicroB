@@ -20,10 +20,14 @@ uint16_t avr_analog_read(uint8_t channel);
 int avr_random(int max);
 int avr_millis();
 
-
 void avr_serial_init();
 char avr_serial_read();
 void avr_serial_write(char c);
+
+void avr_spi_init_master();
+void avr_spi_init_slave();
+char avr_spi_transmit(char c);
+
 
 void esp8266_pin_mode(uint8_t p, uint8_t m);
 void esp8266_digital_write(uint8_t p, uint8_t l);

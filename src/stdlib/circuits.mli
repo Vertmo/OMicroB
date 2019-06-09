@@ -172,12 +172,28 @@ module Connect(S: Sensor)(A: Actuator): Circuit
 
 (** Display that can be printed on *)
 module type Display = sig
-  type level
   val init: unit -> unit
   val print_int: int -> unit
   val print_string: string -> unit
   val print_newline: unit -> unit
-  val print_image: level list list -> unit
-  val set_pixel: int -> int -> level -> unit
+  val print_image: bool list list -> unit
+  val set_pixel: int -> int -> bool -> unit
   val clear_screen: unit -> unit
+end
+
+(*******************************************************************************)
+
+(** I2C communication *)
+module type I2C = sig
+  val init: unit -> unit
+  val read: unit -> bytes
+  val write: bytes -> unit
+end
+
+(*******************************************************************************)
+
+(** SPI communication *)
+module type SPI = sig
+  val init: unit -> unit
+  val transmit: char -> char
 end

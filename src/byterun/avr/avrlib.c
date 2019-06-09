@@ -442,4 +442,32 @@ char avr_serial_read(){
   return (char)getchar();
 }
 
+// http://maxembedded.com/2013/11/the-spi-of-the-avr/
+
+void avr_spi_init_master() {
+#ifdef DEVICE_ARDUINO_UNO
+  DDRB |= (1<<3)|(1<<5); // MOSI, SCK as output
+#endif
+#ifdef DEVICE_ARDUINO_MEGA
+  DDRB |= (1<<2)|(1<<1); // MOSI, SCK as output
+#endif
+  SPCR = (1<<SPE)|(1<<MSTR);
+}
+
+void avr_spi_init_slave() {
+#ifdef DEVICE_ARDUINO_UNO
+  DDRB |= (1<<4); // MISO as output
+#endif
+#ifdef DEVICE_ARDUINO_MEGA
+  DDRB |= (1<<3); // MISO as output
+#endif
+  SPCR = (1<<SPE);
+}
+
+char avr_spi_transmit(char c) {
+  SPDR = c;
+  while(!(SPSR & (1<<SPIF)));
+  return SPDR;
+}
+
 #endif

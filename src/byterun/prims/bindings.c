@@ -34,6 +34,10 @@ value caml_avr_delay(value ms) {
   return Val_unit;
 }
 
+value caml_avr_millis() {
+  return Val_int(avr_millis());
+}
+
 /******************************************************************************/
 
 value caml_avr_write_register(value reg, value val) {
@@ -72,8 +76,20 @@ value caml_avr_serial_read(value unit){
   return Val_int(avr_serial_read());
 }
 
-value caml_avr_millis() {
-  return Val_int(avr_millis());
+/******************************************************************************/
+
+value caml_avr_spi_init_master() {
+  avr_spi_init_master();
+  return Val_unit;
+}
+
+value caml_avr_spi_init_slave() {
+  avr_spi_init_slave();
+  return Val_unit;
+}
+
+value caml_avr_spi_transmit(value c) {
+  return Val_int(avr_spi_transmit(Int_val(c)));
 }
 
 #endif

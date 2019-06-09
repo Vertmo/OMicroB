@@ -105,3 +105,18 @@ module Serial: sig
   val write: string -> unit
   val read: unit -> string
 end
+
+(** SPI slave communication *)
+module SPISlave: Circuits.SPI
+
+module MakeSPIMaster(SC: sig
+    type pin
+    type level
+    type mode
+    val high: level
+    val low: level
+    val output_mode: mode
+    val pin_mode: pin -> mode -> unit
+    val digital_write: pin -> level -> unit
+    val slavePin: pin
+  end): Circuits.SPI

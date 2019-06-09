@@ -23,6 +23,12 @@ char avr_serial_read();
 
 /******************************************************************************/
 
+void avr_spi_init_master();
+void avr_spi_init_slave();
+char avr_spi_transmit(char c);
+
+/******************************************************************************/
+
 void avr_write_register(uint8_t reg, uint8_t val);
 uint8_t avr_read_register(uint8_t reg);
 int avr_random(int max);
