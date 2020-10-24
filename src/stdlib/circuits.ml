@@ -436,3 +436,5 @@ module MakeSSD1306(I2C: I2C) = struct
 
   let print_int _ = failwith "Not yet implemented"
 end
+
+(*******************************************************************************)

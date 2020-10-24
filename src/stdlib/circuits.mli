@@ -220,3 +220,5 @@ module MakeLCD(L: LCDConnection): Display
 (** Original lib : https://github.com/adafruit/Adafruit_SSD1306 *)
 
 module MakeSSD1306(I2C: I2C): Display
+
+(*******************************************************************************)
