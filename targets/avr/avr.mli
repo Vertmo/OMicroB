@@ -27,6 +27,7 @@ module type AvrPins = sig
   val set_bit : register -> bit -> unit
   val clear_bit : register -> bit -> unit
   val read_bit : register -> bit -> bool
+  val pin_change_callback: pin -> (unit -> unit) -> unit
   module MCUConnection : Circuits.MCUConnection
     with type pin = pin
     with type mode = mode
@@ -43,3 +44,12 @@ module Serial : sig
   val write_string : string -> unit
   val write_int : int -> unit
 end
+
+module type Timer = sig
+  val set_period : int -> unit
+  val set_callback : (unit -> unit) -> unit
+end
+
+module Timer0: Timer
+module Timer2: Timer
+

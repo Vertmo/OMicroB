@@ -200,3 +200,10 @@ module MCUConnection = struct
   let millis = Avr.millis
   let delay = Avr.delay
 end
+
+external do_pin_change_callback : register -> bit -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
+
+let pin_change_callback p closure =
+  let input = input_of_pin p in
+  let bit = bit_of_pin p in
+  do_pin_change_callback input bit closure
