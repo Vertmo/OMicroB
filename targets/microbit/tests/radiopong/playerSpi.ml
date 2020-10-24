@@ -1,16 +1,16 @@
 (** Change the side depending on the side you want to program *)
 
-let%component ButtonA = Circuits.MakeButton(connectedPin = PIN7)
-let%component ButtonB = Circuits.MakeButton(connectedPin = PIN6)
+module%comp ButtonA = Circuits.MakeButton(struct let connectedPin = PIN7 end)
+module%comp ButtonB = Circuits.MakeButton(struct let connectedPin = PIN6 end)
 
-let%component Screen = LiquidCrystal.MakeLCD(
-    rsPin = PIN9;
-    enablePin = PIN8;
-    d4Pin = PIN5;
-    d5Pin = PIN4;
-    d6Pin = PIN3;
-    d7Pin = PIN2;
-  )
+module%comp Screen = Circuits.MakeLCD(struct
+    let rsPin = PIN12
+    let enablePin = PIN11
+    let d4Pin = PIN5
+    let d5Pin = PIN4
+    let d6Pin = PIN3
+    let d7Pin = PIN2
+  end)
 
 let _ =
   Screen.init (); SPISlave.init ();

@@ -293,7 +293,7 @@ function target_microbit () {
 ################################################################################
 ## Choose your targets
 
-#target_avr
+target_avr
 #target_pic32
 target_microbit
 
