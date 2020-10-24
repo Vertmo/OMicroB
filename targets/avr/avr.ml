@@ -27,6 +27,10 @@ module type AvrPins = sig
   val set_bit : register -> bit -> unit
   val clear_bit : register -> bit -> unit
   val read_bit : register -> bit -> bool
+  module MCUConnection : Circuits.MCUConnection
+    with type pin = pin
+    with type mode = mode
+    with type level = level
 end
 
 external delay : int -> unit = "caml_delay" [@@noalloc]

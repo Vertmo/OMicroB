@@ -180,3 +180,23 @@ let digital_read p =
   match read_bit input bit with
   | true -> HIGH
   | false -> LOW
+
+type _pin = pin
+type _level = level
+type _mode = mode
+module MCUConnection = struct
+  type pin = _pin
+  type level = _level
+  type mode = _mode
+  let high = HIGH
+  let low = LOW
+  let input_mode = INPUT
+  let output_mode = OUTPUT
+  let pin_mode = pin_mode
+  let digital_write = digital_write
+  let digital_read = digital_read
+  let analog_write _ _ = failwith "TODO"
+  let analog_read _ = failwith "TODO"
+  let millis = Avr.millis
+  let delay = Avr.delay
+end
