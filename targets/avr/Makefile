@@ -6,10 +6,10 @@ FOLDERS := arduino_uno arduino_mega_2560 arduboy
 
 LIB_FOLDERS := $(foreach f,$(FOLDERS),$(LIBAVR)/$(f))
 
-MODULES := avr liquidCrystal
-SUBMODULES := arduino_uno/arduinoUnoPins \
-							arduboy/arduboyPins \
-							arduino_mega_2560/arduinoMegaPins
+MODULES := avr
+SUBMODULES := arduino_uno/arduinoUnoPins
+# arduboy/arduboyPins \
+# arduino_mega_2560/arduinoMegaPins
 
 MLS := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
@@ -34,19 +34,13 @@ TARGETS := $(LIB_FOLDERS) $(LIB_MLS) $(LIB_MLIS) $(LIB_CMIS) $(LIB_CMOS) $(LIBAV
 
 avrs: $(TARGETS)
 
-$(LIBAVR)/avr.cma: avr.cmo liquidCrystal.cmo
+$(LIBAVR)/avr.cma: avr.cmo
 	$(OCAMLC) -a $^ -o $@
 
 avr.cmi: avr.mli
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
 
 avr.cmo: avr.ml avr.cmi
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
-
-liquidCrystal.cmi: liquidCrystal.mli
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
-
-liquidCrystal.cmo: liquidCrystal.ml liquidCrystal.cmi
 	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
 
 $(SCMIS): %.cmi: %.mli
