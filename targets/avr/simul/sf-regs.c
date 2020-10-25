@@ -41,3 +41,13 @@ void avr_serial_write(char c){
   usleep(10000);
   clear_bit(PORTD,3);
 }
+
+/******************************************************************************/
+
+void avr_spi_init_master() {}
+void avr_spi_init_slave() {}
+
+char avr_spi_transmit(char c) {
+  printf("Emited %d\n", c);
+  return c;
+}

@@ -41,3 +41,17 @@ type pin =
 include AvrPins
   with type register := register
   with type pin := pin
+
+module SPISlave: Circuits.SPI
+
+module MakeSPIMaster(SC: sig
+    type pin
+    type level
+    type mode
+    val high: level
+    val low: level
+    val output_mode: mode
+    val pin_mode: pin -> mode -> unit
+    val digital_write: pin -> level -> unit
+    val slavePin: pin
+  end): Circuits.SPI
