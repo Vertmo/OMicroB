@@ -11,9 +11,10 @@ module%comp MyDisp = Circuits.MakeLCD(struct
 
 let _ =
   pin_mode button INPUT;
+  MyDisp.init ();
   pin_change_callback button
     (fun () ->
-       MyDisp.print_string "Hello VMIL !";
-       delay 10000;
-       MyDisp.clear_screen ()
+       match (digital_read button) with
+       | HIGH -> MyDisp.print_string "Hello VMIL !"
+       | LOW -> MyDisp.clear_screen ()
     );

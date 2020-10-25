@@ -13,7 +13,7 @@ demo.elf: demo.ml
 	$(BIN)/omicrob -circuitppx -device arduino-uno -v demo.ml -o $@
 
 flash: demo.hex
-	$(BIN)/omicrob -device arduino-uno -flash -v $^
+	$(BIN)/omicrob -sudo -device arduino-uno -flash -v $^
 
 clean:
 	@rm -f *.cmo *.cmi
