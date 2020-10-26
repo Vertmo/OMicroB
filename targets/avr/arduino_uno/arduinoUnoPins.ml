@@ -207,3 +207,36 @@ let pin_change_callback p closure =
   let input = input_of_pin p in
   let bit = bit_of_pin p in
   do_pin_change_callback input bit closure
+
+module SPISlave = struct
+  external init: unit -> unit = "caml_avr_spi_init_slave" [@@noalloc]
+  external transmit: char -> char = "caml_avr_spi_transmit" [@@noalloc]
+end
+
+module MakeSPIMaster(SC: sig
+    type pin
+    type level
+    type mode
+    val high: level
+    val low: level
+    val output_mode: mode
+    val pin_mode: pin -> mode -> unit
+    val digital_write: pin -> level -> unit
+    val slavePin: pin
+  end) = struct
+
+  external master_init: unit -> unit = "caml_avr_spi_init_master" [@@noalloc]
+
+  let init () =
+    SC.pin_mode SC.slavePin SC.output_mode;
+    SC.digital_write SC.slavePin SC.high;
+    master_init ();
+
+  external master_transmit: char -> char = "caml_avr_spi_transmit" [@@noalloc]
+
+  let transmit c =
+    SC.digital_write SC.slavePin SC.low;
+    let r = master_transmit c in
+    SC.digital_write SC.slavePin SC.high;
+    r
+end

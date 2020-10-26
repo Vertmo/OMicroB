@@ -126,88 +126,32 @@ let input_of_pin =
   | PINA4 -> PINF
   | PINA5 -> PINF
 
-let port_bit_of_pin =
+let bit_of_pin =
   function
-  | PIN0 -> PD2
-  | PIN1 -> PD3
-  | PIN2 -> PD1
-  | PIN3 -> PD0
-  | PIN4 -> PD4
-  | PIN5 -> PC6
-  | PIN6 -> PD7
-  | PIN7 -> PE6
-  | PIN8 -> PB4
-  | PIN9 -> PB5
-  | PIN10 -> PB6
-  | PIN11 -> PB7
-  | PIN12 -> PD6
-  | PIN13 -> PC7
-  | MISO -> PB3
-  | SCK -> PB1
-  | MOSI -> PB2
-  | SS -> PB0
-  | PINA0 -> PF7
-  | PINA1 -> PF6
-  | PINA2 -> PF5
-  | PINA3 -> PF4
-  | PINA4 -> PF1
-  | PINA5 -> PF0
-
-
-let ddr_bit_of_pin =
-  function
-  | PIN0 -> DD2
-  | PIN1 -> DD3
-  | PIN2 -> DD1
-  | PIN3 -> DD0
-  | PIN4 -> DD4
-  | PIN5 -> DC6
-  | PIN6 -> DD7
-  | PIN7 -> DE6
-  | PIN8 -> DB4
-  | PIN9 -> DB5
-  | PIN10 -> DB6
-  | PIN11 -> DB7
-  | PIN12 -> DD6
-  | PIN13 -> DC7
-  | MISO -> DB3
-  | SCK -> DB1
-  | MOSI -> DB2
-  | SS -> DB0
-  | PINA0 -> DF7
-  | PINA1 -> DF6
-  | PINA2 -> DF5
-  | PINA3 -> DF4
-  | PINA4 -> DF1
-  | PINA5 -> DF0
-
-
-let input_bit_of_pin =
-  function
-  | PIN0 -> ID2
-  | PIN1 -> ID3
-  | PIN2 -> ID1
-  | PIN3 -> ID0
-  | PIN4 -> ID4
-  | PIN5 -> IC6
-  | PIN6 -> ID7
-  | PIN7 -> IE6
-  | PIN8 -> IB4
-  | PIN9 -> IB5
-  | PIN10 -> IB6
-  | PIN11 -> IB7
-  | PIN12 -> ID6
-  | PIN13 -> IC7
-  | MISO -> IB3
-  | SCK -> IB1
-  | MOSI -> IB2
-  | SS -> IB0
-  | PINA0 -> IF7
-  | PINA1 -> IF6
-  | PINA2 -> IF5
-  | PINA3 -> IF4
-  | PINA4 -> IF1
-  | PINA5 -> IF0
+  | PIN0 -> B2
+  | PIN1 -> B3
+  | PIN2 -> B1
+  | PIN3 -> B0
+  | PIN4 -> B4
+  | PIN5 -> B6
+  | PIN6 -> B7
+  | PIN7 -> B6
+  | PIN8 -> B4
+  | PIN9 -> B5
+  | PIN10 -> B6
+  | PIN11 -> B7
+  | PIN12 -> B6
+  | PIN13 -> B7
+  | MISO -> B3
+  | SCK -> B1
+  | MOSI -> B2
+  | SS -> B0
+  | PINA0 -> B7
+  | PINA1 -> B6
+  | PINA2 -> B5
+  | PINA3 -> B4
+  | PINA4 -> B1
+  | PINA5 -> B0
 
 external write_register : register -> int -> unit = "caml_write_register" [@@noalloc]
 external read_register : register -> int = "caml_read_register" [@@noalloc]
@@ -217,8 +161,8 @@ external read_bit : register -> bit -> bool = "caml_read_bit" [@@noalloc]
 
 let pin_mode p m =
   let port = port_of_pin p in
-  let bit = port_bit_of_pin p in
-  let ddr_bit = ddr_bit_of_pin p in
+  let bit = bit_of_pin p in
+  let ddr_bit = bit_of_pin p in
   let ddr = ddr_of_pin p in
   match m with
   | OUTPUT ->
@@ -232,21 +176,41 @@ let pin_mode p m =
 
 let digital_write p b =
   let port = port_of_pin p in
-  let bit = port_bit_of_pin p in
+  let bit = bit_of_pin p in
   match b with
   | HIGH -> set_bit port bit
   | LOW -> clear_bit port bit
 
 let digital_read p =
   let input = input_of_pin p in
-  let bit = input_bit_of_pin p in
+  let bit = bit_of_pin p in
   match read_bit input bit with
   | true -> HIGH
   | false -> LOW
 
-external do_pin_change_callback : 'a register -> 'a -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
+type _pin = pin
+type _level = level
+type _mode = mode
+module MCUConnection = struct
+  type pin = _pin
+  type level = _level
+  type mode = _mode
+  let high = HIGH
+  let low = LOW
+  let input_mode = INPUT
+  let output_mode = OUTPUT
+  let pin_mode = pin_mode
+  let digital_write = digital_write
+  let digital_read = digital_read
+  let analog_write _ _ = failwith "TODO"
+  let analog_read _ = failwith "TODO"
+  let millis = Avr.millis
+  let delay = Avr.delay
+end
+
+external do_pin_change_callback : register -> bit -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
 
 let pin_change_callback p closure =
   let input = input_of_pin p in
-  let bit = input_bit_of_pin p in
+  let bit = bit_of_pin p in
   do_pin_change_callback input bit closure

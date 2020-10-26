@@ -250,3 +250,23 @@ void avr_serial_write(char val){
 char avr_serial_read(){
   return (char)getchar();
 }
+
+/******************************************************************************/
+
+// http://maxembedded.com/2013/11/the-spi-of-the-avr/
+
+void avr_spi_init_master() {
+  DDRB |= (1<<2)|(1<<1); // MOSI, SCK as output
+  SPCR = (1<<SPE)|(1<<MSTR);
+}
+
+void avr_spi_init_slave() {
+  DDRB |= (1<<3); // MISO as output
+  SPCR = (1<<SPE);
+}
+
+char avr_spi_transmit(char c) {
+  SPDR = c;
+  while(!(SPSR & (1<<SPIF)));
+  return SPDR;
+}

@@ -31,6 +31,12 @@ void avr_timer_set_callback(int num, int closure);
 
 void avr_pin_change_callback(uint8_t reg, uint8_t bit, int closure);
 
+/******************************************************************************/
+
+void avr_spi_init_master();
+void avr_spi_init_slave();
+char avr_spi_transmit(char c);
+
 #endif
 
 /******************************************************************************/

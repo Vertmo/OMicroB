@@ -329,225 +329,78 @@ let input_of_pin =
   | PINA14 -> PINK
   | PINA15 -> PINK
 
-let port_bit_of_pin =
+let bit_of_pin =
   function
-  | PIN0 -> PE0
-  | PIN1 -> PE1
-  | PIN2 -> PE4
-  | PIN3 -> PE5
-  | PIN4 -> PG5
-  | PIN5 -> PE3
-  | PIN6 -> PH3
-  | PIN7 -> PH4
-  | PIN8 -> PH5
-  | PIN9 -> PH6
-  | PIN10 -> PB4
-  | PIN11 -> PB5
-  | PIN12 -> PB6
-  | PIN13 -> PB7
-  | PIN14 -> PJ1
-  | PIN15 -> PJ0
-  | PIN16 -> PH1
-  | PIN17 -> PH0
-  | PIN18 -> PD3
-  | PIN19 -> PD2
-  | PIN20 -> PD1
-  | PIN21 -> PD0
-  | PIN22 -> PA0
-  | PIN23 -> PA1
-  | PIN24 -> PA2
-  | PIN25 -> PA3
-  | PIN26 -> PA4
-  | PIN27 -> PA5
-  | PIN28 -> PA6
-  | PIN29 -> PA7
-  | PIN30 -> PC7
-  | PIN31 -> PC6
-  | PIN32 -> PC5
-  | PIN33 -> PC4
-  | PIN34 -> PC3
-  | PIN35 -> PC2
-  | PIN36 -> PC1
-  | PIN37 -> PC0
-  | PIN38 -> PD7
-  | PIN39 -> PG2
-  | PIN40 -> PG1
-  | PIN41 -> PG0
-  | PIN42 -> PL7
-  | PIN43 -> PL6
-  | PIN44 -> PL5
-  | PIN45 -> PL4
-  | PIN46 -> PL3
-  | PIN47 -> PL2
-  | PIN48 -> PL1
-  | PIN49 -> PL0
-  | MISO -> PB3
-  | SCK -> PB1
-  | MOSI -> PB2
-  | SS -> PB0
-  | PINA0 -> PF0
-  | PINA1 -> PF1
-  | PINA2 -> PF2
-  | PINA3 -> PF3
-  | PINA4 -> PF4
-  | PINA5 -> PF5
-  | PINA6 -> PF6
-  | PINA7 -> PF7
-  | PINA8 -> PK0
-  | PINA9 -> PK1
-  | PINA10 -> PK2
-  | PINA11 -> PK3
-  | PINA12 -> PK4
-  | PINA13 -> PK5
-  | PINA14 -> PK6
-  | PINA15 -> PK7
-
-
-let ddr_bit_of_pin =
-  function
-  | PIN0 -> DE0
-  | PIN1 -> DE1
-  | PIN2 -> DE4
-  | PIN3 -> DE5
-  | PIN4 -> DG5
-  | PIN5 -> DE3
-  | PIN6 -> DH3
-  | PIN7 -> DH4
-  | PIN8 -> DH5
-  | PIN9 -> DH6
-  | PIN10 -> DB4
-  | PIN11 -> DB5
-  | PIN12 -> DB6
-  | PIN13 -> DB7
-  | PIN14 -> DJ1
-  | PIN15 -> DJ0
-  | PIN16 -> DH1
-  | PIN17 -> DH0
-  | PIN18 -> DD3
-  | PIN19 -> DD2
-  | PIN20 -> DD1
-  | PIN21 -> DD0
-  | PIN22 -> DA0
-  | PIN23 -> DA1
-  | PIN24 -> DA2
-  | PIN25 -> DA3
-  | PIN26 -> DA4
-  | PIN27 -> DA5
-  | PIN28 -> DA6
-  | PIN29 -> DA7
-  | PIN30 -> DC7
-  | PIN31 -> DC6
-  | PIN32 -> DC5
-  | PIN33 -> DC4
-  | PIN34 -> DC3
-  | PIN35 -> DC2
-  | PIN36 -> DC1
-  | PIN37 -> DC0
-  | PIN38 -> DD7
-  | PIN39 -> DG2
-  | PIN40 -> DG1
-  | PIN41 -> DG0
-  | PIN42 -> DL7
-  | PIN43 -> DL6
-  | PIN44 -> DL5
-  | PIN45 -> DL4
-  | PIN46 -> DL3
-  | PIN47 -> DL2
-  | PIN48 -> DL1
-  | PIN49 -> DL0
-  | MISO -> DB3
-  | SCK -> DB1
-  | MOSI -> DB2
-  | SS -> DB0
-  | PINA0 -> DF0
-  | PINA1 -> DF1
-  | PINA2 -> DF2
-  | PINA3 -> DF3
-  | PINA4 -> DF4
-  | PINA5 -> DF5
-  | PINA6 -> DF6
-  | PINA7 -> DF7
-  | PINA8 -> DK0
-  | PINA9 -> DK1
-  | PINA10 -> DK2
-  | PINA11 -> DK3
-  | PINA12 -> DK4
-  | PINA13 -> DK5
-  | PINA14 -> DK6
-  | PINA15 -> DK7
-
-let input_bit_of_pin =
-  function
-  | PIN0 -> IE0
-  | PIN1 -> IE1
-  | PIN2 -> IE4
-  | PIN3 -> IE5
-  | PIN4 -> IG5
-  | PIN5 -> IE3
-  | PIN6 -> IH3
-  | PIN7 -> IH4
-  | PIN8 -> IH5
-  | PIN9 -> IH6
-  | PIN10 -> IB4
-  | PIN11 -> IB5
-  | PIN12 -> IB6
-  | PIN13 -> IB7
-  | PIN14 -> IJ1
-  | PIN15 -> IJ0
-  | PIN16 -> IH1
-  | PIN17 -> IH0
-  | PIN18 -> ID3
-  | PIN19 -> ID2
-  | PIN20 -> ID1
-  | PIN21 -> ID0
-  | PIN22 -> IA0
-  | PIN23 -> IA1
-  | PIN24 -> IA2
-  | PIN25 -> IA3
-  | PIN26 -> IA4
-  | PIN27 -> IA5
-  | PIN28 -> IA6
-  | PIN29 -> IA7
-  | PIN30 -> IC7
-  | PIN31 -> IC6
-  | PIN32 -> IC5
-  | PIN33 -> IC4
-  | PIN34 -> IC3
-  | PIN35 -> IC2
-  | PIN36 -> IC1
-  | PIN37 -> IC0
-  | PIN38 -> ID7
-  | PIN39 -> IG2
-  | PIN40 -> IG1
-  | PIN41 -> IG0
-  | PIN42 -> IL7
-  | PIN43 -> IL6
-  | PIN44 -> IL5
-  | PIN45 -> IL4
-  | PIN46 -> IL3
-  | PIN47 -> IL2
-  | PIN48 -> IL1
-  | PIN49 -> IL0
-  | MISO -> IB3
-  | SCK -> IB1
-  | MOSI -> IB2
-  | SS -> IB0
-  | PINA0 -> IF0
-  | PINA1 -> IF1
-  | PINA2 -> IF2
-  | PINA3 -> IF3
-  | PINA4 -> IF4
-  | PINA5 -> IF5
-  | PINA6 -> IF6
-  | PINA7 -> IF7
-  | PINA8 -> IK0
-  | PINA9 -> IK1
-  | PINA10 -> IK2
-  | PINA11 -> IK3
-  | PINA12 -> IK4
-  | PINA13 -> IK5
-  | PINA14 -> IK6
-  | PINA15 -> IK7
+  | PIN0 -> B0
+  | PIN1 -> B1
+  | PIN2 -> B4
+  | PIN3 -> B5
+  | PIN4 -> B5
+  | PIN5 -> B3
+  | PIN6 -> B3
+  | PIN7 -> B4
+  | PIN8 -> B5
+  | PIN9 -> B6
+  | PIN10 -> B4
+  | PIN11 -> B5
+  | PIN12 -> B6
+  | PIN13 -> B7
+  | PIN14 -> B1
+  | PIN15 -> B0
+  | PIN16 -> B1
+  | PIN17 -> B0
+  | PIN18 -> B3
+  | PIN19 -> B2
+  | PIN20 -> B1
+  | PIN21 -> B0
+  | PIN22 -> B0
+  | PIN23 -> B1
+  | PIN24 -> B2
+  | PIN25 -> B3
+  | PIN26 -> B4
+  | PIN27 -> B5
+  | PIN28 -> B6
+  | PIN29 -> B7
+  | PIN30 -> B7
+  | PIN31 -> B6
+  | PIN32 -> B5
+  | PIN33 -> B4
+  | PIN34 -> B3
+  | PIN35 -> B2
+  | PIN36 -> B1
+  | PIN37 -> B0
+  | PIN38 -> B7
+  | PIN39 -> B2
+  | PIN40 -> B1
+  | PIN41 -> B0
+  | PIN42 -> B7
+  | PIN43 -> B6
+  | PIN44 -> B5
+  | PIN45 -> B4
+  | PIN46 -> B3
+  | PIN47 -> B2
+  | PIN48 -> B1
+  | PIN49 -> B0
+  | MISO -> B3
+  | SCK -> B1
+  | MOSI -> B2
+  | SS -> B0
+  | PINA0 -> B0
+  | PINA1 -> B1
+  | PINA2 -> B2
+  | PINA3 -> B3
+  | PINA4 -> B4
+  | PINA5 -> B5
+  | PINA6 -> B6
+  | PINA7 -> B7
+  | PINA8 -> B0
+  | PINA9 -> B1
+  | PINA10 -> B2
+  | PINA11 -> B3
+  | PINA12 -> B4
+  | PINA13 -> B5
+  | PINA14 -> B6
+  | PINA15 -> B7
 
 external write_register : register -> int -> unit = "caml_write_register" [@@noalloc]
 external read_register : register -> int = "caml_read_register" [@@noalloc]
@@ -557,8 +410,8 @@ external read_bit : register -> bit -> bool = "caml_read_bit" [@@noalloc]
 
 let pin_mode p m =
   let port = port_of_pin p in
-  let bit = port_bit_of_pin p in
-  let ddr_bit = ddr_bit_of_pin p in
+  let bit = bit_of_pin p in
+  let ddr_bit = bit_of_pin p in
   let ddr = ddr_of_pin p in
   match m with
   | OUTPUT ->
@@ -572,21 +425,74 @@ let pin_mode p m =
 
 let digital_write p b =
   let port = port_of_pin p in
-  let bit = port_bit_of_pin p in
+  let bit = bit_of_pin p in
   match b with
   | HIGH -> set_bit port bit
   | LOW -> clear_bit port bit
 
 let digital_read p =
   let input = input_of_pin p in
-  let bit = input_bit_of_pin p in
+  let bit = bit_of_pin p in
   match read_bit input bit with
   | true -> HIGH
   | false -> LOW
 
-external do_pin_change_callback : 'a register -> 'a -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
+type _pin = pin
+type _level = level
+type _mode = mode
+module MCUConnection = struct
+  type pin = _pin
+  type level = _level
+  type mode = _mode
+  let high = HIGH
+  let low = LOW
+  let input_mode = INPUT
+  let output_mode = OUTPUT
+  let pin_mode = pin_mode
+  let digital_write = digital_write
+  let digital_read = digital_read
+  let analog_write _ _ = failwith "TODO"
+  let analog_read _ = failwith "TODO"
+  let millis = Avr.millis
+  let delay = Avr.delay
+end
+
+external do_pin_change_callback : register -> bit -> (unit -> unit) -> unit = "caml_avr_pin_change_callback"
 
 let pin_change_callback p closure =
   let input = input_of_pin p in
-  let bit = input_bit_of_pin p in
+  let bit = bit_of_pin p in
   do_pin_change_callback input bit closure
+
+module SPISlave = struct
+  external init: unit -> unit = "caml_avr_spi_init_slave" [@@noalloc]
+  external transmit: char -> char = "caml_avr_spi_transmit" [@@noalloc]
+end
+
+module MakeSPIMaster(SC: sig
+    type pin
+    type level
+    type mode
+    val high: level
+    val low: level
+    val output_mode: mode
+    val pin_mode: pin -> mode -> unit
+    val digital_write: pin -> level -> unit
+    val slavePin: pin
+  end) = struct
+
+  external master_init: unit -> unit = "caml_avr_spi_init_master" [@@noalloc]
+
+  let init () =
+    SC.pin_mode SC.slavePin SC.output_mode;
+    SC.digital_write SC.slavePin SC.high;
+    master_init ();
+
+  external master_transmit: char -> char = "caml_avr_spi_transmit" [@@noalloc]
+
+  let transmit c =
+    SC.digital_write SC.slavePin SC.low;
+    let r = master_transmit c in
+    SC.digital_write SC.slavePin SC.high;
+    r
+end

@@ -7,9 +7,9 @@ FOLDERS := arduino_uno arduino_mega_2560 arduboy
 LIB_FOLDERS := $(foreach f,$(FOLDERS),$(LIBAVR)/$(f))
 
 MODULES := avr
-SUBMODULES := arduino_uno/arduinoUnoPins
-# arduboy/arduboyPins \
-# arduino_mega_2560/arduinoMegaPins
+SUBMODULES := arduino_uno/arduinoUnoPins \
+	arduboy/arduboyPins \
+  arduino_mega_2560/arduinoMegaPins
 
 MLS := $(MODULES:=.ml)
 MLIS := $(MODULES:=.mli)
