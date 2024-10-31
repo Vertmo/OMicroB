@@ -2,7 +2,7 @@ include ../../../../etc/Makefile.conf
 
 DEVICE ?= numworks
 PROG = hello
-EADK_APP_NAME = OMicroB-tests
+EADK_APP_NAME = \"OMicroB-tests\"
 
 # FIXME: my examples of recursive functions broke quite quickly, do they perform better with an increased STACK_SIZE and HEAP_SIZE ?
 STACK_SIZE = 8192

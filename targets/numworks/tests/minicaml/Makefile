@@ -1,7 +1,7 @@
 include ../../../../etc/Makefile.conf
 
 PROG = minicaml
-EADK_APP_NAME = OCaml-MiniCaml
+EADK_APP_NAME = \"OCaml-MiniCaml\"
 DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these?

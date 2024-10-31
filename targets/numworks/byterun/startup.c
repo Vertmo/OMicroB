@@ -2,12 +2,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// FIXME: I would like to be able to change this "parameter" from the Makefile of a given NWA app... so far, I failed.
-#ifndef EADK_APP_NAME
-#define EADK_APP_NAME "OMicroB OCaml"
-#endif
-
-const char eadk_app_name[] __attribute__((section(".rodata.eadk_app_name"))) = EADK_APP_NAME;
 const uint32_t eadk_api_level  __attribute__((section(".rodata.eadk_api_level"))) = 0;
 
 extern int main(int, char**);

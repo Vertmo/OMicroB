@@ -1,7 +1,7 @@
 include ../../../../etc/Makefile.conf
 
 PROG = prolog
-EADK_APP_NAME = OCaml-Prolog
+EADK_APP_NAME = \"OCaml-Prolog\"
 DEVICE ?= numworks
 
 # FIXME: my examples of recursive functions broke quite quickly, do they perform better with an increased STACK_SIZE and HEAP_SIZE ?
