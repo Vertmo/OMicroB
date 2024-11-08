@@ -2,6 +2,7 @@
 
 let default_arm_cxx_options = [ "-std=c99" ]
                               @ (String.split_on_char ' ' Config.eadk_cflags)
+                              @ [ "-fno-exceptions"; "-fno-unwind-tables" ]
                               @ [ "-Os"; "-Wall"; "-ggdb"]
 
 module NumworksConfig : DEVICECONFIG = struct
