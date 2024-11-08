@@ -22,7 +22,7 @@ let test_cat_read_files () =
   delay 5000;
 
   display_push_allscreen_uniform color_blue;
-  display_draw_string_small content_of_ocamlpy_file 0 0;
+  print_endline content_of_ocamlpy_file;
   delay 10000;
 
   (* display_push_allscreen_uniform color_blue; *)
@@ -47,7 +47,8 @@ let rec fibonacci_rec n =
 (** TODO: finish this main() test function. *)
 let main () =
   delay 1000; clear_screen ();
-  print_endline "Starting main() tests...\r\nIn 1 secs\r\n";
+  print_endline "Starting main() tests...";
+  print_endline "In 1 secs";
 
   (* Dynamically generated strings works fine too *)
   delay 1000; clear_screen ();
@@ -58,24 +59,21 @@ let main () =
   (* assert(120 < 100); *)
   (* FIXME: this prints "Error!" continuously... not very useful... *)
 
-  delay_usec 1_000_000; clear_screen ();
-  print_endline "After a delay_usec 1_000_000";
+  (* delay_usec 1_000_000; clear_screen (); *)
+  (* print_endline "After a delay_usec 1_000_000"; *)
 
-  (* delay 1000; *)
-  (* print_newline (); *)
+  (* delay 1000; clear_screen (); *)
+  (* print_endline "backlight_brightness():"; *)
+  (* print_int (backlight_brightness()); *)
 
-  delay 1000; clear_screen ();
-  print_endline "backlight_brightness():";
-  print_int (backlight_brightness());
-
-  delay 1000; clear_screen ();
-  print_endline "backlight_set_brightness(0):";
-  delay 500;
-  backlight_set_brightness(0);
-  delay 500;
-  print_endline "backlight_set_brightness(100):";
-  backlight_set_brightness(100);
-  delay 500;
+  (* delay 1000; clear_screen (); *)
+  (* print_endline "backlight_set_brightness(0):"; *)
+  (* delay 500; *)
+  (* backlight_set_brightness(0); *)
+  (* delay 500; *)
+  (* print_endline "backlight_set_brightness(100):"; *)
+  (* backlight_set_brightness(100); *)
+  (* delay 500; *)
 
   (* delay 1000; clear_screen ();
   print_endline "battery_is_charging():";
@@ -95,7 +93,7 @@ let main () =
 
   for _ = 1 to 5 do
     delay 1000; clear_screen ();
-    print_endline "random():";
+    print_string "random(): ";
     print_int (random());
   done;
 
@@ -103,22 +101,22 @@ let main () =
   print_endline "print_endline():";
 
   delay 1000; clear_screen ();
-  print_endline "print_int 42:";
+  print_string "print_int 42: ";
   print_int 42;
 
   delay 1000; clear_screen ();
-  print_endline "print_float 3.1415:";
+  print_string "print_float 3.1415: ";
   print_float 3.1415;
 
   delay 1000; clear_screen ();
-  print_endline "print_char '?':";
+  print_string "print_char '?': ";
   print_char '?';
 
   delay 1000; clear_screen ();
-  print_endline "millis():";
+  print_string "millis():";
   print_int (millis ());
   delay 3000; clear_screen ();
-  print_endline "After delay(3000)";
+  print_string "After delay(3000)";
   print_int (millis ());
 
   delay 1000; clear_screen ();
@@ -149,7 +147,7 @@ let main () =
   (* FIXME: fibonacci_rec fails VERY quickly, I guess the stack size for recursive function is VERY LIMITED?
      The STACK_SIZE parameter in the Makefile allows now to change this parameter, to increase it.
   *)
-  let max_n = 30 in
+  let max_n = 10 in
   for n = 0 to max_n do
     print_string "fibonacci_rec "; print_int n; print_string " = "; print_int (fibonacci_rec n);
     print_newline();
@@ -182,27 +180,25 @@ let main () =
   print_endline "End loop #5.";
 
   (* FIXME: this test breaks my calculator, it makes it RESET completely! *)
-  (* let array_colors = [| color_black; color_white; color_red; color_green; color_blue |] in
-  let array_name_colors = [| "black"; "white"; "red"; "green"; "blue" |] in
-  let nb_colors = Array.length array_colors in
+  (* let array_colors = [| color_black; color_white; color_red; color_green; color_blue |] in *)
+  (* let array_name_colors = [| "black"; "white"; "red"; "green"; "blue" |] in *)
+  (* let nb_colors = Array.length array_colors in *)
 
-  for color1 = 0 to nb_colors-1 do
-    for color2 = 0 to nb_colors-1 do
-      for i = 1 to 12 do
-        let x = 0 and y = delta_y * i in
-        let text = "draw " ^ (array_name_colors.(color1)) ^"/" ^ (array_name_colors.(color2)) ^ " at {" ^ (string_of_int x) ^ "," ^ (string_of_int y) ^ "}" in
-        print_endline text;
-        delay 1000;
-        (* FIXME: this test breaks my calculator, it makes it RESET completely! *)
-        display_draw_string_full text x y true array_colors.(color1) array_colors.(color2) ;
-        delay 1000;
-      done;
-      delay 2000;
-    done;
-    delay 200;
-  done;
-  delay 1000; *)
-
+  (* for color1 = 0 to nb_colors-1 do *)
+  (*   for color2 = 0 to nb_colors-1 do *)
+  (*     for i = 1 to 12 do *)
+  (*       let x = 0 and y = delta_y * i in *)
+  (*       let text = "draw " ^ (array_name_colors.(color1)) ^"/" ^ (array_name_colors.(color2)) ^ " at {" ^ (string_of_int x) ^ "," ^ (string_of_int y) ^ "}" in *)
+  (*       print_endline text; *)
+  (*       delay 1000; *)
+  (*       (\* FIXME: this test breaks my calculator, it makes it RESET completely! *\) *)
+  (*       (\* display_draw_string text x y true array_colors.(color1) array_colors.(color2) ; *\) *)
+  (*       delay 1000; *)
+  (*     done; *)
+  (*     delay 2000; *)
+  (*   done; *)
+  (*   delay 200; *)
+  (* done; *)
 
   delay 1000; clear_screen ();
   print_endline "Done for all the tests.";

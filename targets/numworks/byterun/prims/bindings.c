@@ -20,46 +20,6 @@
 /*********************** caml_numworks functions ************************/
 /************************************************************************/
 
-// TODO: break on '\n' in the input string, and jump on a newline manually for every \n found?
-value caml_numworks_print_string(value s) {
-  #ifdef __OCAML__
-  printf("%s", String_val(s));
-  #else
-  int n = caml_string_length(s); int i;
-  char buf[n+1];
-  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
-  buf[n] = '\0';
-  printf("%s", buf);
-  #endif
-  return Val_unit;
-}
-
-value caml_numworks_print_newline(value s) {
-  // TODO: find out how to print a real newline: \n and \r\n and \n\r didn't work
-  printf("\r\n");
-  return Val_unit;
-}
-
-value caml_numworks_print_endline(value s) {
-  #ifdef __OCAML__
-  // TODO: find out how to print a real newline: \n and \r\n and \n\r didn't work
-  printf("%s\r\n", String_val(s));
-  #else
-  int n = caml_string_length(s); int i;
-  char buf[n+1];
-  for(i = 0; i < n; i++) buf[i] = String_field(s, i);
-  buf[n] = '\0';
-  // TODO: find out how to print a real newline: \n and \r\n and \n\r didn't work
-  printf("%s\r\n", buf);
-  #endif
-  return Val_unit;
-}
-
-value caml_numworks_print_int(value i) {
-  printf("%d", (int)Int_val(i));
-  return Val_unit;
-}
-
 value caml_delay_usec(value us) {
   delay_usec(Val_int(us));
   return Val_unit;
@@ -101,18 +61,18 @@ value caml_display_draw_string_small(value text, value x, value y) {
   return Val_unit;
 }
 
-value caml_display_draw_string_full(value text, value x, value y, value large_font, value text_color, value background_color) {
-  #ifdef __OCAML__
-  display_draw_string_full(String_val(text), Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color));
-  #else
-  int n = caml_string_length(text); int i;
-  char buf[n+1];
-  for(i = 0; i < n; i++) buf[i] = String_field(text, i);
-  buf[n] = '\0';
-  display_draw_string_full(buf, Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color));
-  #endif
-  return Val_unit;
-}
+/* value caml_display_draw_string_full(value text, value x, value y, value large_font, value text_color, value background_color) { */
+/*   #ifdef __OCAML__ */
+/*   display_draw_string_full(String_val(text), Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color)); */
+/*   #else */
+/*   int n = caml_string_length(text); int i; */
+/*   char buf[n+1]; */
+/*   for(i = 0; i < n; i++) buf[i] = String_field(text, i); */
+/*   buf[n] = '\0'; */
+/*   display_draw_string_full(buf, Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color)); */
+/*   #endif */
+/*   return Val_unit; */
+/* } */
 
 value caml_display_push_rect_uniform(value background_color, value x, value y, value width, value height) {
   display_push_rect_uniform(Int_val(background_color), Int_val(x), Int_val(y), Int_val(width), Int_val(height));

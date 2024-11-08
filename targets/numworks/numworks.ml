@@ -16,23 +16,6 @@ external delay_usec : int -> unit = "caml_delay_usec" [@@noalloc]
     (detail is not important, only difference between two millis() is useful). *)
 external millis : unit -> int = "caml_millis" [@@noalloc]
 
-(************)
-(* Printing *)
-(************)
-
-external print_string : string -> unit = "caml_numworks_print_string" [@@noalloc]
-external print_newline : unit -> unit = "caml_numworks_print_newline" [@@noalloc]
-external print_endline : string -> unit = "caml_numworks_print_endline" [@@noalloc]
-external print_int : int -> unit = "caml_numworks_print_int" [@@noalloc]
-
-let print_bool b =
-  if b = true then print_string "true"
-  else print_string "false"
-;;
-
-let print_char c = print_string (String.make 1 c);;
-let print_float f = print_string (string_of_float f);;
-
 
 (***********************************)
 (* Functions from the EADK library *)
@@ -49,18 +32,50 @@ let screen_height = 240
 
 external display_draw_string : string -> int -> int -> unit = "caml_display_draw_string" [@@noalloc]
 external display_draw_string_small : string -> int -> int -> unit = "caml_display_draw_string_small" [@@noalloc]
-let display_draw_string_large = display_draw_string  (* an alias only *)
+(* let display_draw_string_large = display_draw_string  (\* an alias only *\) *)
 
 (* FIXME: it RESETs the calculator! *)
-external display_draw_string_full : string -> int -> int -> bool -> int -> int -> unit = "caml_display_draw_string_full" [@@noalloc]
+(* external display_draw_string_full : string -> int -> int -> bool -> int -> int -> unit = "caml_display_draw_string_full" [@@noalloc] *)
 
 external display_push_rect_uniform : int -> int -> int -> int -> int -> unit = "caml_display_push_rect_uniform" [@@noalloc]
 
 external display_push_allscreen_uniform : int -> unit = "caml_display_push_allscreen_uniform" [@@noalloc]
 
-let clear_screen () = display_push_allscreen_uniform color_white;;
-let clear_black_screen () = display_push_allscreen_uniform color_black;;
+(***********************)
+(* High-Level Printing *)
+(***********************)
 
+let cursorX = ref 0 and cursorY = ref 0
+
+let clear_screen () =
+  cursorX := 0;
+  cursorY := 0;
+  display_push_allscreen_uniform color_white
+
+let clear_black_screen () =
+  cursorX := 0;
+  cursorY := 0;
+  display_push_allscreen_uniform color_black
+
+let print_string s =
+  display_draw_string s !cursorX !cursorY;
+  cursorX := !cursorX + 10 * (String.length s)
+
+let print_newline () =
+  cursorX := 0;
+  cursorY := !cursorY + 16
+
+let print_endline s = print_string s; print_newline ()
+
+let print_int i = print_string (string_of_int i)
+
+let print_bool b =
+  if b = true then print_string "true"
+  else print_string "false"
+;;
+
+let print_char c = print_string (String.make 1 c);;
+let print_float f = print_string (string_of_float f);;
 
 (*************)
 (* Backlight *)

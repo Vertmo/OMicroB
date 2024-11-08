@@ -30,7 +30,3 @@ clean: force
 .SECONDARY:
 
 force:
-
-###
-
-$(MICROBIAN): microbian.h

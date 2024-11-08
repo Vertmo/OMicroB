@@ -39,8 +39,8 @@ val screen_height : int
 
 val display_draw_string : string -> int -> int -> unit
 val display_draw_string_small : string -> int -> int -> unit
-val display_draw_string_large : string -> int -> int -> unit
-val display_draw_string_full : string -> int -> int -> bool -> int -> int -> unit (* FIXME: it can RESET the calculator! I don't know why. Wrong conversion from an OCaml int to a uint16_t? *)
+(* val display_draw_string_large : string -> int -> int -> unit *)
+(* val display_draw_string_full : string -> int -> int -> bool -> int -> int -> unit (\* FIXME: it can RESET the calculator! I don't know why. Wrong conversion from an OCaml int to a uint16_t? *\) *)
 
 val display_push_rect_uniform : int -> int -> int -> int -> int -> unit
 val display_push_allscreen_uniform : int -> unit
