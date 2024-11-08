@@ -21,9 +21,8 @@ inline uint32_t reverse32(uint32_t value) {
 
 
 int extapp_fileList(const char ** filename, int maxrecord, const char * extension) {
-  uint32_t storageAddress = extapp_address();
-  char * offset = (char *)storageAddress;
-  const char * endAddress = (char *)extapp_size() + storageAddress;
+  char * offset = (char*) extapp_address();
+  const char * endAddress = offset + extapp_size();
 
   if (!extapp_isValid((const uint32_t *)offset)) {
     // Storage is invalid
@@ -50,9 +49,8 @@ int extapp_fileList(const char ** filename, int maxrecord, const char * extensio
 }
 
 const char * extapp_fileRead(const char * filename, size_t * len) {
-  uint32_t storageAddress = extapp_address();
-  char * offset = (char *)storageAddress;
-  const char * endAddress = (char *)extapp_size() + storageAddress;
+  char * offset = (char *)extapp_address();
+  const char * endAddress = offset + extapp_size();
 
   if (!extapp_isValid((const uint32_t *)offset)) {
     // Storage is invalid
@@ -81,40 +79,39 @@ const char * extapp_fileRead(const char * filename, size_t * len) {
   return NULL;
 }
 
-bool extapp_fileWrite(const char * filename, const char * content, size_t len) {
-  // Check if we have enough free space
-  const uint32_t * recordStartPointer = extapp_nextFree();
-  //                                                          Start Address  + size +     filename     + \0 + content
-  const uint32_t * recordEndPointer = (uint32_t *)((char *)recordStartPointer + 2 + strlen(filename) + 1 + len);
-  const uint32_t * storageEndPointer = extapp_address() + extapp_nextFree();
+/* bool extapp_fileWrite(const char * filename, const char * content, size_t len) { */
+/*   // Check if we have enough free space */
+/*   const uint32_t * recordStartPointer = extapp_nextFree(); */
+/*   //                                                          Start Address  + size +     filename     + \0 + content */
+/*   const uint32_t * recordEndPointer = (uint32_t *)((char *)recordStartPointer + 2 + strlen(filename) + 1 + len); */
+/*   const uint32_t * storageEndPointer = extapp_address() + extapp_nextFree(); */
 
-  // In case where we have overflown storage, we return an error
-  if (storageEndPointer < recordEndPointer) {
-    return false;
-  }
+/*   // In case where we have overflown storage, we return an error */
+/*   if (storageEndPointer < recordEndPointer) { */
+/*     return false; */
+/*   } */
 
-  char * writableRecordStartPointer = (char *)extapp_nextFree();
+/*   char * writableRecordStartPointer = (char *)extapp_nextFree(); */
 
-  // We have enough storage, so we can write the data
-  // Write size :
-  // filename + \0 + content
-  const uint16_t totalSize = strlen(filename) + 1 + len;
-  *(uint16_t *)writableRecordStartPointer = totalSize;
+/*   // We have enough storage, so we can write the data */
+/*   // Write size : */
+/*   // filename + \0 + content */
+/*   const uint16_t totalSize = strlen(filename) + 1 + len; */
+/*   *(uint16_t *)writableRecordStartPointer = totalSize; */
 
-  // Write filename:
-  memcpy(writableRecordStartPointer + 2, filename, strlen(filename) + 1);
+/*   // Write filename: */
+/*   memcpy(writableRecordStartPointer + 2, filename, strlen(filename) + 1); */
 
-  // Write content:
-  memcpy(writableRecordStartPointer + 2 + strlen(filename) + 1, content, len);
+/*   // Write content: */
+/*   memcpy(writableRecordStartPointer + 2 + strlen(filename) + 1, content, len); */
 
-  // The record is now written, so we can return
-  return true;
-}
+/*   // The record is now written, so we can return */
+/*   return true; */
+/* } */
 
 bool extapp_fileErase(const char * filename) {
-  uint32_t storageAddress = extapp_address();
-  char * offset = (char *)storageAddress;
-  const char * endAddress = (char *)extapp_size() + storageAddress;
+  char * offset = (char *)extapp_address();
+  const char * endAddress = offset + extapp_size();
 
   if (!extapp_isValid((const uint32_t *)offset)) {
     // Storage is invalid
@@ -161,19 +158,18 @@ bool extapp_fileErase(const char * filename) {
 }
 
 
-uint32_t extapp_address() {
-  return *(uint32_t *)((*extapp_userlandAddress()) + 0xC);
+uint32_t * extapp_address() {
+  return *(uint32_t **)((*extapp_userlandAddress()) + 0xC);
 }
 
-const uint32_t extapp_size() {
+uint32_t extapp_size() {
   return *(uint32_t *)((*extapp_userlandAddress()) + 0x10);
 }
 
 
 const uint32_t * extapp_nextFree() {
-  uint32_t storageAddress = extapp_address();
-  char * offset = (char *)storageAddress;
-  const char * endAddress = (char *)extapp_size() + storageAddress;
+  char * offset = (char*)extapp_address();
+  const char * endAddress = offset + extapp_size();
 
   if (!extapp_isValid((const uint32_t *)offset)) {
     // Storage is invalid
@@ -193,34 +189,34 @@ const uint32_t * extapp_nextFree() {
   }
 
   // If we exited the loop, it mean that we have gone out of the storage
-  return (uint32_t *)storageAddress + extapp_size();
+  return (uint32_t *)endAddress;
 }
 
-const uint32_t extapp_used() {
-  return (uint32_t)extapp_nextFree() - extapp_address();
-}
+/* uint32_t extapp_used() { */
+/*   return (uint32_t)extapp_nextFree() - extapp_address(); */
+/* } */
 
 
 bool extapp_isValid(const uint32_t * address) {
   return *address == reverse32(0xBADD0BEE);
 }
 
-const uint8_t extapp_calculatorModel() {
+uint8_t extapp_calculatorModel() {
   // To guess the storage size without reading forbidden addresses, we try to
   // get the storage address from the userland header
 
-  uint32_t * userlandMagicSlotAN0110 = *(uint32_t **)0x90010000;
-  uint32_t * userlandMagicSlotBN0110 = *(uint32_t **)0x90410000;
-  uint32_t * userlandMagicSlotAN0120 = *(uint32_t **)0x90020000;
-  uint32_t * userlandMagicSlotBN0120 = *(uint32_t **)0x90420000;
+  uint32_t userlandMagicSlotAN0110 = *(uint32_t *)0x90010000;
+  uint32_t userlandMagicSlotBN0110 = *(uint32_t *)0x90410000;
+  uint32_t userlandMagicSlotAN0120 = *(uint32_t *)0x90020000;
+  uint32_t userlandMagicSlotBN0120 = *(uint32_t *)0x90420000;
 
   // On N0110, RAM start is at 0x20000000 and end is 0x20040000
   // On N0120, RAM start is at 0x20040000
-  bool userlandMagicSlotAN0110IsValid = reverse32(0xfeedc0de) == (uint32_t)userlandMagicSlotAN0110;
-  bool userlandMagicSlotBN0110IsValid = reverse32(0xfeedc0de) == (uint32_t)userlandMagicSlotBN0110;
+  bool userlandMagicSlotAN0110IsValid = reverse32(0xfeedc0de) == userlandMagicSlotAN0110;
+  bool userlandMagicSlotBN0110IsValid = reverse32(0xfeedc0de) == userlandMagicSlotBN0110;
   // TODO: Check the end address on N0120 (should be working, but good to check anyway)
-  bool userlandMagicSlotAN0120IsValid = reverse32(0xfeedc0de) == (uint32_t)userlandMagicSlotAN0120;
-  bool userlandMagicSlotBN0120IsValid = reverse32(0xfeedc0de) == (uint32_t)userlandMagicSlotBN0120;
+  bool userlandMagicSlotAN0120IsValid = reverse32(0xfeedc0de) == userlandMagicSlotAN0120;
+  bool userlandMagicSlotBN0120IsValid = reverse32(0xfeedc0de) == userlandMagicSlotBN0120;
 
   int N0110Counter = userlandMagicSlotAN0110IsValid + userlandMagicSlotBN0110IsValid;
   int N0120Counter = userlandMagicSlotAN0120IsValid + userlandMagicSlotBN0120IsValid;
