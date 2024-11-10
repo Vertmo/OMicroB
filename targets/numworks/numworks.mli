@@ -75,7 +75,7 @@ val random : unit -> int
 (* Storage library *)
 (*******************)
 
-val cat_any_file : string -> int
-val cat_ocamlpy_file : unit -> int
+val cat_any_file : string -> unit
+val cat_ocamlpy_file : unit -> unit
 val read_any_file : string -> string
 val read_ocamlpy_file : unit -> string

@@ -95,6 +95,7 @@ let main () =
     delay 1000; clear_screen ();
     print_string "random(): ";
     print_int (random());
+    print_newline ()
   done;
 
   delay 1000; clear_screen ();
@@ -103,21 +104,26 @@ let main () =
   delay 1000; clear_screen ();
   print_string "print_int 42: ";
   print_int 42;
+  print_newline ();
 
   delay 1000; clear_screen ();
   print_string "print_float 3.1415: ";
   print_float 3.1415;
+  print_newline ();
 
   delay 1000; clear_screen ();
   print_string "print_char '?': ";
   print_char '?';
+  print_newline ();
 
   delay 1000; clear_screen ();
   print_string "millis():";
   print_int (millis ());
+  print_newline ();
   delay 3000; clear_screen ();
   print_string "After delay(3000)";
   print_int (millis ());
+  print_newline ();
 
   delay 1000; clear_screen ();
   print_endline "Loop #1.";

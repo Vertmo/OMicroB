@@ -62,6 +62,7 @@ let print_string s =
   cursorX := !cursorX + 10 * (String.length s)
 
 let print_newline () =
+  print_string "\n"; (* If in simu *)
   cursorX := 0;
   cursorY := !cursorY + 16
 
@@ -105,12 +106,16 @@ external random : unit -> int = "caml_random" [@@noalloc]
 (* Storage library *)
 (*******************)
 
-external cat_any_file : string -> int = "caml_cat_any_file" [@@noalloc]
+external read_any_file : string -> string = "caml_read_any_file"
+
+let cat_any_file s =
+  print_endline ("Reading from "^s);
+  print_string (read_any_file  s)
+
 let cat_ocamlpy_file () =
   cat_any_file "ocaml.py"
 ;;
 
-external read_any_file : string -> string = "caml_read_any_file" [@@noalloc]
 let read_ocamlpy_file () =
   read_any_file "ocaml.py"
 ;;
