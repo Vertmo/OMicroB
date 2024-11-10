@@ -21,6 +21,7 @@ inline uint32_t reverse32(uint32_t value) {
 
 
 int extapp_fileList(const char ** filename, int maxrecord, const char * extension) {
+  // TODO simul version
   char * offset = (char*) extapp_address();
   const char * endAddress = offset + extapp_size();
 
@@ -49,6 +50,7 @@ int extapp_fileList(const char ** filename, int maxrecord, const char * extensio
 }
 
 const char * extapp_fileRead(const char * filename, size_t * len) {
+  #ifdef __NUMWORKS__
   char * offset = (char *)extapp_address();
   const char * endAddress = offset + extapp_size();
 
@@ -68,8 +70,8 @@ const char * extapp_fileRead(const char * filename, size_t * len) {
 
     if (strcmp(name, filename) == 0) {
       *len = size;
-      //     offset + size + filename        + \0
-      return offset + 2    + strlen(name) + 1 ;
+      //     offset + size + filename        + \0 + autoimport status
+      return offset + 2    + strlen(name) + 2 ;
     }
 
     offset += size;
@@ -77,6 +79,25 @@ const char * extapp_fileRead(const char * filename, size_t * len) {
 
   // File not found
   return NULL;
+  #else
+  FILE *fd = fopen(filename, "r");
+  if(fd) {
+    // Get the size of the file
+    if (fseek(fd, 0L, SEEK_END) == 0) {
+      *len = ftell(fd);
+      char *buf = (char*) malloc(sizeof(char) * (*len + 1));
+      // Go back to start
+      fseek(fd, 0L, SEEK_SET);
+      // Now read
+      fread(buf, sizeof(char), *len, fd);
+      buf[*len] = '\0';
+      fclose(fd);
+      return buf;
+    }
+    fclose(fd);
+  }
+  return NULL;
+  #endif
 }
 
 /* bool extapp_fileWrite(const char * filename, const char * content, size_t len) { */
@@ -110,6 +131,7 @@ const char * extapp_fileRead(const char * filename, size_t * len) {
 /* } */
 
 bool extapp_fileErase(const char * filename) {
+  // TODO simul version
   char * offset = (char *)extapp_address();
   const char * endAddress = offset + extapp_size();
 

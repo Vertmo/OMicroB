@@ -169,12 +169,11 @@ value caml_read_any_file(value v) {
     #endif
   }
 
-  // The file is found, so we return his content (content + 1 is for the autoimport status), converted to a value
-  // Create a new OCaml string, using caml_copy_string(char* s), see https://ocaml.org/manual/5.2/intfc.html#ss:c-block-allocation
+  // The file is found, so we return his content
   #ifdef __OCAML__
-  return (value)caml_copy_string(content + 1);
+  return (value)caml_copy_string(content);
   #else
-  return (value)copy_bytes(content + 1);
+  return (value)copy_bytes(content);
   #endif
 }
 

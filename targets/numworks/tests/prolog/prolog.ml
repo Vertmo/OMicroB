@@ -26,27 +26,27 @@ type term = | Var of string | Term of string * term list
 
 type clause = { pos : term; neg : term list }
 
-let rec print_terme =
+let rec string_of_term =
   function
   | Var id -> id
   | Term (f, l) ->
       (match l with
        | [] -> f
        | t :: q ->
-          f ^ "(" ^ (print_terme t) ^ (string_of_terme_list q) ^ ")"
+          f ^ "(" ^ (string_of_term t) ^ (string_of_terme_list q) ^ ")"
       )
 and string_of_terme_list l =
   match l with
   | [] -> ""
   | t :: q ->
-    ", " ^ (print_terme t) ^ (string_of_terme_list q)
+    ", " ^ (string_of_term t) ^ (string_of_terme_list q)
 
-let print_clause cl =
+let string_of_clause cl =
   match cl.neg with
-  | [] -> print_terme cl.pos
+  | [] -> string_of_term cl.pos
   | t :: q ->
-      (* (print_terme cl.pos) ^ " <-- " ^ (print_terme t) ^ (string_of_terme_list q) *)
-      (print_terme cl.pos) ^ " :- " ^ (print_terme t) ^ (string_of_terme_list q)
+      (* (string_of_term cl.pos) ^ " <-- " ^ (string_of_term t) ^ (string_of_terme_list q) *)
+      (string_of_term cl.pos) ^ " :- " ^ (string_of_term t) ^ (string_of_terme_list q)
 
 let lex = Mygenlex.make_lexer [ "<--"; ":-"; "("; ")"; ","; "." ]
 
@@ -55,7 +55,7 @@ let rec parse_term1 (__strm : _ Mystream.t) =
   | Some (Mygenlex.Ident f) ->
       (Mystream.junk __strm;
        (try parse_term2 f __strm
-        with | Mystream.Failure -> raise (Mystream.Error "")))
+        with Mystream.Failure -> raise (Mystream.Error "term1: term2")))
   | _ -> raise Mystream.Failure
 and parse_term2 f (__strm : _ Mystream.t) =
   match Mystream.peek __strm with
@@ -63,14 +63,14 @@ and parse_term2 f (__strm : _ Mystream.t) =
       (Mystream.junk __strm;
        let t1 =
          (try parse_term1 __strm
-          with | Mystream.Failure -> raise (Mystream.Error "")) in
+          with Mystream.Failure -> raise (Mystream.Error "term2: term1")) in
        let l =
          (try parse_term_list __strm
-          with | Mystream.Failure -> raise (Mystream.Error ""))
+          with Mystream.Failure -> raise (Mystream.Error "term2: term_list end"))
        in
          (match Mystream.peek __strm with
           | Some (Mygenlex.Kwd ")") -> (Mystream.junk __strm; Term (f, (t1 :: l)))
-          | _ -> raise (Mystream.Error "")))
+          | _ -> raise (Mystream.Error "term2: )")))
   | _ -> (match f.[0] with | 'A' .. 'Z' -> Var f | _ -> Term (f, []))
 and parse_term_list (__strm : _ Mystream.t) =
   match Mystream.peek __strm with
@@ -78,10 +78,10 @@ and parse_term_list (__strm : _ Mystream.t) =
       (Mystream.junk __strm;
        let t1 =
          (try parse_term1 __strm
-          with | Mystream.Failure -> raise (Mystream.Error "")) in
+          with Mystream.Failure -> raise (Mystream.Error "term_list: term1")) in
        let l =
          (try parse_term_list __strm
-          with | Mystream.Failure -> raise (Mystream.Error ""))
+          with Mystream.Failure -> raise (Mystream.Error "term_list: term_list"))
        in t1 :: l)
   | _ -> []
 
@@ -89,7 +89,7 @@ let parse_goal1 (__strm : _ Mystream.t) =
   let t1 = parse_term1 __strm in
   let l =
     try parse_term_list __strm
-    with | Mystream.Failure -> raise (Mystream.Error "")
+    with Mystream.Failure -> raise (Mystream.Error "goal1: term_list")
   in t1 :: l
 
 let parse_term s = parse_term1 (lex (Mystream.of_string s))
@@ -97,10 +97,10 @@ let parse_term s = parse_term1 (lex (Mystream.of_string s))
 let parse_goal s = parse_goal1 (lex (Mystream.of_string s))
 
 let rec parse_clause1 (__strm : _ Mystream.t) =
-  let t = parse_term1 __strm
-  in
-    try parse_clause2 t __strm
-    with | Mystream.Failure -> raise (Mystream.Error "")
+  let t = parse_term1 __strm in
+  try parse_clause2 t __strm
+  with Mystream.Failure -> raise (Mystream.Error "clause1: clause2")
+
 and parse_clause2 t (__strm : _ Mystream.t) =
   match Mystream.peek __strm with
   | Some (Mygenlex.Kwd ".") -> (Mystream.junk __strm; { pos = t; neg = []; })
@@ -108,28 +108,28 @@ and parse_clause2 t (__strm : _ Mystream.t) =
       (Mystream.junk __strm;
        let t1 =
          (try parse_term1 __strm
-          with | Mystream.Failure -> raise (Mystream.Error "")) in
+          with Mystream.Failure -> raise (Mystream.Error "clause2: :- term1")) in
        let l =
          (try parse_term_list __strm
-          with | Mystream.Failure -> raise (Mystream.Error ""))
+          with Mystream.Failure -> raise (Mystream.Error "clause2: :- term_list"))
        in
          (match Mystream.peek __strm with
           | Some (Mygenlex.Kwd ".") ->
               (Mystream.junk __strm; { pos = t; neg = t1 :: l; })
-          | _ -> raise (Mystream.Error "")))
+          | _ -> raise (Mystream.Error "clause2: .")))
   | Some (Mygenlex.Kwd "<--") ->
       (Mystream.junk __strm;
        let t1 =
          (try parse_term1 __strm
-          with | Mystream.Failure -> raise (Mystream.Error "")) in
+          with | Mystream.Failure -> raise (Mystream.Error "clause2: <-- term1")) in
        let l =
          (try parse_term_list __strm
-          with | Mystream.Failure -> raise (Mystream.Error ""))
+          with | Mystream.Failure -> raise (Mystream.Error "clause2: <-- term_list"))
        in
          (match Mystream.peek __strm with
           | Some (Mygenlex.Kwd ".") ->
               (Mystream.junk __strm; { pos = t; neg = t1 :: l; })
-          | _ -> raise (Mystream.Error "")))
+          | _ -> raise (Mystream.Error "clause2: .")))
   | _ -> raise Mystream.Failure
 
 let parse_clause s = parse_clause1 (lex (Mystream.of_string s))
@@ -139,21 +139,21 @@ let print_subst l =
     function
     | [] -> ""
     | (x, t) :: q ->
-      ",  " ^ x ^ " = " ^ (print_terme t) ^ (aux q)
+      ",  " ^ x ^ " = " ^ (string_of_term t) ^ (aux q)
   in
     match l with
     | [] -> "{ }"
     | (x, t) :: q ->
-      "{ " ^ x ^ " = " ^ (print_terme t) ^ (aux q) ^ " }"
+      "{ " ^ x ^ " = " ^ (string_of_term t) ^ (aux q) ^ " }"
 
 let rec parse_prog_parser acc (__strm : _ Mystream.t) =
-  match try Some (parse_clause1 __strm) with | Mystream.Failure -> None with
-  | Some cl ->
+  match parse_clause1 __strm with
+  | cl ->
       let res =
         (try parse_prog_parser acc __strm
-         with | Mystream.Failure -> raise (Mystream.Error ""))
+         with Mystream.Failure -> raise (Mystream.Error ""))
       in cl :: res
-  | _ -> acc
+  | exception Mystream.Failure -> acc
 
 (* let input_line _ = "FIXME: input_channel not implemented"
 
@@ -219,8 +219,8 @@ let display_subst s =
   print_string "  ";
   print_endline (print_subst s)
 
-let eadk_display_subst ?(delta_y = 0) s =
-  display_draw_string ("Answer:  " ^ (print_subst s)) 0 delta_y
+let eadk_display_subst s =
+  print_endline ("Answer:  " ^ (print_subst s))
 
 
 (* resolution.ml *)
@@ -282,11 +282,10 @@ let rec search_clauses num prog trm =
         then (s, fresh_cl) :: (search_clauses num q trm)
         else search_clauses num q trm
 
-let rec
-  prove_goals_rec ?(delta_y = 0) ?(maxoutput = 10) ?(interactive = false) but num prog s =
+let rec prove_goals_rec ?(maxoutput = 10) ?(interactive = false) but num prog s =
   function
   | [] ->
-      (eadk_display_subst ~delta_y:delta_y (List.filter (fun (v, _) -> occurence_list v but) s);
+      (eadk_display_subst (List.filter (fun (v, _) -> occurence_list v but) s);
        if interactive
        then if not (yes_or_no "continue ?") then failwith "end" else ()
        else ();
@@ -296,14 +295,14 @@ let rec
       in
         do_list
           (fun (s2, cl) ->
-             prove_goals_rec ~delta_y:(delta_y + 10) ~maxoutput: (maxoutput - 1)
+             prove_goals_rec ~maxoutput: (maxoutput - 1)
                ~interactive: interactive but (num + 1) prog (compose s2 s)
                (map (app_subst s2) (cl.neg @ q)))
           ssButs
 
-let prove_goals ?(delta_y = 0) ?(maxoutput = 10) ?(interactive = false) prog trm_list =
+let prove_goals ?(maxoutput = 10) ?(interactive = false) prog trm_list =
   try
-    prove_goals_rec ~delta_y:delta_y ~maxoutput: maxoutput ~interactive: interactive trm_list
+    prove_goals_rec ~maxoutput: maxoutput ~interactive: interactive trm_list
       0 prog [] trm_list
   with | Failure "end" -> ()
 
@@ -352,44 +351,42 @@ else
 # Par Lilian Besson (Naereen)
 stupid(A).
 fast(B).
-ishuntedby(C, D)."
+ishuntedby(C, D).
+"
 let default_questions = filter_out_comments (String.split_on_char '\n' !default_questions)
 
 let numworks_main () =
   let long_delay = 1000 in
   let short_delay = 0 in
-  let delta_y = 18 in
   delay short_delay;
   clear_screen ();
   delay short_delay;
-  display_draw_string ("Loading " ^ (string_of_int (List.length default_programs)) ^ " theory content(s)...") 0 0;
+  print_endline ("Loading " ^ (string_of_int (List.length default_programs)) ^ " theory content(s)...");
   delay long_delay;
   List.iter (fun program_content ->
     clear_screen();
     delay short_delay;
-    display_draw_string "1. Loading this theory:" 0 0;
-    display_draw_string_small program_content 0 delta_y
+    print_endline "1. Loading this theory:";
+    print_endline program_content
     ) default_programs;
   delay long_delay;
   let default_programs = List.map (fun program_content -> string_join_on "\n" (filter_out_comments (String.split_on_char '\n' program_content))) default_programs in
   let prog = parse_strings default_programs in
   clear_screen ();
   delay short_delay;
-  display_draw_string ("2. Loaded " ^ (string_of_int (List.length default_programs)) ^ " theory content(s) !") 0 0;
-  display_draw_string ("Giving "^ (string_of_int (List.length prog)) ^ " fact(s) !") 0 delta_y;
+  print_endline ("2. Loaded " ^ (string_of_int (List.length default_programs)) ^ " theory content(s) !");
+  print_endline ("Giving "^ (string_of_int (List.length prog)) ^ " fact(s) !");
   delay long_delay;
 
   List.iter (fun question ->
     clear_screen();
     delay short_delay;
-    display_draw_string "3. Parsing this question..." 0 0;
-    display_draw_string ("?- " ^ question) 0 delta_y;
-    delay long_delay;
+    print_endline "3. Parsing this question...";
+    print_endline ("?- " ^ question);
     let trm_list = parse_goal question in
-    display_draw_string ("4. Parsed! " ^ (string_of_int (List.length trm_list)) ^ " term(s).") 0 (2*delta_y);
-    display_draw_string "5. Now answering it:" 0 (3*delta_y);
-    delay long_delay;
-    prove_goals ~delta_y:(4*delta_y) ~interactive:false prog trm_list;
+    print_endline ("4. Parsed! " ^ (string_of_int (List.length trm_list)) ^ " term(s).");
+    print_endline "5. Now answering it:";
+    prove_goals ~interactive:false prog trm_list;
     delay long_delay;
     clear_screen ()
   ) default_questions

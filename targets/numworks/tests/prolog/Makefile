@@ -8,7 +8,7 @@ DEVICE ?= numworks
 STACK_SIZE = 2048
 HEAP_SIZE = 8192
 
-TARGETS := $(PROG).hex
+TARGETS := $(PROG).hex $(PROG).elf
 
 OCAMLOPT = ocamlopt.opt
 OCAMLC = ocamlc.opt
