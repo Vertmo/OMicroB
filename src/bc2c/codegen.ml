@@ -240,9 +240,9 @@ let export_code_from_codemap code codemap =
     | STD OFFSETCLOSURE2 ->
       export_opcode Opcode.OFFSETCLOSURE2;
     | STD (OFFSETCLOSURE n) ->
-      check_bounds "CLOSUREREC" n (-0x80) 0x7F;
+      check_bounds "CLOSUREREC" n (-0x8000) 0x7FFF;
       export_opcode Opcode.OFFSETCLOSURE;
-      export_int8 n;
+      export_int16 n;
     | STD PUSHOFFSETCLOSUREM2 ->
       export_opcode Opcode.PUSHOFFSETCLOSUREM2;
     | STD PUSHOFFSETCLOSURE0 ->
@@ -250,9 +250,9 @@ let export_code_from_codemap code codemap =
     | STD PUSHOFFSETCLOSURE2 ->
       export_opcode Opcode.PUSHOFFSETCLOSURE2;
     | STD (PUSHOFFSETCLOSURE n) ->
-      check_bounds "PUSHOFFSETCLOSURE" n (-0x80) 0x7F;
+      check_bounds "PUSHOFFSETCLOSURE" n (-0x8000) 0x7FFF;
       export_opcode Opcode.PUSHOFFSETCLOSURE;
-      export_int8 n;
+      export_int16 n;
     | STD (GETGLOBAL _)
     | STD (PUSHGETGLOBAL _)
     | STD (GETGLOBALFIELD _)

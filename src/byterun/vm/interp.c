@@ -902,7 +902,7 @@ static inline void interp(void) {
 #if defined(OCAML_PUSHOFFSETCLOSURE) || defined(OCAML_OFFSETCLOSURE)
       {
         TRACE_INSTRUCTION("OFFSETCLOSURE");
-        int n = read_int8();
+        int n = read_int16();
         acc = env + Offsetclosure_delta / 2 * n;
         break;
       }
