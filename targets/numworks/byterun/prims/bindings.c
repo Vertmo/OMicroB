@@ -184,6 +184,7 @@ value caml_read_any_file(value v) {
 
 // Manual implementation of caml_lex_engine from ocaml/runtime/lexing.c
 // See https://github.com/ocaml/ocaml/blob/fd41e1ab55fa11cbb98df2dab96e43b5540db31c/runtime/lexing.c#L65
+// TODO This should probably be somewhere else
 #ifndef __OCAML__
 struct lexer_buffer {
   value refill_buff;
@@ -214,24 +215,14 @@ struct lexing_table {
   value lex_code;
 };
 
-#if defined(ARCH_BIG_ENDIAN) || SIZEOF_SHORT != 2
-#define Short(tbl,n) \
-  (*((unsigned char *)((tbl) + (n) * 2)) + \
-          (*((signed char *)((tbl) + (n) * 2 + 1)) << 8))
-#define UShort(tbl,n) \
-  (*((unsigned char *)((tbl) + (n) * 2)) + \
-          (*((unsigned char *)((tbl) + (n) * 2 + 1)) << 8))
-#else
-#define Short(tbl,n) (((short *)(tbl))[(n)])
-#define UShort(tbl,n) (((unsigned short *)(tbl))[(n)])
-#endif
-
-#define Byte_u(x, i) (((unsigned char *) (x)) [i]) /* Also an l-value. */
+#define Short(tbl,n) (((short *)(Block_val(tbl)))[(n)])
+#define UShort(tbl,n) (((unsigned short *)(Block_val(tbl)))[(n)])
+#define Byte_u(tbl,n) (((unsigned char *)(Block_val(tbl)))[n]) /* Also an l-value. */
 
 value caml_lex_engine(value vtbl, value start_state, value vlexbuf)
 {
-  struct lexing_table * tbl = (struct lexing_table *) vtbl;
-  struct lexer_buffer * lexbuf = (struct lexer_buffer *) vlexbuf;
+  struct lexing_table * tbl = (struct lexing_table *) Block_val(vtbl);
+  struct lexer_buffer * lexbuf = (struct lexer_buffer *) Block_val(vlexbuf);
   int state, base, backtrk, c;
 
   state = Int_val(start_state);
@@ -263,7 +254,7 @@ value caml_lex_engine(value vtbl, value start_state, value vlexbuf)
     }else{
       /* Read next input char */
       c = Byte_u(lexbuf->lex_buffer, Int_val(lexbuf->lex_curr_pos));
-      lexbuf->lex_curr_pos += 2;
+      lexbuf->lex_curr_pos = Val_int(Int_val(lexbuf->lex_curr_pos) + 1);
     }
     /* Determine next state */
     if (Short(tbl->lex_check, base + c) == state)
@@ -274,8 +265,7 @@ value caml_lex_engine(value vtbl, value start_state, value vlexbuf)
     if (state < 0) {
       lexbuf->lex_curr_pos = lexbuf->lex_last_pos;
       if (lexbuf->lex_last_action == Val_int(-1)) {
-        // caml_failwith("lexing: empty token");
-        printf("lexing error: empty token");
+        caml_raise_failure("lexing: empty token");
       } else {
         return lexbuf->lex_last_action;
       }

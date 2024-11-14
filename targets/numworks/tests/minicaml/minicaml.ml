@@ -1,14 +1,8 @@
 (* Interprète MML pour la Numworks *)
 
-(* (* FIXME: remove this FAKE implementation when compiling for the Numworks *) *)
-(* let read_any_file filename = "" *)
-(* let delay _ = () *)
-(* let clear_screen () = () *)
-(* let display_draw_string s x y = print_endline s *)
-
 open Mylexing
 
-let long_delay = 5000
+let long_delay = 1000
 let short_delay = 500
 let delta_y = 18
 let exit (code:int) = ()
@@ -17,22 +11,9 @@ let usage = "usage: ./minicaml filename.mml"
 
 let spec = []
 
-(* FIXME: use EADK Numworks to read the content of a filename on the Numworks. *)
-let filename = "minicaml.py";;
+let filename = "minicaml.py"
 
-delay short_delay;;
-clear_screen ();;
-delay short_delay;;
-display_draw_string ("Loading code from " ^ filename ^ " ...") 0 0;;
-delay long_delay;;
-
-(* DONE: this is now read from a 'filename' file, from the local storage *)
-let minicaml_file_content = read_any_file filename
-let default_filecontent = ref "";;
-if minicaml_file_content <> "" then
-  default_filecontent := minicaml_file_content
-else
-  default_filecontent := "let rec fibonacci (n: int) :int =
+let default_program = "let rec fibonacci (n: int) :int =
   if n < 3 then
     1
   else
@@ -47,26 +28,27 @@ let report (b,e) =
   print_endline ("File \"" ^ filename ^ "\", line " ^ (string_of_int lnum) ^ ", characters " ^ (string_of_int fc) ^ "-" ^ (string_of_int lc) ^ ":")
 
 let () =
-  (* FIXME: use EADK Numworks to read the content of a filename on the Numworks. *)
-  let lb = Mylexing.from_string (!default_filecontent) in
+  clear_screen ();
+  print_endline ("Loading code from " ^ filename ^ " ...");
+
+  let file_content = read_any_file filename in
+  let file_content = if file_content = "" then default_program else file_content in
+
+  let lb = Mylexing.from_string file_content in
   try
-    display_draw_string "Reading the file..." 0 0;
-    delay short_delay;
+    print_endline "Parsing the file...";
 
     let prog = Mmlparser.program Mmllexer.token lb in
-    delay short_delay;
 
     let type_of_prog = Typechecker.type_prog prog in
-    display_draw_string "Type of the program: " 0 delta_y;
-    display_draw_string (Mml.typ_to_string type_of_prog) 0 (2*delta_y);
-    delay short_delay;
+    print_string "Type of the program: ";
+    print_string (Mml.typ_to_string type_of_prog);
+    print_newline ();
 
-    display_draw_string "Evaluation of the program: " 0 (3*delta_y);
-    delay short_delay;
+    print_string "Evaluation of the program: ";
     let v = Interpreter.eval_prog prog in
-    Interpreter.draw_string v 0 (4*delta_y);
-    delay short_delay;
-    clear_screen ();
+    Interpreter.print_value v;
+    print_newline ();
     delay long_delay;
     exit 0
   with
@@ -82,7 +64,6 @@ let () =
      print_endline ("type error: " ^ s);
      exit 1
   | e ->
-  (* FIXME: remove this dependency on Printexc. module *)
      (* print_endline ("Anomaly: " ^ (Printexc.to_string e)); *)
      print_endline ("Anomaly: (some exception)");
      exit 2

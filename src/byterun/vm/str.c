@@ -161,3 +161,83 @@ value caml_string_of_bytes(value v){
 value caml_bytes_of_string(value v){
   return v;
 }
+
+#define INT_ERRMSG "int_of_string"
+
+static int parse_sign_and_base(/*in*/  value v,
+                               /*out*/ int * base,
+                               /*out*/ int * signedness,
+                               /*out*/ int * sign) {
+  int pos = 0;
+  *sign = 1;
+  if (String_field(v, pos) == '-') {
+    *sign = -1;
+    pos += 1;
+  } else if (String_field(v, pos) == '+') {
+    pos += 1;
+  }
+  *base = 10; *signedness = 1;
+  if (String_field(v, pos) == '0') {
+    switch (String_field(v, pos+1)) {
+    case 'x': case 'X':
+      *base = 16; *signedness = 0; pos += 2; break;
+    case 'o': case 'O':
+      *base = 8; *signedness = 0; pos += 2; break;
+    case 'b': case 'B':
+      *base = 2; *signedness = 0; pos += 2; break;
+    case 'u': case 'U':
+      *signedness = 0; pos += 2; break;
+    }
+  }
+  return pos;
+}
+
+static int parse_digit(char c) {
+  if (c >= '0' && c <= '9') return c - '0';
+  else if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+  else if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+  else return -1;
+}
+
+static int parse_intnat(value s, int nbits, const char *errmsg) {
+  int pos;
+  int res, threshold;
+  int sign, base, signedness, d;
+
+  pos = parse_sign_and_base(s, &base, &signedness, &sign);
+  threshold = ((unsigned int) -1) / base;
+  d = parse_digit(String_field(s, pos));
+  if (d < 0 || d >= base) caml_raise_failure(errmsg);
+  for (pos++, res = d; /*nothing*/; pos++) {
+    char c = String_field(s, pos);
+    if (c == '_') continue;
+    d = parse_digit(c);
+    if (d < 0 || d >= base) break;
+    /* Detect overflow in multiplication base * res */
+    if (res > threshold) caml_raise_failure(errmsg);
+    res = base * res + d;
+    /* Detect overflow in addition (base * res) + d */
+    if (res < d) caml_raise_failure(errmsg);
+  }
+  if (pos != caml_string_length(s)){
+    caml_raise_failure(errmsg);
+  }
+  if (signedness) {
+    /* Signed representation expected, allow -2^(nbits-1) to 2^(nbits-1) - 1 */
+    if (sign >= 0) {
+      if (res >= (unsigned int)1 << (nbits - 1)) caml_raise_failure(errmsg);
+    } else {
+      if (res >  (unsigned int)1 << (nbits - 1)) caml_raise_failure(errmsg);
+    }
+  } else {
+    /* Unsigned representation expected, allow 0 to 2^nbits - 1
+       and tolerate -(2^nbits - 1) to 0 */
+    if (nbits < sizeof(unsigned int) * 8 && res >= (unsigned int)1 << nbits)
+      caml_raise_failure(errmsg);
+  }
+  return sign < 0 ? -res : res;
+}
+
+value caml_int_of_string(value v) {
+  return Val_int(parse_intnat(v, 8 * sizeof(value) - 1, INT_ERRMSG));
+}

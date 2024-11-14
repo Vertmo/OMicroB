@@ -98,6 +98,7 @@ typedef uint32_t code_t;
 
 #define Ram_block_val(x)     ((value *) ((char *) ocaml_ram_heap + ((int32_t) (x) & 0x000FFFFF)))
 #define Flash_block_val(x)   ((value *) ((char *) ocaml_flash_heap + ((int32_t) (x) & 0x000FFFFF)))
+#define Block_val(x) (Is_block_in_flash_heap(x) ? Flash_block_val(x) : Ram_block_val(x))
 
 #define Val_int(x) ((value) (((uint32_t) (int32_t) (x) << 1) | 1))
 #define Int_val(x) ((int32_t) ((value) (x) >> 1))
