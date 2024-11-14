@@ -15,6 +15,7 @@
 #include "int32.c"
 #include "int64.c"
 #include "callback.c"
+#include "lexing.c"
 
 #if defined(OCAML_GC_MARK_AND_COMPACT)
 #include "mark-and-compact.c"
