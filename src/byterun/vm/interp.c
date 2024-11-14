@@ -793,7 +793,7 @@ static inline void interp(void) {
       }
       push(acc);
       for (i = 1; i < f; i ++){
-        push(Ram_field(acc, 2 * i));
+        push(acc + Offsetclosure_delta * i);
       }
        break;
     }
@@ -820,7 +820,7 @@ static inline void interp(void) {
       }
       push(acc);
       for (i = 1; i < f; i ++){
-        push(Ram_field(acc, 2 * i));
+        push(acc + Offsetclosure_delta * i));
       }
       break;
     }
