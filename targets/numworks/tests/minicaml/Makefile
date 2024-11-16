@@ -5,8 +5,8 @@ EADK_APP_NAME = \"OCaml-MiniCaml\"
 DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these?
-STACK_SIZE = 32768  # 4096*8
-HEAP_SIZE = 32768   # 4096*8
+STACK_SIZE = 16192
+HEAP_SIZE = 32768
 
 TARGETS := $(PROG).hex $(PROG).elf
 
