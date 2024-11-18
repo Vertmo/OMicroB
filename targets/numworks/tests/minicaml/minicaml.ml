@@ -13,13 +13,13 @@ let spec = []
 
 let filename = "minicaml.py"
 
-let default_program = "let rec fibonacci (n: int) :int =
-  if n < 3 then
-    1
+let default_program = "let rec fib (n: int) :int =
+  if n <= 2 then
+    n
   else
-    fibonacci (n-1) + fibonacci (n-2)
+    fib (n-1) + fib (n-2)
 in
-fibonacci 30"
+fib 10"
 
 let report (b,e) =
   let lnum = b.pos_lnum in

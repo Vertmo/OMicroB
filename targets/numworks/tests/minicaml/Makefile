@@ -6,7 +6,7 @@ DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these?
 STACK_SIZE = 16192
-HEAP_SIZE = 32768
+HEAP_SIZE = 16192
 
 TARGETS := $(PROG).hex $(PROG).elf
 
