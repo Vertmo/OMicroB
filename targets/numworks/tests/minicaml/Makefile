@@ -6,7 +6,7 @@ DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these?
 STACK_SIZE = 16192
-HEAP_SIZE = 16192
+HEAP_SIZE = 1024
 
 TARGETS := $(PROG).hex $(PROG).elf
 
@@ -18,7 +18,7 @@ all: $(TARGETS)
 
 $(TARGETS): mml.ml interpreter.ml typechecker.ml mylexing.mli mylexing.ml mmlparser.mli mmlparser.ml mmllexer.ml minicaml.ml
 	@echo "omicrob $<"
-	$(BIN)/omicrob -v -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
+	$(BIN)/omicrob -trace 3 -v -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
 
 
 minicaml.exe:	mml.ml interpreter.ml typechecker.ml mylexing.mli mylexing.ml mmlparser.mli mmlparser.ml mmllexer.ml minicaml.ml

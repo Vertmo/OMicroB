@@ -19,7 +19,7 @@ let default_program = "let rec fib (n: int) :int =
   else
     fib (n-1) + fib (n-2)
 in
-fib 10"
+fib 30"
 
 let report (b,e) =
   let lnum = b.pos_lnum in
