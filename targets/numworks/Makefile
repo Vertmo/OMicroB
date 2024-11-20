@@ -26,10 +26,10 @@ $(LIBNUMWORKS)/numworks.cma: numworks.cmo
 	$(OCAMLC) -a $^ -o $@
 
 numworks.cmi: numworks.mli
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
+	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a-32-37 $< -o $@
 
 numworks.cmo: numworks.ml numworks.cmi
-	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a $< -o $@
+	CAMLLIB=$(LIB) $(OCAMLC) -c -w @a-32-37 $< -o $@
 
 $(LIBNUMWORKS):
 	mkdir -p $@
