@@ -5,10 +5,10 @@ EADK_APP_NAME = \"OCaml-Interpreter\"
 DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these?
-STACK_SIZE = 16384
-HEAP_SIZE = 16384
+STACK_SIZE = 16384  # 2^14
+HEAP_SIZE = 16384   # 2^14
 
-# FIXME: I obtained a segfault, apparently due to the M&C garbage collector, so let's try to other one (S&C)
+# FIXME: I obtained a segfault, apparently due to the M&C garbage collector, so let's try to other one (S&C), but it's much less efficient!
 # Default strategy: Mark and Compact
 GC_ALGO = MAC
 # Other strategy:   Stop and Copy
@@ -266,7 +266,8 @@ interpreter.byte: interpreter.ml
 
 .PHONY: clean
 clean:
-	rm -vf *.cmi *.cmo *.cmx *.byte *.c *.arm_o *.elf *.arm_elf *.hex *.nwa *.elf *.bytecode *.o *.exe
+	rm -vI ./*.cmi ./*.cmo ./*.cmx ./*.byte ./*.c ./*.arm_o ./*.elf ./*.arm_elf ./*.hex ./*.nwa ./*.elf ./*.bytecode ./*.o ./*.exe
+	rm -vI ./*/*.cmi ./*/*.cmo
 
 NWLINK = npx --yes -- nwlink@0.0.17
 

@@ -5,8 +5,8 @@ EADK_APP_NAME = \"OCaml-Prolog\"
 DEVICE ?= numworks
 
 # FIXME: my examples of recursive functions broke quite quickly, do they perform better with an increased STACK_SIZE and HEAP_SIZE ?
-STACK_SIZE = 2048
-HEAP_SIZE = 8192
+STACK_SIZE = 2048  # 2^11
+HEAP_SIZE = 8192   # 2^13
 
 TARGETS := $(PROG).hex $(PROG).elf
 
@@ -20,8 +20,6 @@ all: $(TARGETS)
 $(TARGETS): mystream.mli mystream.ml mygenlex.mli mygenlex.ml $(PROG).ml
 	@echo "omicrob $<"
 	$(BIN)/omicrob -v -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
-
-
 
 $(PROG).exe:	$(PROG).ml
 	@echo "OCAMLOPT $<"
@@ -41,7 +39,7 @@ $(PROG).bytecode:	$(PROG).ml mygenlex.ml
 	# To test what was produced:
 	./$@
 
-.PHONY: run
+.PHONY: clean
 clean:
 	rm -vf *.cmi *.cmo *.cmx *.byte *.c *.arm_o *.elf *.arm_elf *.hex *.nwa *.elf *.bytecode *.o *.exe
 
