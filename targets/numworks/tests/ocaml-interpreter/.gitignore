@@ -1,0 +1,4 @@
+*.exe
+mocaml_history.ml
+*.byte
+_build/
