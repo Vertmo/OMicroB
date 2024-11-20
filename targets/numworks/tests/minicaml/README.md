@@ -11,8 +11,9 @@ $ make
 ```
 This should create the `minicaml.nwa` app, which you can then [install on your Numworks calculator](https://my.numworks.com/apps).
 
-## TODO: support user defined programs
-> TODO: By default, the app runs a short example, but you can define a file `minicaml.py` for the code of the program to be executed.
+## It supports user defined programs
+> By default, the app runs a short example, but you can define a file `minicaml.py` for the code of the program to be executed.
+> There is no interactivity: the app *does not* let you chose which file should be executed, it always runs `minicaml.py` if present, or the default one otherwise.
 
 See the files on [my user-space on Numworks.com](https://my.numworks.com/python/lilian-besson-1/):
 

@@ -3,7 +3,9 @@
 # Cf. OMicroB OCaml Prolog
 # Par Lilian Besson (Naereen)
 cat(tom).
+cat(ajani).
 mouse(jerry).
+mouse(mickey).
 
 fast(X) <-- mouse(X).
 stupid(X) <-- cat(X).

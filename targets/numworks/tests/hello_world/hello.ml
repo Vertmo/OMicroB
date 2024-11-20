@@ -44,7 +44,7 @@ let rec fibonacci_rec n =
 ;;
 
 
-(** TODO: finish this main() test function. *)
+(** TODO: document this main() test function. *)
 let main () =
   delay 1000; clear_screen ();
   print_endline "Starting main() tests...";
