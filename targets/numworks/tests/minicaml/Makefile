@@ -20,7 +20,6 @@ $(TARGETS): mml.ml interpreter.ml typechecker.ml mylexing.mli mylexing.ml mmlpar
 	@echo "omicrob $<"
 	$(BIN)/omicrob -v -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
 
-
 minicaml.exe:	mml.ml interpreter.ml typechecker.ml mylexing.mli mylexing.ml mmlparser.mli mmlparser.ml mmllexer.ml minicaml.ml
 	@echo "OCAMLOPT $<"
 	$(OCAMLOPT) -c mml.ml
@@ -52,7 +51,7 @@ mmli.exe:	mml.ml interpreter.ml typechecker.ml mylexing.mli mylexing.ml mmlparse
 	# To test what was produced:
 	./tests_all.sh
 
-.PHONY: run
+.PHONY: clean
 clean:
 	rm -vf *.cmi *.cmo *.cmx *.byte *.c *.arm_o *.elf *.arm_elf *.hex *.nwa *.elf *.bytecode *.o *.exe
 

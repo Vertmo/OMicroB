@@ -7,10 +7,6 @@ let short_delay = 500
 let delta_y = 18
 let exit (code:int) = ()
 
-let usage = "usage: ./minicaml filename.mml"
-
-let spec = []
-
 let filename = "minicaml.py"
 
 let default_program = "let rec fib (n: int) :int =
