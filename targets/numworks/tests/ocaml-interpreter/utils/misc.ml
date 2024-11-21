@@ -617,14 +617,8 @@ module Color = struct
     pp_set_margin ppf (pp_get_margin std_formatter());
     ()
 
-  external isatty : out_channel -> bool = "caml_sys_isatty"
-
   (* reasonable heuristic on whether colors should be enabled *)
-  let should_enable_color () =
-    let term = try Sys.getenv "TERM" with Not_found -> "" in
-    term <> "dumb"
-    && term <> ""
-    && isatty stderr
+  let should_enable_color () = false (* TODO check later *)
 
   type setting = Auto | Always | Never
 

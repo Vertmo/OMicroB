@@ -164,13 +164,7 @@ type open_flag =
 
 external open_desc : string -> open_flag list -> int -> int = "caml_sys_open"
 
-external set_out_channel_name: out_channel -> string -> unit = "caml_ml_set_channel_name"
-
-let open_out_gen mode perm name =
-  let c = open_descriptor_out(open_desc name mode perm) in
-  print_endline "set_out_channel_name";
-  set_out_channel_name c name;
-  c
+let open_out_gen mode perm name = open_descriptor_out (open_desc name mode perm)
 
 let open_out name =
   open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_text] 0o666 name
@@ -178,51 +172,31 @@ let open_out name =
 let open_out_bin name =
   open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_binary] 0o666 name
 
-external flush : out_channel -> unit = "caml_ml_flush"
-
-external out_channels_list : unit -> out_channel list
-                         = "caml_ml_out_channels_list"
-
-let flush_all () =
-let rec iter = function
-    [] -> ()
-  | a::l ->
-      begin try
-          flush a
-      with Sys_error _ ->
-        () (* ignore channels closed during a preceding flush. *)
-      end;
-      iter l
-in iter (out_channels_list ())
-
-external unsafe_output : out_channel -> bytes -> int -> int -> unit
-                     = "caml_ml_output_bytes"
-external unsafe_output_string : out_channel -> string -> int -> int -> unit
-                            = "caml_ml_output"
-
-external output_char : out_channel -> char -> unit = "caml_ml_output_char"
-
-let output_bytes oc s =
-unsafe_output oc s 0 (bytes_length s)
+let flush _ = () (* Every operation flushes anyway *)
+let flush_all () = ()
 
 let output_string oc s =
-unsafe_output_string oc s 0 (string_length s)
+  if oc = stdout || oc = stderr then print_string s
+  else print_endline "FIXME output_string"
+
+let output_bytes oc b = output_string oc (bytes_unsafe_to_string b)
+
+let output_char oc c = output_string oc (String.make 1 c)
 
 let output oc s ofs len =
-if ofs < 0 || len < 0 || ofs > bytes_length s - len
-then invalid_arg "output"
-else unsafe_output oc s ofs len
+  if ofs < 0 || len < 0 || ofs > bytes_length s - len
+  then invalid_arg "output"
+  else output_bytes oc (Bytes.sub s ofs len)
 
 let output_substring oc s ofs len =
-if ofs < 0 || len < 0 || ofs > string_length s - len
-then invalid_arg "output_substring"
-else unsafe_output_string oc s ofs len
+  if ofs < 0 || len < 0 || ofs > string_length s - len
+  then invalid_arg "output_substring"
+  else output_string oc (String.sub s ofs len)
 
-external output_byte : out_channel -> int -> unit = "caml_ml_output_char"
 external output_binary_int : out_channel -> int -> unit = "caml_ml_output_int"
 
 external marshal_to_channel : out_channel -> 'a -> unit list -> unit
-   = "caml_output_value"
+  = "caml_output_value"
 let output_value chan v = marshal_to_channel chan v []
 
 external seek_out : out_channel -> int -> unit = "caml_ml_seek_out"
@@ -231,29 +205,24 @@ external out_channel_length : out_channel -> int = "caml_ml_channel_size"
 external close_out_channel : out_channel -> unit = "caml_ml_close_channel"
 let close_out oc = flush oc; close_out_channel oc
 let close_out_noerr oc =
-(try flush oc with _ -> ());
-(try close_out_channel oc with _ -> ())
+  (try flush oc with _ -> ());
+  (try close_out_channel oc with _ -> ())
 external set_binary_mode_out : out_channel -> bool -> unit
-                           = "caml_ml_set_binary_mode"
+  = "caml_ml_set_binary_mode"
 
 
 (* Output functions on standard output *)
 
-let print_bytes s = output_bytes (open_descriptor_out 1) s
+let print_bytes s = print_string (bytes_unsafe_to_string s)
 
 (* Output functions on standard error *)
 
-let prerr_bytes s = output_bytes (open_descriptor_out 2) s
+let prerr_bytes s = (* TODO with the correct color *)
+  print_bytes s
 
 (* General input functions *)
 
-external set_in_channel_name: in_channel -> string -> unit =
-  "caml_ml_set_channel_name"
-
-let open_in_gen mode perm name =
-  let c = open_descriptor_in(open_desc name mode perm) in
-  set_in_channel_name c name;
-  c
+let open_in_gen mode perm name = open_descriptor_in (open_desc name mode perm)
 
 let open_in name =
   open_in_gen [Open_rdonly; Open_text] 0 name

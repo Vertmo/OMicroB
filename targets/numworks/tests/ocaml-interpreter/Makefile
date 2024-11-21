@@ -1,6 +1,6 @@
 include ../../../../etc/Makefile.conf
 
-PROG = ocaml-interpreter
+PROG = interpreter
 EADK_APP_NAME = \"OCaml-Interpreter\"
 DEVICE ?= numworks
 

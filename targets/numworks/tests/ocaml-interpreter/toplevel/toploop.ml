@@ -179,20 +179,10 @@ let load_lambda ppf lam =
     may_trace := true;
     let retval = (Meta.reify_bytecode code code_size) () in
     may_trace := false;
-    if can_free then begin
-      Meta.remove_debug_info code;
-      Meta.static_release_bytecode code code_size;
-      Meta.static_free code;
-    end;
     Result retval
   with x ->
     may_trace := false;
     record_backtrace ();
-    if can_free then begin
-      Meta.remove_debug_info code;
-      Meta.static_release_bytecode code code_size;
-      Meta.static_free code;
-    end;
     toplevel_value_bindings := initial_bindings; (* PR#6211 *)
     Symtable.restore_state initial_symtable;
     Exception x
@@ -463,22 +453,22 @@ let refill_lexbuf buffer len =
    beginning of loop() so that user code linked in with ocamlmktop
    can call directives from Topdirs. *)
 
-let _ =
-  if !Sys.interactive then (* PR#6108 *)
-    invalid_arg "The ocamltoplevel.cma library from compiler-libs \
-                 cannot be loaded inside the OCaml toplevel";
-  Clflags.debug := true;
-  Sys.interactive := true;
-  let crc_intfs = Symtable.init_toplevel() in
-  Compmisc.init_path false;
-  List.iter
-    (fun (name, crco) ->
-      Env.add_import name;
-      match crco with
-        None -> ()
-      | Some crc->
-          Consistbl.set Env.crc_units name crc Sys.executable_name)
-    crc_intfs
+(* let _ = *)
+(*   if !Sys.interactive then (\* PR#6108 *\) *)
+(*     invalid_arg "The ocamltoplevel.cma library from compiler-libs \ *)
+(*                  cannot be loaded inside the OCaml toplevel"; *)
+(*   Clflags.debug := true; *)
+(*   Sys.interactive := true; *)
+(*   let crc_intfs = Symtable.init_toplevel() in *)
+(*   Compmisc.init_path false; *)
+(*   List.iter *)
+(*     (fun (name, crco) -> *)
+(*       Env.add_import name; *)
+(*       match crco with *)
+(*         None -> () *)
+(*       | Some crc-> *)
+(*           Consistbl.set Env.crc_units name crc Sys.executable_name) *)
+(*     crc_intfs *)
 
 let load_ocamlinit ppf =
   if !Clflags.noinit then ()

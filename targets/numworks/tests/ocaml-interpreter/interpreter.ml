@@ -24,33 +24,26 @@ let eval code =
   let as_buf = Lexing.from_string code in
   (* let as_buf = Stdlib.Lexing.from_string code in *)
   let parsed = !Toploop.parse_toplevel_phrase as_buf in
+  print_endline "Parsed";
   ignore (Toploop.execute_phrase true Format.std_formatter parsed)
 
 
 let () =
-  (* This initialization step has to be done, see the StackOverflow post above. *)
-  Toploop.initialize_toplevel_env ();
+  try
+    print_endline "Before initialization";
+    Toploop.initialize_toplevel_env ();
+    print_endline "After initialization";
 
-  (* TODO: when compiling for the Numworks, uncomment these lines. *)
-  clear_screen ();
-  print_endline ("Loading code from '" ^ filename ^ "' ...");
-  let file_content = read_any_file filename in
+    (* TODO: when compiling for the Numworks, uncomment these lines. *)
+    clear_screen ();
+    print_endline ("Loading code from '" ^ filename ^ "' ...");
+    let file_content = read_any_file filename in
 
-  (* let file_content = "" in *)
-  let file_content = if file_content = "" then default_program else file_content in
+    (* let file_content = "" in *)
+    let file_content = if file_content = "" then default_program else file_content in
 
-  print_endline (
+    print_endline (
     "Parsing the file content (length " ^ (string_of_int (String.length file_content))^ ")..."
-  );
-  eval file_content;
-
-  (* Test to check if the previous 'eval file_content' was correct *)
-  print_newline ();
-  print_endline "If everything went alright,";
-  print_endline "the previous line should have been:";
-  print_endline "- : (int -> int) * int = (<fun>, 610)";
-
-  print_newline ();
-  (* TODO: when compiling for the Numworks, uncomment these lines. *)
-  delay long_delay;
-  exit 0
+    );
+    eval file_content
+  with exn -> Location.report_exception Format.err_formatter exn
