@@ -20,8 +20,6 @@ val version: string
 
 val standard_library: string
         (* The directory containing the standard libraries *)
-val standard_runtime: string
-        (* The full path to the standard bytecode interpreter ocamlrun *)
 val ccomp_type: string
         (* The "kind" of the C compiler, assembler and linker used: one of
                "cc" (for Unix-style C compilers)
@@ -51,12 +49,8 @@ val mkexe: string
         (* The linker command line to build executables. *)
 val mkmaindll: string
         (* The linker command line to build main programs as dlls. *)
-val ranlib: string
-        (* Command to randomize a library, or "" if not needed *)
 val ar: string
         (* Name of the ar command, or "" if not needed  (MSVC) *)
-val cc_profile : string
-        (* The command line option to the C compiler to enable profiling. *)
 
 val load_path: string list ref
         (* Directories in the search path for .cmi and .cmo files *)
@@ -145,27 +139,16 @@ val target : string
 
 val print_config : out_channel -> unit;;
 
-val profiling : bool
-        (* Whether profiling with gprof is supported on this platform *)
-
 val flambda : bool
         (* Whether the compiler was configured for flambda *)
 val with_flambda_invariants : bool
         (* Whether the invariants checks for flambda are enabled *)
 
-val spacetime : bool
-        (* Whether the compiler was configured for Spacetime profiling *)
-val enable_call_counts : bool
-        (* Whether call counts are to be available when Spacetime profiling *)
 val profinfo : bool
         (* Whether the compiler was configured for profiling *)
 val profinfo_width : int
         (* How many bits are to be used in values' headers for profiling
            information *)
-val libunwind_available : bool
-        (* Whether the libunwind library is available on the target *)
-val libunwind_link_flags : string
-        (* Linker flags to use libunwind *)
 
 val safe_string: bool
         (* Whether the compiler was configured with -force-safe-string;

@@ -18,6 +18,8 @@ TARGETS := $(PROG).hex $(PROG).elf
 
 # TODO: find how to compile the requirements for the Toploop module, using omicrob
 
+TOPLEVEL_DEP += ./stdlib/sys.mli
+TOPLEVEL_DEP += ./stdlib/sys.ml
 TOPLEVEL_DEP += ./stdlib/camlinternalFormatBasics.mli
 TOPLEVEL_DEP += ./stdlib/camlinternalFormatBasics.ml
 TOPLEVEL_DEP += ./stdlib/camlinternalFormat.mli
@@ -26,36 +28,34 @@ TOPLEVEL_DEP += ./stdlib/format.mli
 TOPLEVEL_DEP += ./stdlib/format.ml
 TOPLEVEL_DEP += ./stdlib/lexing.mli
 TOPLEVEL_DEP += ./stdlib/lexing.ml
-TOPLEVEL_DEP += ./stdlib/sys.mli
-TOPLEVEL_DEP += ./stdlib/sys.ml
 TOPLEVEL_DEP += ./stdlib/nativeint.mli
 TOPLEVEL_DEP += ./stdlib/nativeint.ml
 TOPLEVEL_DEP += ./stdlib/digest.mli
 TOPLEVEL_DEP += ./stdlib/digest.ml
-TOPLEVEL_DEP += ./stdlib/random.mli
-TOPLEVEL_DEP += ./stdlib/random.ml
 TOPLEVEL_DEP += ./stdlib/camlinternalLazy.mli
 TOPLEVEL_DEP += ./stdlib/camlinternalLazy.ml
 TOPLEVEL_DEP += ./stdlib/lazy.mli
 TOPLEVEL_DEP += ./stdlib/lazy.ml
 TOPLEVEL_DEP += ./stdlib/printf.mli
 TOPLEVEL_DEP += ./stdlib/printf.ml
+TOPLEVEL_DEP += ./stdlib/gc.mli
+TOPLEVEL_DEP += ./stdlib/gc.ml
+TOPLEVEL_DEP += ./stdlib/printexc.mli
+TOPLEVEL_DEP += ./stdlib/printexc.ml
+TOPLEVEL_DEP += ./stdlib/seq.mli
+TOPLEVEL_DEP += ./stdlib/seq.ml
+TOPLEVEL_DEP += ./stdlib/array.mli
+TOPLEVEL_DEP += ./stdlib/array.ml
+TOPLEVEL_DEP += ./stdlib/random.mli
+TOPLEVEL_DEP += ./stdlib/random.ml
 TOPLEVEL_DEP += ./stdlib/filename.mli
 TOPLEVEL_DEP += ./stdlib/filename.ml
 TOPLEVEL_DEP += ./stdlib/arg.mli
 TOPLEVEL_DEP += ./stdlib/arg.ml
 TOPLEVEL_DEP += ./stdlib/parsing.mli
 TOPLEVEL_DEP += ./stdlib/parsing.ml
-TOPLEVEL_DEP += ./stdlib/gc.mli
-TOPLEVEL_DEP += ./stdlib/gc.ml
-TOPLEVEL_DEP += ./stdlib/printexc.mli
-TOPLEVEL_DEP += ./stdlib/printexc.ml
 TOPLEVEL_DEP += ./stdlib/weak.mli
 TOPLEVEL_DEP += ./stdlib/weak.ml
-TOPLEVEL_DEP += ./stdlib/seq.mli
-TOPLEVEL_DEP += ./stdlib/seq.ml
-TOPLEVEL_DEP += ./stdlib/array.mli
-TOPLEVEL_DEP += ./stdlib/array.ml
 TOPLEVEL_DEP += ./stdlib/marshal.mli
 TOPLEVEL_DEP += ./stdlib/marshal.ml
 
@@ -256,18 +256,10 @@ $(TARGETS): $(TOPLEVEL_DEP) interpreter.ml
 	@echo "omicrob to generate $@"
 	$(BIN)/omicrob -v -gc $(GC_ALGO) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopts -I,stdlib/,-I,utils/,-I,parsing/,-I,typing/,-I,bytecomp/,-I,driver/,-I,toplevel/ -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
 
-.PHONY: interpreter.byte
-interpreter.byte: interpreter.ml
-	@echo "Compiling 'interpreter.byte' ..."
-	ocamlbuild -no-hygiene -classic-display -r interpreter.byte -pkgs compiler-libs,compiler-libs.toplevel
-	mv -vf ./interpreter.byte ./interpreter.ocamlbuild.byte
-	@echo "Testing 'interpreter.ocamlbuild.byte' ..."
-	./interpreter.ocamlbuild.byte
-
 .PHONY: clean
 clean:
-	rm -vI ./*.cmi ./*.cmo ./*.cmx ./*.byte ./*.c ./*.arm_o ./*.elf ./*.arm_elf ./*.hex ./*.nwa ./*.elf ./*.bytecode ./*.o ./*.exe
-	rm -vI ./*/*.cmi ./*/*.cmo
+	rm -rf ./*.cmi ./*.cmo ./*.cmx ./*.byte ./*.c ./*.arm_o ./*.elf ./*.arm_elf ./*.hex ./*.nwa ./*.elf ./*.bytecode ./*.o ./*.exe
+	rm -rf **/*.cmi **/*.cmo
 
 NWLINK = npx --yes -- nwlink@0.0.17
 

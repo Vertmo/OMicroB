@@ -1054,6 +1054,13 @@ let pp_make_buffer () = Buffer.create pp_buffer_size
 (* The standard (shared) buffer. *)
 let stdbuf = pp_make_buffer ()
 
+(* external open_descriptor_out : int -> out_channel = "caml_ml_open_descriptor_out" *)
+(* external open_descriptor_in : int -> in_channel = "caml_ml_open_descriptor_in" *)
+
+(* let stdin = open_descriptor_in 0 *)
+(* let stdout = open_descriptor_out 1 *)
+(* let stderr = open_descriptor_out 2 *)
+
 (* Predefined formatters standard formatter to print
    to [stdout], [stderr], and {!stdbuf}. *)
 let std_formatter = formatter_of_out_channel stdout

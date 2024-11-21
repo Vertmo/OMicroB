@@ -104,13 +104,13 @@ type in_channel
 type out_channel
 (** The type of output channel. *)
 
-(* val stdin : in_channel *)
+val stdin : in_channel
 (** The standard input for the process. *)
 
-(* val stdout : out_channel *)
+val stdout : out_channel
 (** The standard output for the process. *)
 
-(* val stderr : out_channel *)
+val stderr : out_channel
 (** The standard error output for the process. *)
 
 val print_bytes : bytes -> unit

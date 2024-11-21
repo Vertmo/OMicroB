@@ -148,13 +148,12 @@ external bytes_unsafe_to_string : bytes -> string = "%bytes_to_string"
 type in_channel
 type out_channel
 
-external open_descriptor_out : int -> out_channel
-                             = "numworks_caml_ml_open_descriptor_out" [@@noalloc]
+external open_descriptor_out : int -> out_channel = "numworks_caml_ml_open_descriptor_out" [@@noalloc]
 external open_descriptor_in : int -> in_channel = "numworks_caml_ml_open_descriptor_in" [@@noalloc]
 
-(* let stdin = open_descriptor_in 0 *)
-(* let stdout = open_descriptor_out 1 *)
-(* let stderr = open_descriptor_out 2 *)
+let stdin = open_descriptor_in 0
+let stdout = open_descriptor_out 1
+let stderr = open_descriptor_out 2
 
 (* General output functions *)
 
@@ -165,19 +164,19 @@ type open_flag =
 
 external open_desc : string -> open_flag list -> int -> int = "caml_sys_open"
 
-external set_out_channel_name: out_channel -> string -> unit =
-"caml_ml_set_channel_name"
+external set_out_channel_name: out_channel -> string -> unit = "caml_ml_set_channel_name"
 
 let open_out_gen mode perm name =
-let c = open_descriptor_out(open_desc name mode perm) in
-set_out_channel_name c name;
-c
+  let c = open_descriptor_out(open_desc name mode perm) in
+  print_endline "set_out_channel_name";
+  set_out_channel_name c name;
+  c
 
 let open_out name =
-open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_text] 0o666 name
+  open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_text] 0o666 name
 
 let open_out_bin name =
-open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_binary] 0o666 name
+  open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_binary] 0o666 name
 
 external flush : out_channel -> unit = "caml_ml_flush"
 
