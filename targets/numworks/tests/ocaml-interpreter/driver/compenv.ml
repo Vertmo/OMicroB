@@ -420,10 +420,6 @@ let read_one_param ppf position name v =
   | "can-discard" ->
     can_discard := v ::!can_discard
 
-  | "timings" | "profile" ->
-     let if_on = if name = "timings" then [ `Time ] else Profile.all_columns in
-     profile_columns := if check_bool ppf name v then if_on else []
-
   | "plugin" -> !load_plugin v
 
   | _ ->

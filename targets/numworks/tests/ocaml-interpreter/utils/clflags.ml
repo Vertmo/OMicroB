@@ -126,7 +126,6 @@ let dump_linear = ref false             (* -dlinear *)
 let dump_interval = ref false           (* -dinterval *)
 let keep_startup_file = ref false       (* -dstartup *)
 let dump_combine = ref false            (* -dcombine *)
-let profile_columns : Profile.column list ref = ref [] (* -dprofile/-dtimings *)
 
 let debug_runavail = ref false          (* -drunavail *)
 

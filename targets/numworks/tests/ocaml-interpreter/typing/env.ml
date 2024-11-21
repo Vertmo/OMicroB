@@ -2137,56 +2137,6 @@ let imports () =
 let is_imported_opaque s =
   StringSet.mem s !imported_opaque_units
 
-(* Save a signature to a file *)
-
-let save_signature_with_imports ~deprecated sg modname filename imports =
-  (*prerr_endline filename;
-  List.iter (fun (name, crc) -> prerr_endline name) imports;*)
-  Btype.cleanup_abbrev ();
-  Subst.reset_for_saving ();
-  let sg = Subst.signature (Subst.for_saving Subst.identity) sg in
-  let flags =
-    List.concat [
-      if !Clflags.recursive_types then [Cmi_format.Rectypes] else [];
-      if !Clflags.opaque then [Cmi_format.Opaque] else [];
-      (if !Clflags.unsafe_string then [Cmi_format.Unsafe_string] else []);
-      (match deprecated with Some s -> [Deprecated s] | None -> []);
-    ]
-  in
-  try
-    let cmi = {
-      cmi_name = modname;
-      cmi_sign = sg;
-      cmi_crcs = imports;
-      cmi_flags = flags;
-    } in
-    let crc =
-      output_to_file_via_temporary (* see MPR#7472, MPR#4991 *)
-         ~mode: [Open_binary] filename
-         (fun temp_filename oc -> output_cmi temp_filename oc cmi) in
-    (* Enter signature in persistent table so that imported_unit()
-       will also return its crc *)
-    let comps =
-      components_of_module ~deprecated ~loc:Location.none
-        empty Subst.identity
-        (Pident(Ident.create_persistent modname)) (Mty_signature sg) in
-    let ps =
-      { ps_name = modname;
-        ps_sig = lazy (Subst.signature Subst.identity sg);
-        ps_comps = comps;
-        ps_crcs = (cmi.cmi_name, Some crc) :: imports;
-        ps_filename = filename;
-        ps_flags = cmi.cmi_flags;
-      } in
-    save_pers_struct crc ps;
-    cmi
-  with exn ->
-    remove_file filename;
-    raise exn
-
-let save_signature ~deprecated sg modname filename =
-  save_signature_with_imports ~deprecated sg modname filename (imports())
-
 (* Folding on environments *)
 
 let find_all proj1 proj2 f lid env acc =

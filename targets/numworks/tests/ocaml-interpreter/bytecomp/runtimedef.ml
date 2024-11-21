@@ -360,13 +360,9 @@ let builtin_primitives = [|
   "caml_sub_float";
   "caml_sys_chdir";
   "caml_sys_close";
-  "caml_sys_const_backend_type";
   "caml_sys_const_big_endian";
   "caml_sys_const_int_size";
   "caml_sys_const_max_wosize";
-  "caml_sys_const_ostype_cygwin";
-  "caml_sys_const_ostype_unix";
-  "caml_sys_const_ostype_win32";
   "caml_sys_const_word_size";
   "caml_sys_exit";
   "caml_sys_file_exists";

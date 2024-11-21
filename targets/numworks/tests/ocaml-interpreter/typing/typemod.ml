@@ -1863,8 +1863,8 @@ let type_implementation sourcefile outputprefix modulename initial_env ast =
       (* It is important to run these checks after the inclusion test above,
          so that value declarations which are not used internally but exported
          are not reported as being unused. *)
-      Cmt_format.save_cmt (outputprefix ^ ".cmt") modulename
-        (Cmt_format.Implementation str) (Some sourcefile) initial_env None;
+      (* Cmt_format.save_cmt (outputprefix ^ ".cmt") modulename *)
+      (*   (Cmt_format.Implementation str) (Some sourcefile) initial_env None; *)
       (str, coercion)
     end else begin
       let coercion =
@@ -1879,23 +1879,19 @@ let type_implementation sourcefile outputprefix modulename initial_env ast =
          declarations like "let x = true;; let x = 1;;", because in this
          case, the inferred signature contains only the last declaration. *)
       if not !Clflags.dont_write_files then begin
-        let deprecated = Builtin_attributes.deprecated_of_str ast in
-        let cmi =
-          Env.save_signature ~deprecated
-            simple_sg modulename (outputprefix ^ ".cmi")
-        in
-        Cmt_format.save_cmt  (outputprefix ^ ".cmt") modulename
-          (Cmt_format.Implementation str)
-          (Some sourcefile) initial_env (Some cmi);
+        let deprecated = Builtin_attributes.deprecated_of_str ast in ()
+        (* Cmt_format.save_cmt  (outputprefix ^ ".cmt") modulename *)
+        (*   (Cmt_format.Implementation str) *)
+        (*   (Some sourcefile) initial_env (Some cmi); *)
       end;
       (str, coercion)
     end
     end
   with e ->
-    Cmt_format.save_cmt  (outputprefix ^ ".cmt") modulename
-      (Cmt_format.Partial_implementation
-         (Array.of_list (Cmt_format.get_saved_types ())))
-      (Some sourcefile) initial_env None;
+    (* Cmt_format.save_cmt  (outputprefix ^ ".cmt") modulename *)
+    (*   (Cmt_format.Partial_implementation *)
+    (*      (Array.of_list (Cmt_format.get_saved_types ()))) *)
+    (*   (Some sourcefile) initial_env None; *)
     raise e
 
 let type_implementation sourcefile outputprefix modulename initial_env ast =
@@ -1903,8 +1899,9 @@ let type_implementation sourcefile outputprefix modulename initial_env ast =
     (type_implementation sourcefile outputprefix modulename initial_env ast)
 
 let save_signature modname tsg outputprefix source_file initial_env cmi =
-  Cmt_format.save_cmt  (outputprefix ^ ".cmti") modname
-    (Cmt_format.Interface tsg) (Some source_file) initial_env (Some cmi)
+  (* Cmt_format.save_cmt  (outputprefix ^ ".cmti") modname *)
+  (*   (Cmt_format.Interface tsg) (Some source_file) initial_env (Some cmi) *)
+  ()
 
 let type_interface sourcefile env ast =
   InterfaceHooks.apply_hooks { Misc.sourcefile } (transl_signature env ast)
@@ -1951,28 +1948,10 @@ let package_units initial_env objfiles cmifile modulename =
                   Interface_not_compiled mlifile))
     end;
     let dclsig = Env.read_signature modulename cmifile in
-    Cmt_format.save_cmt  (prefix ^ ".cmt") modulename
-      (Cmt_format.Packed (sg, objfiles)) None initial_env  None ;
+    (* Cmt_format.save_cmt  (prefix ^ ".cmt") modulename *)
+    (*   (Cmt_format.Packed (sg, objfiles)) None initial_env  None ; *)
     Includemod.compunit initial_env "(obtained by packing)" sg mlifile dclsig
-  end else begin
-    (* Determine imports *)
-    let unit_names = List.map fst units in
-    let imports =
-      List.filter
-        (fun (name, _crc) -> not (List.mem name unit_names))
-        (Env.imports()) in
-    (* Write packaged signature *)
-    if not !Clflags.dont_write_files then begin
-      let cmi =
-        Env.save_signature_with_imports ~deprecated:None
-          sg modulename
-          (prefix ^ ".cmi") imports
-      in
-      Cmt_format.save_cmt (prefix ^ ".cmt")  modulename
-        (Cmt_format.Packed (cmi.Cmi_format.cmi_sign, objfiles)) None initial_env (Some cmi)
-    end;
-    Tcoerce_none
-  end
+  end else Tcoerce_none
 
 (* Error report *)
 

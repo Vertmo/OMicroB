@@ -28,16 +28,6 @@ module StringSet = Set.Make(String)
 type error = Not_compatible_32 of (string * string)
 exception Error of error
 
-(* marshal and possibly check 32bit compat *)
-let marshal_to_channel_with_possibly_32bit_compat ~filename ~kind outchan obj =
-  try
-    Marshal.to_channel outchan obj
-      (if !Clflags.bytecode_compatible_32
-       then [Marshal.Compat_32] else [])
-  with Failure _ ->
-    raise (Error (Not_compatible_32 (filename, kind)))
-
-
 let report_error ppf (file, kind) =
   Format.fprintf ppf "Generated %s %S cannot be used on a 32-bit platform" kind file
 let () =
@@ -392,49 +382,6 @@ let rec emit = function
   (* Default case *)
   | instr :: c ->
       emit_instr instr; emit c
-
-(* Emission to a file *)
-
-let to_file outchan unit_name objfile ~required_globals code =
-  init();
-  output_string outchan cmo_magic_number;
-  let pos_depl = pos_out outchan in
-  output_binary_int outchan 0;
-  let pos_code = pos_out outchan in
-  emit code;
-  LongString.output outchan !out_buffer 0 !out_position;
-  let (pos_debug, size_debug) =
-    if !Clflags.debug then begin
-      debug_dirs := StringSet.add
-        (Filename.dirname (Location.absolute_path objfile))
-        !debug_dirs;
-      let p = pos_out outchan in
-      output_value outchan !events;
-      output_value outchan (StringSet.elements !debug_dirs);
-      (p, pos_out outchan - p)
-    end else
-      (0, 0) in
-  let compunit =
-    { cu_name = unit_name;
-      cu_pos = pos_code;
-      cu_codesize = !out_position;
-      cu_reloc = List.rev !reloc_info;
-      cu_imports = Env.imports();
-      cu_primitives = List.map Primitive.byte_name
-                               !Translmod.primitive_declarations;
-      cu_required_globals = Ident.Set.elements required_globals;
-      cu_force_link = !Clflags.link_everything;
-      cu_debug = pos_debug;
-      cu_debugsize = size_debug } in
-  init();                               (* Free out_buffer and reloc_info *)
-  Btype.cleanup_abbrev ();              (* Remove any cached abbreviation
-                                           expansion before saving *)
-  let pos_compunit = pos_out outchan in
-  marshal_to_channel_with_possibly_32bit_compat
-    ~filename:objfile ~kind:"bytecode unit"
-    outchan compunit;
-  seek_out outchan pos_depl;
-  output_binary_int outchan pos_compunit
 
 (* Emission to a memory block *)
 

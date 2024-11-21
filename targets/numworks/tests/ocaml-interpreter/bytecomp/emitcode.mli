@@ -18,15 +18,6 @@
 open Cmo_format
 open Instruct
 
-val to_file: out_channel -> string -> string ->
-  required_globals:Ident.Set.t -> instruction list -> unit
-        (* Arguments:
-             channel on output file
-             name of compilation unit implemented
-             path of cmo file being written
-             required_globals: list of compilation units that must be
-               evaluated before this one
-             list of instructions to emit *)
 val to_memory: instruction list -> instruction list ->
                     bytes * int * (reloc_info * int) list * debug_event list
         (* Arguments:
@@ -46,5 +37,3 @@ val to_packed_file:
              relocation information (reversed) *)
 
 val reset: unit -> unit
-
-val marshal_to_channel_with_possibly_32bit_compat : filename:string -> kind:string -> out_channel -> 'a -> unit

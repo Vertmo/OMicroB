@@ -25,22 +25,10 @@ let command cmdline =
 
 let run_command cmdline = ignore(command cmdline)
 
-(* Build @responsefile to work around Windows limitations on
-   command-line length *)
-let build_diversion lst =
-  let (responsefile, oc) = Filename.open_temp_file "camlresp" "" in
-  List.iter (fun f -> Printf.fprintf oc "%s\n" f) lst;
-  close_out oc;
-  (* at_exit (fun () -> Misc.remove_file responsefile); *)
-  "@" ^ responsefile
-
 let quote_files lst =
   let lst = List.filter (fun f -> f <> "") lst in
   let quoted = List.map Filename.quote lst in
-  let s = String.concat " " quoted in
-  if String.length s >= 4096 && Sys.os_type = "Win32"
-  then build_diversion quoted
-  else s
+  let s = String.concat " " quoted in s
 
 let quote_prefixed pr lst =
   let lst = List.filter (fun f -> f <> "") lst in
@@ -66,14 +54,14 @@ let display_msvc_output file name =
 
 let compile_file ?output ?(opt="") name =
   let (pipe, file) =
-    if Config.ccomp_type = "msvc" && not !Clflags.verbose then
-      try
-        let (t, c) = Filename.open_temp_file "msvc" "stdout" in
-        close_out c;
-        (Printf.sprintf " > %s" (Filename.quote t), t)
-      with _ ->
-        ("", "")
-    else
+    (* if Config.ccomp_type = "msvc" && not !Clflags.verbose then *)
+    (*   try *)
+    (*     let (t, c) = Filename.open_temp_file "msvc" "stdout" in *)
+    (*     close_out c; *)
+    (*     (Printf.sprintf " > %s" (Filename.quote t), t) *)
+    (*   with _ -> *)
+    (*     ("", "") *)
+    (* else *)
       ("", "") in
   let exit =
     command

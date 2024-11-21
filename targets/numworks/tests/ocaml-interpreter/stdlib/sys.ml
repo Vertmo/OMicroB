@@ -1,4 +1,3 @@
-#2 "stdlib/sys.mlp"
 (**************************************************************************)
 (*                                                                        *)
 (*                                 OCaml                                  *)
@@ -14,36 +13,23 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* WARNING: sys.ml is generated from sys.mlp.  DO NOT EDIT sys.ml or
-   your changes will be lost.
-*)
-
 type backend_type =
   | Native
   | Bytecode
   | Other of string
 (* System interface *)
 
-external get_config: unit -> string * int * bool = "caml_sys_get_config"
-external get_argv: unit -> string * string array = "caml_sys_get_argv"
-external big_endian : unit -> bool = "%big_endian"
-external word_size : unit -> int = "%word_size"
-external int_size : unit -> int = "%int_size"
-external max_wosize : unit -> int = "%max_wosize"
-external unix : unit -> bool = "%ostype_unix"
-external win32 : unit -> bool = "%ostype_win32"
-external cygwin : unit -> bool = "%ostype_cygwin"
-external get_backend_type : unit -> backend_type = "%backend_type"
+let word_size () = 32
+let max_wosize () = 2 lsl 22 - 1
 
-let (executable_name, argv) = get_argv()
-let (os_type, _, _) = get_config()
-let backend_type = get_backend_type ()
-let big_endian = big_endian ()
+let (executable_name, argv) = ("interpreter.byte", [||])
+let os_type = "numworks"
+let backend_type = Bytecode
+let big_endian = true
 let word_size = word_size ()
-let int_size = int_size ()
-let unix = unix ()
-let win32 = win32 ()
-let cygwin = cygwin ()
+let unix = false
+let win32 = false
+let cygwin = false
 let max_array_length = max_wosize ()
 let max_string_length = word_size / 8 * max_array_length - 1
 external runtime_variant : unit -> string = "caml_runtime_variant"
@@ -53,7 +39,7 @@ external file_exists: string -> bool = "caml_sys_file_exists"
 external is_directory : string -> bool = "caml_sys_is_directory"
 external remove: string -> unit = "caml_sys_remove"
 external rename : string -> string -> unit = "caml_sys_rename"
-external getenv: string -> string = "caml_sys_getenv"
+let getenv _ = raise Not_found
 
 let getenv_opt s =
   (* TODO: expose a non-raising primitive directly. *)

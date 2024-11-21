@@ -30,6 +30,8 @@ let eval code =
 
 let () =
   try
+    print_endline "Before init_path";
+    Compmisc.init_path false;
     print_endline "Before initialization";
     Toploop.initialize_toplevel_env ();
     print_endline "After initialization";
@@ -38,12 +40,7 @@ let () =
     clear_screen ();
     print_endline ("Loading code from '" ^ filename ^ "' ...");
     let file_content = read_any_file filename in
-
-    (* let file_content = "" in *)
     let file_content = if file_content = "" then default_program else file_content in
 
-    print_endline (
-    "Parsing the file content (length " ^ (string_of_int (String.length file_content))^ ")..."
-    );
     eval file_content
   with exn -> Location.report_exception Format.err_formatter exn

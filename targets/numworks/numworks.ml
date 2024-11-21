@@ -145,7 +145,7 @@ external bytes_unsafe_to_string : bytes -> string = "%bytes_to_string"
 
 (* I/O operations *)
 
-type in_channel
+type in_channel = bytes * int ref
 type out_channel
 
 external open_descriptor_out : int -> out_channel = "numworks_caml_ml_open_descriptor_out" [@@noalloc]
@@ -162,9 +162,9 @@ type open_flag =
 | Open_creat | Open_trunc | Open_excl
 | Open_binary | Open_text | Open_nonblock
 
-external open_desc : string -> open_flag list -> int -> int = "caml_sys_open"
-
-let open_out_gen mode perm name = open_descriptor_out (open_desc name mode perm)
+let open_out_gen _mode _perm _name =
+  failwith "TODO open_out_gen"
+(* open_descriptor_out (open_desc name mode perm) *)
 
 let open_out name =
   open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_text] 0o666 name
@@ -202,11 +202,8 @@ let output_value chan v = marshal_to_channel chan v []
 external seek_out : out_channel -> int -> unit = "caml_ml_seek_out"
 external pos_out : out_channel -> int = "caml_ml_pos_out"
 external out_channel_length : out_channel -> int = "caml_ml_channel_size"
-external close_out_channel : out_channel -> unit = "caml_ml_close_channel"
-let close_out oc = flush oc; close_out_channel oc
-let close_out_noerr oc =
-  (try flush oc with _ -> ());
-  (try close_out_channel oc with _ -> ())
+let close_out oc = flush oc
+let close_out_noerr oc = try flush oc with _ -> ()
 external set_binary_mode_out : out_channel -> bool -> unit
   = "caml_ml_set_binary_mode"
 
@@ -222,7 +219,9 @@ let prerr_bytes s = (* TODO with the correct color *)
 
 (* General input functions *)
 
-let open_in_gen mode perm name = open_descriptor_in (open_desc name mode perm)
+let open_in_gen _ _ name =
+  let content = read_any_file name in (* TODO read_any_file should raise exceptions *)
+  (Bytes.of_string content, ref 0)
 
 let open_in name =
   open_in_gen [Open_rdonly; Open_text] 0 name
@@ -230,12 +229,23 @@ let open_in name =
 let open_in_bin name =
   open_in_gen [Open_rdonly; Open_binary] 0 name
 
-external input_char : in_channel -> char = "caml_ml_input_char"
+let input_char ic =
+  let c = Bytes.get (fst ic) !(snd ic) in
+  (snd ic) := !(snd ic) + 1;
+  c
 
-external unsafe_input : in_channel -> bytes -> int -> int -> int
-                      = "caml_ml_input"
+let unsafe_input ic buf start len =
+  Bytes.unsafe_blit (fst ic) !(snd ic) buf start len;
+  (snd ic) := !(snd ic) + len;
+  len (* FIXME *)
 
-external input_scan_line : in_channel -> int = "caml_ml_input_scan_line"
+let input_scan_line ic =
+  let len = Bytes.length (fst ic) in
+  let rec search pos =
+    if pos >= len then -pos
+    else if Bytes.get (fst ic) pos = '\n' then pos
+    else search (pos + 1)
+  in (search !(snd ic)) - !(snd ic)
 
 let input_line chan =
   let rec build_result buf pos = function

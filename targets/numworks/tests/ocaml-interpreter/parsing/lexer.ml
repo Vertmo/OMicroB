@@ -2437,7 +2437,7 @@ and directive lexbuf =
   lexbuf.Lexing.lex_mem.(4) <- lexbuf.Lexing.lex_curr_pos ;
  __ocaml_lex_directive_rec lexbuf 133
 and __ocaml_lex_directive_rec lexbuf __ocaml_lex_state =
-  match Lexing.new_engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
+  match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 let
 # 520 "parsing/lexer.mll"
@@ -2607,7 +2607,7 @@ and __ocaml_lex_comment_rec lexbuf __ocaml_lex_state =
 and string lexbuf =
   lexbuf.Lexing.lex_mem <- Array.make 2 (-1); __ocaml_lex_string_rec lexbuf 170
 and __ocaml_lex_string_rec lexbuf __ocaml_lex_state =
-  match Lexing.new_engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
+  match Lexing.engine __ocaml_lex_tables __ocaml_lex_state lexbuf with
       | 0 ->
 # 626 "parsing/lexer.mll"
       ( () )

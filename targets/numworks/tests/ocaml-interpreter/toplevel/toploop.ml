@@ -208,7 +208,6 @@ let print_out_exception ppf exn outv =
   !print_out_phrase ppf (Ophr_exception (exn, outv))
 
 let print_exception_outcome ppf exn =
-  if exn = Out_of_memory then Gc.full_major ();
   let outv = outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn in
   print_out_exception ppf exn outv;
   if Printexc.backtrace_status ()
@@ -274,7 +273,6 @@ let execute_phrase print_outcome ppf phr =
               else Ophr_signature []
           | Exception exn ->
               toplevel_env := oldenv;
-              if exn = Out_of_memory then Gc.full_major();
               let outv =
                 outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn
               in
@@ -350,9 +348,9 @@ let preprocess_phrase ppf phr =
   let phr =
     match phr with
     | Ptop_def str ->
-        let str =
-          Pparse.apply_rewriters_str ~restore:true ~tool_name:"ocaml" str
-        in
+        (* let str = *)
+        (*   Pparse.apply_rewriters_str ~restore:true ~tool_name:"ocaml" str *)
+        (* in *)
         let str =
           Pparse.ImplementationHooks.apply_hooks
             { Misc.sourcefile = "//toplevel//" } str in
@@ -490,8 +488,8 @@ let set_paths () =
   load_path := !load_path @ [Filename.concat Config.standard_library "camlp4"];
   load_path := "" :: List.rev (!Compenv.last_include_dirs @
                                !Clflags.include_dirs @
-                               !Compenv.first_include_dirs) @ !load_path;
-  Dll.add_path !load_path
+                               !Compenv.first_include_dirs) @ !load_path
+  (* Dll.add_path !load_path *)
 
 let initialize_toplevel_env () =
   toplevel_env := Compmisc.initial_env()

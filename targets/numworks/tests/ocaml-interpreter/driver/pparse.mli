@@ -36,18 +36,6 @@ val write_ast : 'a ast_kind -> string -> 'a -> unit
 val file : formatter -> tool_name:string -> string ->
   (Lexing.lexbuf -> 'a) -> 'a ast_kind -> 'a
 
-val apply_rewriters: ?restore:bool -> tool_name:string ->
-  'a ast_kind -> 'a -> 'a
-  (** If [restore = true] (the default), cookies set by external
-      rewriters will be kept for later calls. *)
-
-val apply_rewriters_str:
-  ?restore:bool -> tool_name:string -> Parsetree.structure ->
-  Parsetree.structure
-val apply_rewriters_sig:
-  ?restore:bool -> tool_name:string -> Parsetree.signature ->
-  Parsetree.signature
-
 val report_error : formatter -> error -> unit
 
 
@@ -57,7 +45,7 @@ val parse_interface:
   formatter -> tool_name:string -> string -> Parsetree.signature
 
 (* [call_external_preprocessor sourcefile pp] *)
-val call_external_preprocessor : string -> string -> string
+(* val call_external_preprocessor : string -> string -> string *)
 val open_and_check_magic : string -> string -> in_channel * bool
 
 module ImplementationHooks : Misc.HookSig with type t = Parsetree.structure

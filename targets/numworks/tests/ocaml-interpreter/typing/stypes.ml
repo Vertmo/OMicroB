@@ -191,20 +191,3 @@ let get_info () =
   annotations := [];
   info
 ;;
-
-let dump filename =
-  if !Clflags.annotations then begin
-    let do_dump _temp_filename pp =
-      let info = get_info () in
-      sort_filter_phrases ();
-      ignore (List.fold_left (print_info pp) Location.none info) in
-    begin match filename with
-    | None -> do_dump "" stdout
-    | Some filename ->
-        Misc.output_to_file_via_temporary ~mode:[Open_text] filename do_dump
-    end;
-    phrases := [];
-  end else begin
-    annotations := [];
-  end;
-;;

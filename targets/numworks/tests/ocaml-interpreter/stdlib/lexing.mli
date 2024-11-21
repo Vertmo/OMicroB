@@ -173,4 +173,4 @@ type lex_tables =
     lex_code: string;}
 
 val engine : lex_tables -> int -> lexbuf -> int
-val new_engine : lex_tables -> int -> lexbuf -> int
+(* val new_engine : lex_tables -> int -> lexbuf -> int *)

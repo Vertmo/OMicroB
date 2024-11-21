@@ -23,29 +23,9 @@ exception Error of error
 
 (* Optionally preprocess a source file *)
 
-let call_external_preprocessor sourcefile pp =
-      let tmpfile = Filename.temp_file "ocamlpp" "" in
-      let comm = Printf.sprintf "%s %s > %s"
-                                pp (Filename.quote sourcefile) tmpfile
-      in
-      if Ccomp.command comm <> 0 then begin
-        Misc.remove_file tmpfile;
-        raise (Error (CannotRun comm));
-      end;
-      tmpfile
+let preprocess sourcefile = sourcefile
 
-let preprocess sourcefile =
-  match !Clflags.preprocessor with
-    None -> sourcefile
-  | Some pp ->
-      Profile.record "-pp"
-        (call_external_preprocessor sourcefile) pp
-
-
-let remove_preprocessed inputfile =
-  match !Clflags.preprocessor with
-    None -> ()
-  | Some _ -> Misc.remove_file inputfile
+let remove_preprocessed inputfile = ()
 
 type 'a ast_kind =
 | Structure : Parsetree.structure ast_kind
@@ -65,31 +45,6 @@ let write_ast (type a) (kind : a ast_kind) fn (ast : a) =
   output_value oc (ast : a);
   close_out oc
 
-let apply_rewriter kind fn_in ppx =
-  let magic = magic_of_kind kind in
-  let fn_out = Filename.temp_file "camlppx" "" in
-  let comm =
-    Printf.sprintf "%s %s %s" ppx (Filename.quote fn_in) (Filename.quote fn_out)
-  in
-  let ok = Ccomp.command comm = 0 in
-  Misc.remove_file fn_in;
-  if not ok then begin
-    Misc.remove_file fn_out;
-    raise (Error (CannotRun comm));
-  end;
-  if not (Sys.file_exists fn_out) then
-    raise (Error (WrongMagic comm));
-  (* check magic before passing to the next ppx *)
-  let ic = open_in_bin fn_out in
-  let buffer =
-    try really_input_string ic (String.length magic) with End_of_file -> "" in
-  close_in ic;
-  if buffer <> magic then begin
-    Misc.remove_file fn_out;
-    raise (Error (WrongMagic comm));
-  end;
-  fn_out
-
 let read_ast (type a) (kind : a ast_kind) fn : a =
   let ic = open_in_bin fn in
   try
@@ -105,38 +60,6 @@ let read_ast (type a) (kind : a ast_kind) fn : a =
     close_in ic;
     Misc.remove_file fn;
     raise exn
-
-let rewrite kind ppxs ast =
-  let fn = Filename.temp_file "camlppx" "" in
-  write_ast kind fn ast;
-  let fn = List.fold_left (apply_rewriter kind) fn (List.rev ppxs) in
-  read_ast kind fn
-
-let apply_rewriters_str ?(restore = true) ~tool_name ast =
-  match !Clflags.all_ppx with
-  | [] -> ast
-  | ppxs ->
-      ast
-      |> Ast_mapper.add_ppx_context_str ~tool_name
-      |> rewrite Structure ppxs
-      |> Ast_mapper.drop_ppx_context_str ~restore
-
-let apply_rewriters_sig ?(restore = true) ~tool_name ast =
-  match !Clflags.all_ppx with
-  | [] -> ast
-  | ppxs ->
-      ast
-      |> Ast_mapper.add_ppx_context_sig ~tool_name
-      |> rewrite Signature ppxs
-      |> Ast_mapper.drop_ppx_context_sig ~restore
-
-let apply_rewriters ?restore ~tool_name
-    (type a) (kind : a ast_kind) (ast : a) : a =
-  match kind with
-  | Structure ->
-      apply_rewriters_str ?restore ~tool_name ast
-  | Signature ->
-      apply_rewriters_sig ?restore ~tool_name ast
 
 (* Parse a file or get a dumped syntax tree from it *)
 
@@ -180,15 +103,13 @@ let file_aux ppf ~tool_name inputfile (type a) parse_fun invariant_fun
         seek_in ic 0;
         let lexbuf = Lexing.from_channel ic in
         Location.init lexbuf inputfile;
-        Profile.record_call "parser" (fun () -> parse_fun lexbuf)
+        parse_fun lexbuf
       end
     with x -> close_in ic; raise x
   in
   close_in ic;
-  let ast =
-    Profile.record_call "-ppx" (fun () ->
-      apply_rewriters ~restore:false ~tool_name kind ast) in
-  if is_ast_file || !Clflags.all_ppx <> [] then invariant_fun ast;
+  (* let ast = apply_rewriters ~restore:false ~tool_name kind ast in *)
+  (* if is_ast_file || !Clflags.all_ppx <> [] then invariant_fun ast; *)
   ast
 
 let file ppf ~tool_name inputfile parse_fun ast_kind =
@@ -230,10 +151,8 @@ module InterfaceHooks = Misc.MakeHooks(struct
   end)
 
 let parse_implementation ppf ~tool_name sourcefile =
-  Profile.record_call "parsing" (fun () ->
-    parse_file ~tool_name Ast_invariants.structure
-      ImplementationHooks.apply_hooks Structure ppf sourcefile)
+  parse_file ~tool_name Ast_invariants.structure
+    ImplementationHooks.apply_hooks Structure ppf sourcefile
 let parse_interface ppf ~tool_name sourcefile =
-  Profile.record_call "parsing" (fun () ->
-    parse_file ~tool_name Ast_invariants.signature
-      InterfaceHooks.apply_hooks Signature ppf sourcefile)
+  parse_file ~tool_name Ast_invariants.signature
+    InterfaceHooks.apply_hooks Signature ppf sourcefile
