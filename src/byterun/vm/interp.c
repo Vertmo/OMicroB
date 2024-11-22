@@ -755,7 +755,7 @@ static inline void interp(void) {
 
       /* Create f functions in the closure */
       for (i = 1; i < f; i ++) {
-        Ram_field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_white);
+        Ram_field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_red);
         Ram_field(acc, 2 * i) = Val_codeptr(read_ptr_1B() - i - 2);
       }
         /* pop what should be elems of the closure */
@@ -784,7 +784,7 @@ static inline void interp(void) {
       OCamlAlloc(acc, 2 * f - 1 + v, Closure_tag);
       Ram_field(acc, 0) = Val_codeptr(o);
       for (i = 1; i < f; i ++) {
-        Ram_field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_white);
+        Ram_field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_red);
         Ram_field(acc, 2 * i) = Val_codeptr(read_ptr_2B() - 2 * i - 2);
       }
       /* pop v elems into the closure */
@@ -812,7 +812,7 @@ static inline void interp(void) {
       OCamlAlloc(acc, 2 * f - 1 + v, Closure_tag);
       Ram_field(acc, 0) = o;
       for (i = 1; i < f; i ++) {
-        Ram_field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_white);
+        Ram_field(acc, 2 * i - 1) = Make_header(2 * i, Infix_tag, Color_red);
         Ram_field(acc, 2 * i) = Val_codeptr(read_ptr_4B() - 4 * i - 2);
       }
       for (i = 0 ; i < v; i ++) {

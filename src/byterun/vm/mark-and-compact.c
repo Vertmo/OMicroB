@@ -159,20 +159,7 @@ static void wipe_dead_blocks() {
       *start = Make_header(p - start - 1, String_tag, Color_white);
     } else {
       *p = h ^ Color_black;                        /* Switch color to White                   */
-      if (Tag_hd(h) == Closure_tag) {
-        mlsize_t size = Wosize_hd(h);
-        value *pp = p + 1;
-        p += Wosize_hd(h) + 1;                     /* Jump to the next block                  */
-        while (pp < p) {
-          value v = *pp;
-          if (Color_hd(v) == Color_black) {
-            *pp = v ^ Color_black;                 /* Switch color of infix headers to White  */
-          }
-          pp ++;
-        }
-      } else {
-        p += Wosize_hd(h) + 1;                     /* Jump to the next block                  */
-      }
+      p += Wosize_hd(h) + 1;                     /* Jump to the next block                  */
       h = *p;
     }
   }
