@@ -264,13 +264,15 @@ static void update_pointers(void) {
         mlsize_t i = 2;
         for (p ++; p < end; p ++, i ++) {                     /* Loop over fields and restore pointers to destination infix sub-block            */
           value v = *p;
-          if (Color_hd(v) == Color_black) {                   /* Is it an infix location?                                                           */
+          if (Color_hd(v) == Color_black &&
+              Is_block_in_dynamic_heap(v ^ Color_black)) {    /* Is it an infix location?                                                           */
             do {                                              /* Loop over the reversed pointer list                                             */
               v ^= Color_black;                               /* Restore pointers to this infix block                                            */
               value next = *Ram_block_val(v) & ~Color_red;
               *Ram_block_val(v) = Val_dynamic_block(alloc_pos + i);
               v = next;
-            } while (Color_hd(v) == Color_black);
+            } while (Color_hd(v) == Color_black &&
+                     Is_block_in_dynamic_heap(v ^ Color_black));
             *p = v | Color_red;                               /* Restore the Red original infix header                                           */
           }
         }
