@@ -63,6 +63,10 @@ let () =
   | Typechecker.Type_error s ->
      print_endline ("type error: " ^ s);
      exit 1
+  | Out_of_memory ->
+    print_endline "Out of memory!"
+  | Stack_overflow ->
+    print_endline "Stack overflow!"
   | e ->
      (* print_endline ("Anomaly: " ^ (Printexc.to_string e)); *)
      print_endline ("Anomaly: (some exception)");
