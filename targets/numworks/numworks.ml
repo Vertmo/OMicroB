@@ -276,7 +276,7 @@ let input_line chan =
   in bytes_unsafe_to_string (scan [] 0)
 
 external input_value : in_channel -> 'a = "caml_input_value"
-external close_in : in_channel -> unit = "caml_ml_close_channel"
+let close_in _ = ()
 
 external input_byte : in_channel -> int = "caml_ml_input_char"
 external input_binary_int : in_channel -> int = "caml_ml_input_int"
