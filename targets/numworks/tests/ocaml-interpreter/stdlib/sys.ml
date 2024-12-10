@@ -50,7 +50,7 @@ external command: string -> int = "caml_sys_system_command"
 external time: unit -> (float [@unboxed]) =
   "caml_sys_time" "caml_sys_time_unboxed" [@@noalloc]
 external chdir: string -> unit = "caml_sys_chdir"
-external getcwd: unit -> string = "caml_sys_getcwd"
+let getcwd () = "/" (* TODO? *)
 external readdir : string -> string array = "caml_sys_read_directory"
 
 let interactive = ref false

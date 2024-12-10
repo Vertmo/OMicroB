@@ -23,43 +23,43 @@ let section_table = ref ([] : (string * int) list)
 
 let section_beginning = ref 0
 
-let init_record outchan =
-  section_beginning := pos_out outchan;
-  section_table := []
+(* let init_record outchan = *)
+(*   section_beginning := pos_out outchan; *)
+(*   section_table := [] *)
 
-let record outchan name =
-  let pos = pos_out outchan in
-  section_table := (name, pos - !section_beginning) :: !section_table;
-  section_beginning := pos
+(* let record outchan name = *)
+(*   let pos = pos_out outchan in *)
+(*   section_table := (name, pos - !section_beginning) :: !section_table; *)
+(*   section_beginning := pos *)
 
-let write_toc_and_trailer outchan =
-  List.iter
-    (fun (name, len) ->
-      output_string outchan name; output_binary_int outchan len)
-    (List.rev !section_table);
-  output_binary_int outchan (List.length !section_table);
-  output_string outchan Config.exec_magic_number;
-  section_table := [];
+(* let write_toc_and_trailer outchan = *)
+(*   List.iter *)
+(*     (fun (name, len) -> *)
+(*       output_string outchan name; output_binary_int outchan len) *)
+(*     (List.rev !section_table); *)
+(*   output_binary_int outchan (List.length !section_table); *)
+(*   output_string outchan Config.exec_magic_number; *)
+(*   section_table := [] *)
 
 (* Read the table of sections from a bytecode executable *)
 
-exception Bad_magic_number
+(* exception Bad_magic_number *)
 
-let read_toc ic =
-  let pos_trailer = in_channel_length ic - 16 in
-  seek_in ic pos_trailer;
-  let num_sections = input_binary_int ic in
-  let header =
-    really_input_string ic (String.length Config.exec_magic_number)
-  in
-  if header <> Config.exec_magic_number then raise Bad_magic_number;
-  seek_in ic (pos_trailer - 8 * num_sections);
-  section_table := [];
-  for _i = 1 to num_sections do
-    let name = really_input_string ic 4 in
-    let len = input_binary_int ic in
-    section_table := (name, len) :: !section_table
-  done
+(* let read_toc ic = *)
+(*   let pos_trailer = in_channel_length ic - 16 in *)
+(*   seek_in ic pos_trailer; *)
+(*   let num_sections = input_binary_int ic in *)
+(*   let header = *)
+(*     really_input_string ic (String.length Config.exec_magic_number) *)
+(*   in *)
+(*   if header <> Config.exec_magic_number then raise Bad_magic_number; *)
+(*   seek_in ic (pos_trailer - 8 * num_sections); *)
+(*   section_table := []; *)
+(*   for _i = 1 to num_sections do *)
+(*     let name = really_input_string ic 4 in *)
+(*     let len = input_binary_int ic in *)
+(*     section_table := (name, len) :: !section_table *)
+(*   done *)
 
 (* Return the current table of contents *)
 

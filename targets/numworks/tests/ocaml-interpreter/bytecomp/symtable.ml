@@ -224,8 +224,8 @@ let initial_global_table () =
 
 (* Save the table of globals *)
 
-let output_global_map oc =
-  output_value oc !global_table
+(* let output_global_map oc = *)
+(*   output_value oc !global_table *)
 
 let data_global_map () =
   Obj.repr !global_table
@@ -263,7 +263,7 @@ let read_sections () =
         (fun () -> ()) }
   with Not_found ->
     let ic = open_in_bin Sys.executable_name in
-    Bytesections.read_toc ic;
+    (* Bytesections.read_toc ic; *)
     { read_string = Bytesections.read_section_string ic;
       read_struct = Bytesections.read_section_struct ic;
       close_reader = fun () -> close_in ic }
@@ -295,7 +295,7 @@ let init_toplevel () =
     (* Done *)
     sect.close_reader();
     crcintfs
-  with Bytesections.Bad_magic_number | Not_found | Failure _ ->
+  with (* Bytesections.Bad_magic_number | *) Not_found | Failure _ ->
     fatal_error "Toplevel bytecode executable is corrupted"
 
 (* Find the value of a global identifier *)

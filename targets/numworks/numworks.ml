@@ -134,15 +134,6 @@ let read_ocamlpy_file () =
 (* Copied content of the stdlib.ml file *)
 (****************************************)
 
-(* String and byte sequence operations -- more in modules String and Bytes *)
-
-external string_length : string -> int = "%string_length"
-external bytes_length : bytes -> int = "%bytes_length"
-external bytes_create : int -> bytes = "caml_create_bytes"
-external string_blit : string -> int -> bytes -> int -> int -> unit = "caml_blit_string" [@@noalloc]
-external bytes_blit : bytes -> int -> bytes -> int -> int -> unit = "caml_blit_bytes" [@@noalloc]
-external bytes_unsafe_to_string : bytes -> string = "%bytes_to_string"
-
 (* I/O operations *)
 
 type in_channel = bytes * int ref
@@ -179,38 +170,27 @@ let output_string oc s =
   if oc = stdout || oc = stderr then print_string s
   else print_endline "FIXME output_string"
 
-let output_bytes oc b = output_string oc (bytes_unsafe_to_string b)
+let output_bytes oc b = output_string oc (Bytes.unsafe_to_string b)
 
 let output_char oc c = output_string oc (String.make 1 c)
 
 let output oc s ofs len =
-  if ofs < 0 || len < 0 || ofs > bytes_length s - len
+  if ofs < 0 || len < 0 || ofs > Bytes.length s - len
   then invalid_arg "output"
   else output_bytes oc (Bytes.sub s ofs len)
 
 let output_substring oc s ofs len =
-  if ofs < 0 || len < 0 || ofs > string_length s - len
+  if ofs < 0 || len < 0 || ofs > String.length s - len
   then invalid_arg "output_substring"
   else output_string oc (String.sub s ofs len)
 
-external output_binary_int : out_channel -> int -> unit = "caml_ml_output_int"
-
-external marshal_to_channel : out_channel -> 'a -> unit list -> unit
-  = "caml_output_value"
-let output_value chan v = marshal_to_channel chan v []
-
-external seek_out : out_channel -> int -> unit = "caml_ml_seek_out"
-external pos_out : out_channel -> int = "caml_ml_pos_out"
-external out_channel_length : out_channel -> int = "caml_ml_channel_size"
 let close_out oc = flush oc
 let close_out_noerr oc = try flush oc with _ -> ()
-external set_binary_mode_out : out_channel -> bool -> unit
-  = "caml_ml_set_binary_mode"
 
 
 (* Output functions on standard output *)
 
-let print_bytes s = print_string (bytes_unsafe_to_string s)
+let print_bytes s = print_string (Bytes.unsafe_to_string s)
 
 (* Output functions on standard error *)
 
@@ -251,43 +231,40 @@ let input_line chan =
   let rec build_result buf pos = function
     [] -> buf
   | hd :: tl ->
-      let len = bytes_length hd in
-      bytes_blit hd 0 buf (pos - len) len;
+      let len = Bytes.length hd in
+      Bytes.unsafe_blit hd 0 buf (pos - len) len;
       build_result buf (pos - len) tl in
   let rec scan accu len =
     let n = input_scan_line chan in
     if n = 0 then begin                   (* n = 0: we are at EOF *)
       match accu with
         [] -> raise End_of_file
-      | _  -> build_result (bytes_create len) len accu
+      | _  -> build_result (Bytes.create len) len accu
     end else if n > 0 then begin          (* n > 0: newline found in buffer *)
-      let res = bytes_create (n - 1) in
+      let res = Bytes.create (n - 1) in
       ignore (unsafe_input chan res 0 (n - 1));
       ignore (input_char chan);           (* skip the newline *)
       match accu with
         [] -> res
       |  _ -> let len = len + n - 1 in
-              build_result (bytes_create len) len (res :: accu)
+              build_result (Bytes.create len) len (res :: accu)
     end else begin                        (* n < 0: newline not found *)
-      let beg = bytes_create (-n) in
+      let beg = Bytes.create (-n) in
       ignore(unsafe_input chan beg 0 (-n));
       scan (beg :: accu) (len - n)
     end
-  in bytes_unsafe_to_string (scan [] 0)
+  in Bytes.unsafe_to_string (scan [] 0)
 
 external input_value : in_channel -> 'a = "caml_input_value"
 let close_in _ = ()
 
-external input_byte : in_channel -> int = "caml_ml_input_char"
-external input_binary_int : in_channel -> int = "caml_ml_input_int"
-external input_value : in_channel -> 'a = "caml_input_value"
 external seek_in : in_channel -> int -> unit = "caml_ml_seek_in"
 external pos_in : in_channel -> int = "caml_ml_pos_in"
 
 external in_channel_length : in_channel -> int = "caml_ml_channel_size"
 
 let input ic s ofs len =
-  if ofs < 0 || len < 0 || ofs > bytes_length s - len
+  if ofs < 0 || len < 0 || ofs > Bytes.length s - len
   then invalid_arg "input"
   else unsafe_input ic s ofs len
 
@@ -300,11 +277,11 @@ let rec unsafe_really_input ic s ofs len =
   end
 
 let really_input ic s ofs len =
-  if ofs < 0 || len < 0 || ofs > bytes_length s - len
+  if ofs < 0 || len < 0 || ofs > Bytes.length s - len
   then invalid_arg "really_input"
   else unsafe_really_input ic s ofs len
 
 let really_input_string ic len =
-  let s = bytes_create len in
+  let s = Bytes.create len in
   really_input ic s 0 len;
-  bytes_unsafe_to_string s
+  Bytes.unsafe_to_string s

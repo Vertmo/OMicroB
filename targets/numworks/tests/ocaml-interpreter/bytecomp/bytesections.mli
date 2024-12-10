@@ -17,24 +17,24 @@
 
 (** Recording sections written to a bytecode executable file *)
 
-val init_record: out_channel -> unit
-    (* Start recording sections from the current position in out_channel *)
+(* val init_record: out_channel -> unit *)
+(*     (\* Start recording sections from the current position in out_channel *\) *)
 
-val record: out_channel -> string -> unit
-    (* Record the current position in the out_channel as the end of
-       the section with the given name *)
+(* val record: out_channel -> string -> unit *)
+(*     (\* Record the current position in the out_channel as the end of *)
+(*        the section with the given name *\) *)
 
-val write_toc_and_trailer: out_channel -> unit
-    (* Write the table of contents and the standard trailer for bytecode
-       executable files *)
+(* val write_toc_and_trailer: out_channel -> unit *)
+(*     (\* Write the table of contents and the standard trailer for bytecode *)
+(*        executable files *\) *)
 
 (** Reading sections from a bytecode executable file *)
 
-val read_toc: in_channel -> unit
-    (* Read the table of sections from a bytecode executable *)
+(* val read_toc: in_channel -> unit *)
+(*     (\* Read the table of sections from a bytecode executable *\) *)
 
-exception Bad_magic_number
-    (* Raised by [read_toc] if magic number doesn't match *)
+(* exception Bad_magic_number *)
+(*     (\* Raised by [read_toc] if magic number doesn't match *\) *)
 
 val toc: unit -> (string * int) list
     (* Return the current table of contents as a list of

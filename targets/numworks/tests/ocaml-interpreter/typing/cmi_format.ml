@@ -73,17 +73,17 @@ let read_cmi filename =
       close_in ic;
       raise (Error e)
 
-let output_cmi filename oc cmi =
-(* beware: the provided signature must have been substituted for saving *)
-  output_string oc Config.cmi_magic_number;
-  output_value oc (cmi.cmi_name, cmi.cmi_sign);
-  flush oc;
-  (* let crc = Digest.file filename in *)
-  let crc = Digest.string filename in
-  let crcs = (cmi.cmi_name, Some crc) :: cmi.cmi_crcs in
-  output_value oc crcs;
-  output_value oc cmi.cmi_flags;
-  crc
+(* let output_cmi filename oc cmi = *)
+(* (\* beware: the provided signature must have been substituted for saving *\) *)
+(*   output_string oc Config.cmi_magic_number; *)
+(*   output_value oc (cmi.cmi_name, cmi.cmi_sign); *)
+(*   flush oc; *)
+(*   (\* let crc = Digest.file filename in *\) *)
+(*   let crc = Digest.string filename in *)
+(*   let crcs = (cmi.cmi_name, Some crc) :: cmi.cmi_crcs in *)
+(*   output_value oc crcs; *)
+(*   output_value oc cmi.cmi_flags; *)
+(*   crc *)
 
 (* Error report *)
 

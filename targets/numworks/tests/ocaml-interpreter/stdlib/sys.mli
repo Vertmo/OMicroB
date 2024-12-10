@@ -73,7 +73,7 @@ external time : unit -> (float [@unboxed]) =
 (** Return the processor time, in seconds, used by the program
    since the beginning of execution. *)
 
-external getcwd : unit -> string = "caml_sys_getcwd"
+val getcwd : unit -> string
 (** Return the current working directory of the process. *)
 
 val interactive : bool ref

@@ -38,12 +38,12 @@ let magic_of_kind : type a . a ast_kind -> string = function
 (* Note: some of the functions here should go to Ast_mapper instead,
    which would encapsulate the "binary AST" protocol. *)
 
-let write_ast (type a) (kind : a ast_kind) fn (ast : a) =
-  let oc = open_out_bin fn in
-  output_string oc (magic_of_kind kind);
-  output_value oc (!Location.input_name : string);
-  output_value oc (ast : a);
-  close_out oc
+(* let write_ast (type a) (kind : a ast_kind) fn (ast : a) = *)
+(*   let oc = open_out_bin fn in *)
+(*   output_string oc (magic_of_kind kind); *)
+(*   output_value oc (!Location.input_name : string); *)
+(*   output_value oc (ast : a); *)
+(*   close_out oc *)
 
 let read_ast (type a) (kind : a ast_kind) fn : a =
   let ic = open_in_bin fn in

@@ -514,25 +514,25 @@ let matching_filename filename { pattern } =
     let pattern = String.lowercase_ascii pattern in
     filename = pattern
 
-let apply_config_file ppf position =
-  let config_file =
-    Filename.concat Config.standard_library "ocaml_compiler_internal_params"
-  in
-  let config =
-    if Sys.file_exists config_file then
-      load_config ppf config_file
-    else
-      []
-  in
-  let config =
-    match position with
-    | Before_compile filename ->
-      List.filter (matching_filename filename) config
-    | Before_args | Before_link ->
-      List.filter (fun { pattern } -> pattern = Any) config
-  in
-  List.iter (fun { name; value } -> read_one_param ppf position name value)
-    config
+let apply_config_file _ppf _position = ()
+  (* let config_file = *)
+  (*   Filename.concat Config.standard_library "ocaml_compiler_internal_params" *)
+  (* in *)
+  (* let config = *)
+  (*   if Sys.file_exists config_file then *)
+  (*     load_config ppf config_file *)
+  (*   else *)
+  (*     [] *)
+  (* in *)
+  (* let config = *)
+  (*   match position with *)
+  (*   | Before_compile filename -> *)
+  (*     List.filter (matching_filename filename) config *)
+  (*   | Before_args | Before_link -> *)
+  (*     List.filter (fun { pattern } -> pattern = Any) config *)
+  (* in *)
+  (* List.iter (fun { name; value } -> read_one_param ppf position name value) *)
+  (*   config *)
 
 let readenv ppf position =
   last_include_dirs := [];

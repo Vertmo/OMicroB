@@ -24,7 +24,7 @@ val patch_object: bytes -> (reloc_info * int) list -> unit
 val ls_patch_object: Misc.LongString.t -> (reloc_info * int) list -> unit
 val require_primitive: string -> unit
 val initial_global_table: unit -> Obj.t array
-val output_global_map: out_channel -> unit
+(* val output_global_map: out_channel -> unit *)
 val output_primitive_names: out_channel -> unit
 val output_primitive_table: out_channel -> unit
 val data_global_map: unit -> Obj.t

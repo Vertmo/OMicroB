@@ -187,38 +187,6 @@ val output_substring : out_channel -> string -> int -> int -> unit
 a byte sequence.
 @since 4.02.0 *)
 
-val output_binary_int : out_channel -> int -> unit
-(** Write one integer in binary format (4 bytes, big-endian)
-on the given output channel.
-The given integer is taken modulo 2{^32}.
-The only reliable way to read it back is through the
-{!Pervasives.input_binary_int} function. The format is compatible across
-all machines for a given version of OCaml. *)
-
-val output_value : out_channel -> 'a -> unit
-(** Write the representation of a structured value of any type
-to a channel. Circularities and sharing inside the value
-are detected and preserved. The object can be read back,
-by the function {!Pervasives.input_value}. See the description of module
-{!Marshal} for more information. {!Pervasives.output_value} is equivalent
-to {!Marshal.to_channel} with an empty list of flags. *)
-
-val seek_out : out_channel -> int -> unit
-(** [seek_out chan pos] sets the current writing position to [pos]
-for channel [chan]. This works only for regular files. On
-files of other kinds (such as terminals, pipes and sockets),
-the behavior is unspecified. *)
-
-val pos_out : out_channel -> int
-(** Return the current writing position for the given channel.  Does
-not work on channels opened with the [Open_append] flag (returns
-unspecified results). *)
-
-val out_channel_length : out_channel -> int
-(** Return the size (number of characters) of the regular file
-on which the given channel is opened.  If the channel is opened
-on a file that is not a regular file, the result is meaningless. *)
-
 val close_out : out_channel -> unit
 (** Close the given channel, flushing all buffered write operations.
 Output functions raise a [Sys_error] exception when they are
@@ -229,16 +197,6 @@ system signals an error when flushing or closing. *)
 
 val close_out_noerr : out_channel -> unit
 (** Same as [close_out], but ignore all errors. *)
-
-val set_binary_mode_out : out_channel -> bool -> unit
-(** [set_binary_mode_out oc true] sets the channel [oc] to binary
-mode: no translations take place during output.
-[set_binary_mode_out oc false] sets the channel [oc] to text
-mode: depending on the operating system, some translations
-may take place during output.  For instance, under Windows,
-end-of-lines will be translated from [\n] to [\r\n].
-This function has no effect under operating systems that
-do not distinguish between text mode and binary mode. *)
 
 
 (** {2 General input functions} *)
@@ -315,17 +273,6 @@ val close_in : in_channel -> unit
   exception when they are applied to a closed input channel,
   except [close_in], which does nothing when applied to an already
   closed channel. *)
-
-val input_byte : in_channel -> int
-(** Same as {!Pervasives.input_char}, but return the 8-bit integer representing
-   the character.
-   Raise [End_of_file] if an end of file was reached. *)
-
-val input_binary_int : in_channel -> int
-(** Read an integer encoded in binary format (4 bytes, big-endian)
-   from the given input channel. See {!Pervasives.output_binary_int}.
-   Raise [End_of_file] if an end of file was reached while reading the
-   integer. *)
 
 val input_value : in_channel -> 'a
 (** Read the representation of a structured value, as produced

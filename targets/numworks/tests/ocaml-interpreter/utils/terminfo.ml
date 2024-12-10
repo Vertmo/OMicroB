@@ -15,7 +15,7 @@
 
 open Printf
 
-external terminfo_rows: out_channel -> int = "caml_terminfo_rows"
+let terminfo_rows _ = 0
 
 type status =
   | Uninitialised

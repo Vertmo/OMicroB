@@ -244,57 +244,58 @@ let execute_phrase print_outcome ppf phr =
       Typecore.force_delayed_checks ();
       let lam = Translmod.transl_toplevel_definition str in
       Warnings.check_fatal ();
-      begin try
-        toplevel_env := newenv;
-        let res = load_lambda ppf lam in
-        let out_phr =
-          match res with
-          | Result v ->
-              if print_outcome then
-                Printtyp.wrap_printing_env ~error:false oldenv (fun () ->
-                  match str.str_items with
-                  | [ { str_desc =
-                          (Tstr_eval (exp, _)
-                          |Tstr_value
-                              (Asttypes.Nonrecursive,
-                               [{vb_pat = {pat_desc=Tpat_any};
-                                 vb_expr = exp}
-                               ]
-                              )
-                          )
-                      }
-                    ] ->
-                      let outv = outval_of_value newenv v exp.exp_type in
-                      let ty = Printtyp.tree_of_type_scheme exp.exp_type in
-                      Ophr_eval (outv, ty)
+      (* begin try *)
+      (*   toplevel_env := newenv; *)
+      (*   let res = load_lambda ppf lam in *)
+      (*   let out_phr = *)
+      (*     match res with *)
+      (*     | Result v -> *)
+      (*         if print_outcome then *)
+      (*           Printtyp.wrap_printing_env ~error:false oldenv (fun () -> *)
+      (*             match str.str_items with *)
+      (*             | [ { str_desc = *)
+      (*                     (Tstr_eval (exp, _) *)
+      (*                     |Tstr_value *)
+      (*                         (Asttypes.Nonrecursive, *)
+      (*                          [{vb_pat = {pat_desc=Tpat_any}; *)
+      (*                            vb_expr = exp} *)
+      (*                          ] *)
+      (*                         ) *)
+      (*                     ) *)
+      (*                 } *)
+      (*               ] -> *)
+      (*                 let outv = outval_of_value newenv v exp.exp_type in *)
+      (*                 let ty = Printtyp.tree_of_type_scheme exp.exp_type in *)
+      (*                 Ophr_eval (outv, ty) *)
 
-                  | [] -> Ophr_signature []
-                  | _ -> Ophr_signature (pr_item newenv sg'))
-              else Ophr_signature []
-          | Exception exn ->
-              toplevel_env := oldenv;
-              let outv =
-                outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn
-              in
-              Ophr_exception (exn, outv)
-        in
-        !print_out_phrase ppf out_phr;
-        if Printexc.backtrace_status ()
-        then begin
-          match !backtrace with
-            | None -> ()
-            | Some b ->
-                pp_print_string ppf b;
-                pp_print_flush ppf ();
-                backtrace := None;
-        end;
-        begin match out_phr with
-        | Ophr_eval (_, _) | Ophr_signature _ -> true
-        | Ophr_exception _ -> false
-        end
-      with x ->
-        toplevel_env := oldenv; raise x
-      end
+      (*             | [] -> Ophr_signature [] *)
+      (*             | _ -> Ophr_signature (pr_item newenv sg')) *)
+      (*         else Ophr_signature [] *)
+      (*     | Exception exn -> *)
+      (*         toplevel_env := oldenv; *)
+      (*         let outv = *)
+      (*           outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn *)
+      (*         in *)
+      (*         Ophr_exception (exn, outv) *)
+      (*   in *)
+      (*   !print_out_phrase ppf out_phr; *)
+      (*   if Printexc.backtrace_status () *)
+      (*   then begin *)
+      (*     match !backtrace with *)
+      (*       | None -> () *)
+      (*       | Some b -> *)
+      (*           pp_print_string ppf b; *)
+      (*           pp_print_flush ppf (); *)
+      (*           backtrace := None; *)
+      (*   end; *)
+      (*   begin match out_phr with *)
+      (*   | Ophr_eval (_, _) | Ophr_signature _ -> true *)
+      (*   | Ophr_exception _ -> false *)
+      (*   end *)
+      (* with x -> *)
+      (*   toplevel_env := oldenv; raise x *)
+      (* end *)
+      print_endline "TODO"; true
   | Ptop_dir(dir_name, dir_arg) ->
       let d =
         try Some (Hashtbl.find directive_table dir_name)

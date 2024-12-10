@@ -826,71 +826,71 @@ let extension_of_exn exn =
   | None -> raise exn
 
 
-let apply_lazy ~source ~target mapper =
-  let implem ast =
-    let fields, ast =
-      match ast with
-      | {pstr_desc = Pstr_attribute ({txt = "ocaml.ppx.context"}, x)} :: l ->
-          PpxContext.get_fields x, l
-      | _ -> [], ast
-    in
-    PpxContext.restore fields;
-    let ast =
-      try
-        let mapper = mapper () in
-        mapper.structure mapper ast
-      with exn ->
-        [{pstr_desc = Pstr_extension (extension_of_exn exn, []);
-          pstr_loc  = Location.none}]
-    in
-    let fields = PpxContext.update_cookies fields in
-    Str.attribute (PpxContext.mk fields) :: ast
-  in
-  let iface ast =
-    let fields, ast =
-      match ast with
-      | {psig_desc = Psig_attribute ({txt = "ocaml.ppx.context"}, x)} :: l ->
-          PpxContext.get_fields x, l
-      | _ -> [], ast
-    in
-    PpxContext.restore fields;
-    let ast =
-      try
-        let mapper = mapper () in
-        mapper.signature mapper ast
-      with exn ->
-        [{psig_desc = Psig_extension (extension_of_exn exn, []);
-          psig_loc  = Location.none}]
-    in
-    let fields = PpxContext.update_cookies fields in
-    Sig.attribute (PpxContext.mk fields) :: ast
-  in
+(* let apply_lazy ~source ~target mapper = *)
+(*   let implem ast = *)
+(*     let fields, ast = *)
+(*       match ast with *)
+(*       | {pstr_desc = Pstr_attribute ({txt = "ocaml.ppx.context"}, x)} :: l -> *)
+(*           PpxContext.get_fields x, l *)
+(*       | _ -> [], ast *)
+(*     in *)
+(*     PpxContext.restore fields; *)
+(*     let ast = *)
+(*       try *)
+(*         let mapper = mapper () in *)
+(*         mapper.structure mapper ast *)
+(*       with exn -> *)
+(*         [{pstr_desc = Pstr_extension (extension_of_exn exn, []); *)
+(*           pstr_loc  = Location.none}] *)
+(*     in *)
+(*     let fields = PpxContext.update_cookies fields in *)
+(*     Str.attribute (PpxContext.mk fields) :: ast *)
+(*   in *)
+(*   let iface ast = *)
+(*     let fields, ast = *)
+(*       match ast with *)
+(*       | {psig_desc = Psig_attribute ({txt = "ocaml.ppx.context"}, x)} :: l -> *)
+(*           PpxContext.get_fields x, l *)
+(*       | _ -> [], ast *)
+(*     in *)
+(*     PpxContext.restore fields; *)
+(*     let ast = *)
+(*       try *)
+(*         let mapper = mapper () in *)
+(*         mapper.signature mapper ast *)
+(*       with exn -> *)
+(*         [{psig_desc = Psig_extension (extension_of_exn exn, []); *)
+(*           psig_loc  = Location.none}] *)
+(*     in *)
+(*     let fields = PpxContext.update_cookies fields in *)
+(*     Sig.attribute (PpxContext.mk fields) :: ast *)
+(*   in *)
 
-  let ic = open_in_bin source in
-  let magic =
-    really_input_string ic (String.length Config.ast_impl_magic_number)
-  in
+(*   let ic = open_in_bin source in *)
+(*   let magic = *)
+(*     really_input_string ic (String.length Config.ast_impl_magic_number) *)
+(*   in *)
 
-  let rewrite transform =
-    Location.input_name := input_value ic;
-    let ast = input_value ic in
-    close_in ic;
-    let ast = transform ast in
-    let oc = open_out_bin target in
-    output_string oc magic;
-    output_value oc !Location.input_name;
-    output_value oc ast;
-    close_out oc
-  and fail () =
-    close_in ic;
-    failwith "Ast_mapper: OCaml version mismatch or malformed input";
-  in
+(*   let rewrite transform = *)
+(*     Location.input_name := input_value ic; *)
+(*     let ast = input_value ic in *)
+(*     close_in ic; *)
+(*     let ast = transform ast in *)
+(*     let oc = open_out_bin target in *)
+(*     output_string oc magic; *)
+(*     output_value oc !Location.input_name; *)
+(*     output_value oc ast; *)
+(*     close_out oc *)
+(*   and fail () = *)
+(*     close_in ic; *)
+(*     failwith "Ast_mapper: OCaml version mismatch or malformed input"; *)
+(*   in *)
 
-  if magic = Config.ast_impl_magic_number then
-    rewrite (implem : structure -> structure)
-  else if magic = Config.ast_intf_magic_number then
-    rewrite (iface : signature -> signature)
-  else fail ()
+(*   if magic = Config.ast_impl_magic_number then *)
+(*     rewrite (implem : structure -> structure) *)
+(*   else if magic = Config.ast_intf_magic_number then *)
+(*     rewrite (iface : signature -> signature) *)
+(*   else fail () *)
 
 let drop_ppx_context_str ~restore = function
   | {pstr_desc = Pstr_attribute({Location.txt = "ocaml.ppx.context"}, a)}
@@ -915,30 +915,30 @@ let add_ppx_context_sig ~tool_name ast =
   Ast_helper.Sig.attribute (ppx_context ~tool_name ()) :: ast
 
 
-let apply ~source ~target mapper =
-  apply_lazy ~source ~target (fun () -> mapper)
+(* let apply ~source ~target mapper = *)
+(*   apply_lazy ~source ~target (fun () -> mapper) *)
 
-let run_main mapper =
-  try
-    let a = Sys.argv in
-    let n = Array.length a in
-    if n > 2 then
-      let mapper () =
-        try mapper (Array.to_list (Array.sub a 1 (n - 3)))
-        with exn ->
-          (* PR#6463 *)
-          let f _ _ = raise exn in
-          {default_mapper with structure = f; signature = f}
-      in
-      apply_lazy ~source:a.(n - 2) ~target:a.(n - 1) mapper
-    else begin
-      Printf.eprintf "Usage: %s [extra_args] <infile> <outfile>\n%!"
-                     Sys.executable_name;
-      exit 2
-    end
-  with exn ->
-    prerr_endline (Printexc.to_string exn);
-    exit 2
+(* let run_main mapper = *)
+(*   try *)
+(*     let a = Sys.argv in *)
+(*     let n = Array.length a in *)
+(*     if n > 2 then *)
+(*       let mapper () = *)
+(*         try mapper (Array.to_list (Array.sub a 1 (n - 3))) *)
+(*         with exn -> *)
+(*           (\* PR#6463 *\) *)
+(*           let f _ _ = raise exn in *)
+(*           {default_mapper with structure = f; signature = f} *)
+(*       in *)
+(*       apply_lazy ~source:a.(n - 2) ~target:a.(n - 1) mapper *)
+(*     else begin *)
+(*       Printf.eprintf "Usage: %s [extra_args] <infile> <outfile>\n%!" *)
+(*                      Sys.executable_name; *)
+(*       exit 2 *)
+(*     end *)
+(*   with exn -> *)
+(*     prerr_endline (Printexc.to_string exn); *)
+(*     exit 2 *)
 
-let register_function = ref (fun _name f -> run_main f)
-let register name f = !register_function name f
+(* let register_function = ref (fun _name f -> run_main f) *)
+(* let register name f = !register_function name f *)
