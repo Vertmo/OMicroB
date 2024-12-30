@@ -37,7 +37,6 @@ module Const = struct
   let int ?suffix i = integer ?suffix (string_of_int i)
   let int32 ?(suffix='l') i = integer ~suffix (Int32.to_string i)
   let int64 ?(suffix='L') i = integer ~suffix (Int64.to_string i)
-  let nativeint ?(suffix='n') i = integer ~suffix (Nativeint.to_string i)
   let float ?suffix f = Pconst_float (f, suffix)
   let char c = Pconst_char c
   let string ?quotation_delimiter s = Pconst_string (s, quotation_delimiter)

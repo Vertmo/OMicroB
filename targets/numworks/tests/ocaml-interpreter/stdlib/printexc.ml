@@ -323,6 +323,6 @@ let handle_uncaught_exception exn debugger_in_use =
 external register_named_value : string -> 'a -> unit
   = "caml_register_named_value"
 
-let () =
-  register_named_value "Printexc.handle_uncaught_exception"
-    handle_uncaught_exception
+(* let () = *)
+(*   register_named_value "Printexc.handle_uncaught_exception" *)
+(*     handle_uncaught_exception *)

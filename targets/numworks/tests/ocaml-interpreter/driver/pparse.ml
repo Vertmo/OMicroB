@@ -45,21 +45,21 @@ let magic_of_kind : type a . a ast_kind -> string = function
 (*   output_value oc (ast : a); *)
 (*   close_out oc *)
 
-let read_ast (type a) (kind : a ast_kind) fn : a =
-  let ic = open_in_bin fn in
-  try
-    let magic = magic_of_kind kind in
-    let buffer = really_input_string ic (String.length magic) in
-    assert(buffer = magic); (* already checked by apply_rewriter *)
-    Location.input_name := (input_value ic : string);
-    let ast = (input_value ic : a) in
-    close_in ic;
-    Misc.remove_file fn;
-    ast
-  with exn ->
-    close_in ic;
-    Misc.remove_file fn;
-    raise exn
+(* let read_ast (type a) (kind : a ast_kind) fn : a = *)
+(*   let ic = open_in_bin fn in *)
+(*   try *)
+(*     let magic = magic_of_kind kind in *)
+(*     let buffer = really_input_string ic (String.length magic) in *)
+(*     assert(buffer = magic); (\* already checked by apply_rewriter *\) *)
+(*     Location.input_name := (input_value ic : string); *)
+(*     let ast = (input_value ic : a) in *)
+(*     close_in ic; *)
+(*     Misc.remove_file fn; *)
+(*     ast *)
+(*   with exn -> *)
+(*     close_in ic; *)
+(*     Misc.remove_file fn; *)
+(*     raise exn *)
 
 (* Parse a file or get a dumped syntax tree from it *)
 

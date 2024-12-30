@@ -92,9 +92,9 @@ let read_section_struct ic name =
 
 (* Return the position of the beginning of the first section *)
 
-let pos_first_section ic =
-  in_channel_length ic - 16 - 8 * List.length !section_table -
-  List.fold_left (fun total (_name, len) -> total + len) 0 !section_table
+(* let pos_first_section ic = *)
+(*   in_channel_length ic - 16 - 8 * List.length !section_table - *)
+(*   List.fold_left (fun total (_name, len) -> total + len) 0 !section_table *)
 
 let reset () =
   section_table := [];

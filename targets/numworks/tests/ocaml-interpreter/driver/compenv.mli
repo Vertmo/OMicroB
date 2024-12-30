@@ -43,7 +43,7 @@ type filename = string
 type readenv_position =
   Before_args | Before_compile of filename | Before_link
 
-val readenv : Format.formatter -> readenv_position -> unit
+(* val readenv : Format.formatter -> readenv_position -> unit *)
 
 (* [is_unit_name name] returns true only if [name] can be used as a
    correct module name *)
@@ -69,10 +69,10 @@ val anonymous : string -> unit
 val impl : string -> unit
 val intf : string -> unit
 
-val process_deferred_actions :
-  Format.formatter *
-  (Format.formatter -> string -> string -> unit) * (* compile implementation *)
-  (Format.formatter -> string -> string -> unit) * (* compile interface *)
-  string * (* ocaml module extension *)
-  string -> (* ocaml library extension *)
-  unit
+(* val process_deferred_actions : *)
+(*   Format.formatter * *)
+(*   (Format.formatter -> string -> string -> unit) * (\* compile implementation *\) *)
+(*   (Format.formatter -> string -> string -> unit) * (\* compile interface *\) *)
+(*   string * (\* ocaml module extension *\) *)
+(*   string -> (\* ocaml library extension *\) *)
+(*   unit *)

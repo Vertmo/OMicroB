@@ -51,7 +51,7 @@ val read_section_string: in_channel -> string -> string
 val read_section_struct: in_channel -> string -> 'a
     (* Return the contents of a section, as marshalled data *)
 
-val pos_first_section: in_channel -> int
-   (* Return the position of the beginning of the first section *)
+(* val pos_first_section: in_channel -> int *)
+(*    (\* Return the position of the beginning of the first section *\) *)
 
 val reset: unit -> unit

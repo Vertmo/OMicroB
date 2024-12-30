@@ -31,8 +31,8 @@ val loop : formatter -> unit
 
 (* Read and execute a script from the given file *)
 
-val run_script : formatter -> string -> string array -> bool
-        (* true if successful, false if error *)
+(* val run_script : formatter -> string -> string array -> bool *)
+(*         (\* true if successful, false if error *\) *)
 
 (* Interface with toplevel directives *)
 
@@ -74,16 +74,16 @@ val preprocess_phrase :
     formatter -> Parsetree.toplevel_phrase ->  Parsetree.toplevel_phrase
         (* Preprocess the given toplevel phrase using regular and ppx
            preprocessors. Return the updated phrase. *)
-val use_file : formatter -> string -> bool
-val use_silently : formatter -> string -> bool
-val mod_use_file : formatter -> string -> bool
-        (* Read and execute commands from a file.
-           [use_file] prints the types and values of the results.
-           [use_silently] does not print them.
-           [mod_use_file] wrap the file contents into a module. *)
+(* val use_file : formatter -> string -> bool *)
+(* val use_silently : formatter -> string -> bool *)
+(* val mod_use_file : formatter -> string -> bool *)
+(*         (\* Read and execute commands from a file. *)
+(*            [use_file] prints the types and values of the results. *)
+(*            [use_silently] does not print them. *)
+(*            [mod_use_file] wrap the file contents into a module. *\) *)
 val eval_path: Env.t -> Path.t -> Obj.t
         (* Return the toplevel object referred to by the given path *)
-val record_backtrace : unit -> unit
+(* val record_backtrace : unit -> unit *)
 
 (* Printing of values *)
 

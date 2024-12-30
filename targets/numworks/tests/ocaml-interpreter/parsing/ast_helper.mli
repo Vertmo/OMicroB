@@ -42,7 +42,6 @@ module Const : sig
   val int : ?suffix:char -> int -> constant
   val int32 : ?suffix:char -> int32 -> constant
   val int64 : ?suffix:char -> int64 -> constant
-  val nativeint : ?suffix:char -> nativeint -> constant
   val float : ?suffix:char -> string -> constant
 end
 

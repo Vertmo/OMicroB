@@ -230,8 +230,6 @@ external format_int: string -> int -> string
   = "caml_format_int"
 external format_int32: string -> int32 -> string
   = "caml_int32_format"
-external format_nativeint: string -> nativeint -> string
-  = "caml_nativeint_format"
 external format_int64: string -> int64 -> string
   = "caml_int64_format"
 external hexstring_of_float: float -> int -> char -> string
@@ -1420,7 +1418,6 @@ let format_of_fconv fconv prec =
 (* Convert an integer to a string according to a conversion. *)
 let convert_int iconv n = format_int (format_of_iconv iconv) n
 let convert_int32 iconv n = format_int32 (format_of_iconvl iconv) n
-let convert_nativeint iconv n = format_nativeint (format_of_iconvn iconv) n
 let convert_int64 iconv n = format_int64 (format_of_iconvL iconv) n
 
 (* Convert a float to string. *)
@@ -1499,8 +1496,8 @@ fun k o acc fmt -> match fmt with
     make_int_padding_precision k o acc rest pad prec convert_int iconv
   | Int32 (iconv, pad, prec, rest) ->
     make_int_padding_precision k o acc rest pad prec convert_int32 iconv
-  | Nativeint (iconv, pad, prec, rest) ->
-    make_int_padding_precision k o acc rest pad prec convert_nativeint iconv
+  | Nativeint _ ->
+    failwith "Native ints not supported"
   | Int64 (iconv, pad, prec, rest) ->
     make_int_padding_precision k o acc rest pad prec convert_int64 iconv
   | Float (fconv, pad, prec, rest) ->

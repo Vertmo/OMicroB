@@ -152,9 +152,9 @@ type evaluation_outcome = Result of Obj.t | Exception of exn
 
 let backtrace = ref None
 
-let record_backtrace () =
-  if Printexc.backtrace_status ()
-  then backtrace := Some (Printexc.get_backtrace ())
+(* let record_backtrace () = *)
+(*   if Printexc.backtrace_status () *)
+(*   then backtrace := Some (Printexc.get_backtrace ()) *)
 
 let load_lambda ppf lam =
   if !Clflags.dump_rawlambda then fprintf ppf "%a@." Printlambda.lambda lam;
@@ -182,7 +182,7 @@ let load_lambda ppf lam =
     Result retval
   with x ->
     may_trace := false;
-    record_backtrace ();
+    (* record_backtrace (); *)
     toplevel_value_bindings := initial_bindings; (* PR#6211 *)
     Symtable.restore_state initial_symtable;
     Exception x
@@ -209,14 +209,14 @@ let print_out_exception ppf exn outv =
 
 let print_exception_outcome ppf exn =
   let outv = outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn in
-  print_out_exception ppf exn outv;
-  if Printexc.backtrace_status ()
-  then
-    match !backtrace with
-      | None -> ()
-      | Some b ->
-          print_string b;
-          backtrace := None
+  print_out_exception ppf exn outv
+  (* if Printexc.backtrace_status () *)
+  (* then *)
+  (*   match !backtrace with *)
+  (*     | None -> () *)
+  (*     | Some b -> *)
+  (*         print_string b; *)
+  (*         backtrace := None *)
 
 
 (* Inserting new toplevel directives *)
@@ -244,58 +244,57 @@ let execute_phrase print_outcome ppf phr =
       Typecore.force_delayed_checks ();
       let lam = Translmod.transl_toplevel_definition str in
       Warnings.check_fatal ();
-      (* begin try *)
-      (*   toplevel_env := newenv; *)
-      (*   let res = load_lambda ppf lam in *)
-      (*   let out_phr = *)
-      (*     match res with *)
-      (*     | Result v -> *)
-      (*         if print_outcome then *)
-      (*           Printtyp.wrap_printing_env ~error:false oldenv (fun () -> *)
-      (*             match str.str_items with *)
-      (*             | [ { str_desc = *)
-      (*                     (Tstr_eval (exp, _) *)
-      (*                     |Tstr_value *)
-      (*                         (Asttypes.Nonrecursive, *)
-      (*                          [{vb_pat = {pat_desc=Tpat_any}; *)
-      (*                            vb_expr = exp} *)
-      (*                          ] *)
-      (*                         ) *)
-      (*                     ) *)
-      (*                 } *)
-      (*               ] -> *)
-      (*                 let outv = outval_of_value newenv v exp.exp_type in *)
-      (*                 let ty = Printtyp.tree_of_type_scheme exp.exp_type in *)
-      (*                 Ophr_eval (outv, ty) *)
+      begin try
+        toplevel_env := newenv;
+        let res = load_lambda ppf lam in
+        let out_phr =
+          match res with
+          | Result v ->
+              if print_outcome then
+                Printtyp.wrap_printing_env ~error:false oldenv (fun () ->
+                  match str.str_items with
+                  | [ { str_desc =
+                          (Tstr_eval (exp, _)
+                          |Tstr_value
+                              (Asttypes.Nonrecursive,
+                               [{vb_pat = {pat_desc=Tpat_any};
+                                 vb_expr = exp}
+                               ]
+                              )
+                          )
+                      }
+                    ] ->
+                      let outv = outval_of_value newenv v exp.exp_type in
+                      let ty = Printtyp.tree_of_type_scheme exp.exp_type in
+                      Ophr_eval (outv, ty)
 
-      (*             | [] -> Ophr_signature [] *)
-      (*             | _ -> Ophr_signature (pr_item newenv sg')) *)
-      (*         else Ophr_signature [] *)
-      (*     | Exception exn -> *)
-      (*         toplevel_env := oldenv; *)
-      (*         let outv = *)
-      (*           outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn *)
-      (*         in *)
-      (*         Ophr_exception (exn, outv) *)
-      (*   in *)
-      (*   !print_out_phrase ppf out_phr; *)
-      (*   if Printexc.backtrace_status () *)
-      (*   then begin *)
-      (*     match !backtrace with *)
-      (*       | None -> () *)
-      (*       | Some b -> *)
-      (*           pp_print_string ppf b; *)
-      (*           pp_print_flush ppf (); *)
-      (*           backtrace := None; *)
-      (*   end; *)
-      (*   begin match out_phr with *)
-      (*   | Ophr_eval (_, _) | Ophr_signature _ -> true *)
-      (*   | Ophr_exception _ -> false *)
-      (*   end *)
-      (* with x -> *)
-      (*   toplevel_env := oldenv; raise x *)
-      (* end *)
-      print_endline "TODO"; true
+                  | [] -> Ophr_signature []
+                  | _ -> Ophr_signature (pr_item newenv sg'))
+              else Ophr_signature []
+          | Exception exn ->
+              toplevel_env := oldenv;
+              let outv =
+                outval_of_value !toplevel_env (Obj.repr exn) Predef.type_exn
+              in
+              Ophr_exception (exn, outv)
+        in
+        !print_out_phrase ppf out_phr;
+        if Printexc.backtrace_status ()
+        then begin
+          match !backtrace with
+            | None -> ()
+            | Some b ->
+                pp_print_string ppf b;
+                pp_print_flush ppf ();
+                backtrace := None;
+        end;
+        begin match out_phr with
+        | Ophr_eval (_, _) | Ophr_signature _ -> true
+        | Ophr_exception _ -> false
+        end
+      with x ->
+        toplevel_env := oldenv; raise x
+      end
   | Ptop_dir(dir_name, dir_arg) ->
       let d =
         try Some (Hashtbl.find directive_table dir_name)
@@ -362,47 +361,47 @@ let preprocess_phrase ppf phr =
   if !Clflags.dump_source then Pprintast.top_phrase ppf phr;
   phr
 
-let use_file ppf wrap_mod name =
-  try
-    let (filename, ic, must_close) =
-      if name = "" then
-        ("(stdin)", stdin, false)
-      else begin
-        let filename = find_in_path !Config.load_path name in
-        let ic = open_in_bin filename in
-        (filename, ic, true)
-      end
-    in
-    let lb = Lexing.from_channel ic in
-    Warnings.reset_fatal ();
-    Location.init lb filename;
-    (* Skip initial #! line if any *)
-    Lexer.skip_hash_bang lb;
-    let success =
-      protect_refs [ R (Location.input_name, filename) ] (fun () ->
-        try
-          List.iter
-            (fun ph ->
-              let ph = preprocess_phrase ppf ph in
-              if not (execute_phrase !use_print_results ppf ph) then raise Exit)
-            (if wrap_mod then
-               parse_mod_use_file name lb
-             else
-               !parse_use_file lb);
-          true
-        with
-        | Exit -> false
-        | Sys.Break -> fprintf ppf "Interrupted.@."; false
-        | x -> Location.report_exception ppf x; false) in
-    if must_close then close_in ic;
-    success
-  with Not_found -> fprintf ppf "Cannot find file %s.@." name; false
+(* let use_file ppf wrap_mod name = *)
+(*   try *)
+(*     let (filename, ic, must_close) = *)
+(*       if name = "" then *)
+(*         ("(stdin)", stdin, false) *)
+(*       else begin *)
+(*         let filename = find_in_path !Config.load_path name in *)
+(*         let ic = open_in_bin filename in *)
+(*         (filename, ic, true) *)
+(*       end *)
+(*     in *)
+(*     let lb = Lexing.from_channel ic in *)
+(*     Warnings.reset_fatal (); *)
+(*     Location.init lb filename; *)
+(*     (\* Skip initial #! line if any *\) *)
+(*     Lexer.skip_hash_bang lb; *)
+(*     let success = *)
+(*       protect_refs [ R (Location.input_name, filename) ] (fun () -> *)
+(*         try *)
+(*           List.iter *)
+(*             (fun ph -> *)
+(*               let ph = preprocess_phrase ppf ph in *)
+(*               if not (execute_phrase !use_print_results ppf ph) then raise Exit) *)
+(*             (if wrap_mod then *)
+(*                parse_mod_use_file name lb *)
+(*              else *)
+(*                !parse_use_file lb); *)
+(*           true *)
+(*         with *)
+(*         | Exit -> false *)
+(*         | Sys.Break -> fprintf ppf "Interrupted.@."; false *)
+(*         | x -> Location.report_exception ppf x; false) in *)
+(*     if must_close then close_in ic; *)
+(*     success *)
+(*   with Not_found -> fprintf ppf "Cannot find file %s.@." name; false *)
 
-let mod_use_file ppf name = use_file ppf true name
-let use_file ppf name = use_file ppf false name
+(* let mod_use_file ppf name = use_file ppf true name *)
+(* let use_file ppf name = use_file ppf false name *)
 
-let use_silently ppf name =
-  protect_refs [ R (use_print_results, false) ] (fun () -> use_file ppf name)
+(* let use_silently ppf name = *)
+(*   protect_refs [ R (use_print_results, false) ] (fun () -> use_file ppf name) *)
 
 (* Reading function for interactive use *)
 
@@ -469,18 +468,18 @@ let refill_lexbuf buffer len =
 (*           Consistbl.set Env.crc_units name crc Sys.executable_name) *)
 (*     crc_intfs *)
 
-let load_ocamlinit ppf =
-  if !Clflags.noinit then ()
-  else match !Clflags.init_file with
-  | Some f -> if Sys.file_exists f then ignore (use_silently ppf f)
-              else fprintf ppf "Init file not found: \"%s\".@." f
-  | None ->
-     if Sys.file_exists ".ocamlinit" then ignore (use_silently ppf ".ocamlinit")
-     else try
-       let home_init = Filename.concat (Sys.getenv "HOME") ".ocamlinit" in
-       if Sys.file_exists home_init then ignore (use_silently ppf home_init)
-     with Not_found -> ()
-;;
+(* let load_ocamlinit ppf = *)
+(*   if !Clflags.noinit then () *)
+(*   else match !Clflags.init_file with *)
+(*   | Some f -> if Sys.file_exists f then ignore (use_silently ppf f) *)
+(*               else fprintf ppf "Init file not found: \"%s\".@." f *)
+(*   | None -> *)
+(*      if Sys.file_exists ".ocamlinit" then ignore (use_silently ppf ".ocamlinit") *)
+(*      else try *)
+(*        let home_init = Filename.concat (Sys.getenv "HOME") ".ocamlinit" in *)
+(*        if Sys.file_exists home_init then ignore (use_silently ppf home_init) *)
+(*      with Not_found -> () *)
+(* ;; *)
 
 let set_paths () =
   (* Add whatever -I options have been specified on the command line,
@@ -513,7 +512,7 @@ let loop ppf =
   Location.input_name := "//toplevel//";
   Location.input_lexbuf := Some lb;
   Sys.catch_break true;
-  load_ocamlinit ppf;
+  (* load_ocamlinit ppf; *)
   while true do
     let snap = Btype.snapshot () in
     try
@@ -541,20 +540,20 @@ let override_sys_argv args =
   Obj.truncate (Obj.repr Sys.argv) len;
   Arg.current := 0
 
-let run_script ppf name args =
-  override_sys_argv args;
-  Compmisc.init_path ~dir:(Filename.dirname name) true;
-                   (* Note: would use [Filename.abspath] here, if we had it. *)
-  begin
-    try toplevel_env := Compmisc.initial_env()
-    with Env.Error _ | Typetexp.Error _ as exn ->
-      Location.report_exception ppf exn; exit 2
-  end;
-  Sys.interactive := false;
-  let explicit_name =
-    (* Prevent use_silently from searching in the path. *)
-    if name <> "" && Filename.is_implicit name
-    then Filename.concat Filename.current_dir_name name
-    else name
-  in
-  use_silently ppf explicit_name
+(* let run_script ppf name args = *)
+(*   override_sys_argv args; *)
+(*   Compmisc.init_path ~dir:(Filename.dirname name) true; *)
+(*                    (\* Note: would use [Filename.abspath] here, if we had it. *\) *)
+(*   begin *)
+(*     try toplevel_env := Compmisc.initial_env() *)
+(*     with Env.Error _ | Typetexp.Error _ as exn -> *)
+(*       Location.report_exception ppf exn; exit 2 *)
+(*   end; *)
+(*   Sys.interactive := false; *)
+(*   let explicit_name = *)
+(*     (\* Prevent use_silently from searching in the path. *\) *)
+(*     if name <> "" && Filename.is_implicit name *)
+(*     then Filename.concat Filename.current_dir_name name *)
+(*     else name *)
+(*   in *)
+(*   use_silently ppf explicit_name *)

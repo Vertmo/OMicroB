@@ -27,6 +27,10 @@ value copy_bytes(const char *str) {
   return res;
 }
 
+value caml_create_string(value ml_len) {
+  return create_bytes(Int_val(ml_len));
+}
+
 value caml_create_bytes(value ml_len) {
   return create_bytes(Int_val(ml_len));
 }
@@ -101,6 +105,10 @@ int string_compare(value s1, value s2) {
 
 value caml_string_compare(value s1, value s2) {
   return Val_int(string_compare(s1, s2));
+}
+
+value caml_string_lessthan(value s1, value s2) {
+  return caml_string_compare(s1, s2) < Val_int(0) ? Val_true : Val_false;
 }
 
 value caml_bytes_compare(value b1, value b2) {

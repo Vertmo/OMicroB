@@ -1845,28 +1845,29 @@ let type_implementation sourcefile outputprefix modulename initial_env ast =
       (fun () -> fprintf std_formatter "%a@." Printtyp.signature simple_sg);
     (str, Tcoerce_none)   (* result is ignored by Compile.implementation *)
   end else begin
-    let sourceintf =
-      Filename.remove_extension sourcefile ^ !Config.interface_suffix in
-    if Sys.file_exists sourceintf then begin
-      let intf_file =
-        try
-          find_in_path_uncap !Config.load_path (modulename ^ ".cmi")
-        with Not_found ->
-          raise(Error(Location.in_file sourcefile, Env.empty,
-                      Interface_not_compiled sourceintf)) in
-      let dclsig = Env.read_signature modulename intf_file in
-      let coercion =
-        Includemod.compunit initial_env ~mark:Includemod.Mark_positive
-          sourcefile sg intf_file dclsig
-      in
-      Typecore.force_delayed_checks ();
-      (* It is important to run these checks after the inclusion test above,
-         so that value declarations which are not used internally but exported
-         are not reported as being unused. *)
-      (* Cmt_format.save_cmt (outputprefix ^ ".cmt") modulename *)
-      (*   (Cmt_format.Implementation str) (Some sourcefile) initial_env None; *)
-      (str, coercion)
-    end else begin
+    (* let sourceintf = *)
+    (*   Filename.remove_extension sourcefile ^ !Config.interface_suffix in *)
+    (* if Sys.file_exists sourceintf then begin *)
+    (*   let intf_file = *)
+    (*     try *)
+    (*       find_in_path_uncap !Config.load_path (modulename ^ ".cmi") *)
+    (*     with Not_found -> *)
+    (*       raise(Error(Location.in_file sourcefile, Env.empty, *)
+    (*                   Interface_not_compiled sourceintf)) in *)
+    (*   let dclsig = Env.read_signature modulename intf_file in *)
+    (*   let coercion = *)
+    (*     Includemod.compunit initial_env ~mark:Includemod.Mark_positive *)
+    (*       sourcefile sg intf_file dclsig *)
+    (*   in *)
+    (*   Typecore.force_delayed_checks (); *)
+    (*   (\* It is important to run these checks after the inclusion test above, *)
+    (*      so that value declarations which are not used internally but exported *)
+    (*      are not reported as being unused. *\) *)
+    (*   (\* Cmt_format.save_cmt (outputprefix ^ ".cmt") modulename *\) *)
+    (*   (\*   (Cmt_format.Implementation str) (Some sourcefile) initial_env None; *\) *)
+    (*   (str, coercion) *)
+    (* end else  *)
+    begin
       let coercion =
         Includemod.compunit initial_env ~mark:Includemod.Mark_positive
           sourcefile sg "(inferred signature)" simple_sg
@@ -1922,36 +1923,36 @@ let rec package_signatures subst = function
                  Trec_not) ::
       package_signatures (Subst.add_module oldid (Pident newid) subst) rem
 
-let package_units initial_env objfiles cmifile modulename =
-  (* Read the signatures of the units *)
-  let units =
-    List.map
-      (fun f ->
-         let pref = chop_extensions f in
-         let modname = String.capitalize_ascii(Filename.basename pref) in
-         let sg = Env.read_signature modname (pref ^ ".cmi") in
-         if Filename.check_suffix f ".cmi" &&
-            not(Mtype.no_code_needed_sig Env.initial_safe_string sg)
-         then raise(Error(Location.none, Env.empty,
-                          Implementation_is_required f));
-         (modname, Env.read_signature modname (pref ^ ".cmi")))
-      objfiles in
-  (* Compute signature of packaged unit *)
-  Ident.reinit();
-  let sg = package_signatures Subst.identity units in
-  (* See if explicit interface is provided *)
-  let prefix = Filename.remove_extension cmifile in
-  let mlifile = prefix ^ !Config.interface_suffix in
-  if Sys.file_exists mlifile then begin
-    if not (Sys.file_exists cmifile) then begin
-      raise(Error(Location.in_file mlifile, Env.empty,
-                  Interface_not_compiled mlifile))
-    end;
-    let dclsig = Env.read_signature modulename cmifile in
-    (* Cmt_format.save_cmt  (prefix ^ ".cmt") modulename *)
-    (*   (Cmt_format.Packed (sg, objfiles)) None initial_env  None ; *)
-    Includemod.compunit initial_env "(obtained by packing)" sg mlifile dclsig
-  end else Tcoerce_none
+(* let package_units initial_env objfiles cmifile modulename = *)
+(*   (\* Read the signatures of the units *\) *)
+(*   let units = *)
+(*     List.map *)
+(*       (fun f -> *)
+(*          let pref = chop_extensions f in *)
+(*          let modname = String.capitalize_ascii(Filename.basename pref) in *)
+(*          let sg = Env.read_signature modname (pref ^ ".cmi") in *)
+(*          if Filename.check_suffix f ".cmi" && *)
+(*             not(Mtype.no_code_needed_sig Env.initial_safe_string sg) *)
+(*          then raise(Error(Location.none, Env.empty, *)
+(*                           Implementation_is_required f)); *)
+(*          (modname, Env.read_signature modname (pref ^ ".cmi"))) *)
+(*       objfiles in *)
+(*   (\* Compute signature of packaged unit *\) *)
+(*   Ident.reinit(); *)
+(*   let sg = package_signatures Subst.identity units in *)
+(*   (\* See if explicit interface is provided *\) *)
+(*   let prefix = Filename.remove_extension cmifile in *)
+(*   let mlifile = prefix ^ !Config.interface_suffix in *)
+(*   if Sys.file_exists mlifile then begin *)
+(*     if not (Sys.file_exists cmifile) then begin *)
+(*       raise(Error(Location.in_file mlifile, Env.empty, *)
+(*                   Interface_not_compiled mlifile)) *)
+(*     end; *)
+(*     let dclsig = Env.read_signature modulename cmifile in *)
+(*     (\* Cmt_format.save_cmt  (prefix ^ ".cmt") modulename *\) *)
+(*     (\*   (Cmt_format.Packed (sg, objfiles)) None initial_env  None ; *\) *)
+(*     Includemod.compunit initial_env "(obtained by packing)" sg mlifile dclsig *)
+(*   end else Tcoerce_none *)
 
 (* Error report *)
 

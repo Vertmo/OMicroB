@@ -30,7 +30,7 @@ type 'a ast_kind =
 | Structure : Parsetree.structure ast_kind
 | Signature : Parsetree.signature ast_kind
 
-val read_ast : 'a ast_kind -> string -> 'a
+(* val read_ast : 'a ast_kind -> string -> 'a *)
 (* val write_ast : 'a ast_kind -> string -> 'a -> unit *)
 
 val file : formatter -> tool_name:string -> string ->

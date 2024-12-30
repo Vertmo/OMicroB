@@ -181,33 +181,33 @@ let may_map = Stdlib.Option.map
 
 (* File functions *)
 
-let find_in_path path name =
-  if not (Filename.is_implicit name) then
-    if Sys.file_exists name then name else raise Not_found
-  else begin
-    let rec try_dir = function
-      [] -> raise Not_found
-    | dir::rem ->
-        let fullname = Filename.concat dir name in
-        if Sys.file_exists fullname then fullname else try_dir rem
-    in try_dir path
-  end
+(* let find_in_path path name = *)
+(*   if not (Filename.is_implicit name) then *)
+(*     if Sys.file_exists name then name else raise Not_found *)
+(*   else begin *)
+(*     let rec try_dir = function *)
+(*       [] -> raise Not_found *)
+(*     | dir::rem -> *)
+(*         let fullname = Filename.concat dir name in *)
+(*         if Sys.file_exists fullname then fullname else try_dir rem *)
+(*     in try_dir path *)
+(*   end *)
 
-let find_in_path_rel path name =
-  let rec simplify s =
-    let open Filename in
-    let base = basename s in
-    let dir = dirname s in
-    if dir = s then dir
-    else if base = current_dir_name then simplify dir
-    else concat (simplify dir) base
-  in
-  let rec try_dir = function
-    [] -> raise Not_found
-  | dir::rem ->
-      let fullname = simplify (Filename.concat dir name) in
-      if Sys.file_exists fullname then fullname else try_dir rem
-  in try_dir path
+(* let find_in_path_rel path name = *)
+(*   let rec simplify s = *)
+(*     let open Filename in *)
+(*     let base = basename s in *)
+(*     let dir = dirname s in *)
+(*     if dir = s then dir *)
+(*     else if base = current_dir_name then simplify dir *)
+(*     else concat (simplify dir) base *)
+(*   in *)
+(*   let rec try_dir = function *)
+(*     [] -> raise Not_found *)
+(*   | dir::rem -> *)
+(*       let fullname = simplify (Filename.concat dir name) in *)
+(*       if Sys.file_exists fullname then fullname else try_dir rem *)
+(*   in try_dir path *)
 
 let find_in_path_uncap path name =
   let uname = String.uncapitalize_ascii name in
@@ -221,12 +221,12 @@ let find_in_path_uncap path name =
       else try_dir rem
   in try_dir path
 
-let remove_file filename =
-  try
-    if Sys.file_exists filename
-    then Sys.remove filename
-  with Sys_error _msg ->
-    ()
+(* let remove_file filename = *)
+(*   try *)
+(*     if Sys.file_exists filename *)
+(*     then Sys.remove filename *)
+(*   with Sys_error _msg -> *)
+(*     () *)
 
 (* Expand a -I option: if it starts with +, make it relative to the standard
    library directory *)
@@ -299,7 +299,6 @@ module Int_literal_converter = struct
   let int s = cvt_int_aux s (~-) int_of_string
   let int32 s = cvt_int_aux s Int32.neg Int32.of_string
   let int64 s = cvt_int_aux s Int64.neg Int64.of_string
-  let nativeint s = cvt_int_aux s Nativeint.neg Nativeint.of_string
 end
 
 (* String operations *)

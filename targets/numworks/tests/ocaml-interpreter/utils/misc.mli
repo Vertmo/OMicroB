@@ -99,16 +99,16 @@ module Stdlib : sig
   end
 end
 
-val find_in_path: string list -> string -> string
-        (* Search a file in a list of directories. *)
-val find_in_path_rel: string list -> string -> string
-        (* Search a relative file in a list of directories. *)
+(* val find_in_path: string list -> string -> string *)
+(*         (\* Search a file in a list of directories. *\) *)
+(* val find_in_path_rel: string list -> string -> string *)
+(*         (\* Search a relative file in a list of directories. *\) *)
 val find_in_path_uncap: string list -> string -> string
         (* Same, but search also for uncapitalized name, i.e.
            if name is Foo.ml, allow /path/Foo.ml and /path/foo.ml
            to match. *)
-val remove_file: string -> unit
-        (* Delete the given file if it exists. Never raise an error. *)
+(* val remove_file: string -> unit *)
+(*         (\* Delete the given file if it exists. Never raise an error. *\) *)
 val expand_directory: string -> string -> string
         (* [expand_directory alt file] eventually expands a [+] at the
            beginning of file into [alt] (an alternate root directory) *)
@@ -151,7 +151,6 @@ module Int_literal_converter : sig
   val int : string -> int
   val int32 : string -> int32
   val int64 : string -> int64
-  val nativeint : string -> nativeint
 end
 
 val chop_extensions: string -> string
