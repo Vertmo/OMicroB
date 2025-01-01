@@ -4,3 +4,4 @@ mocaml_history.ml
 _build/
 */*.cmo
 */*.cmi
+interpreter.d

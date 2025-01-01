@@ -8,9 +8,9 @@ let arch_args = []
 (** Signatures for a device's configuration *)
 module type DEVICECONFIG = sig
   (** Compile a .ml to a .byte *)
-  val compile_ml_to_byte : ppx_options:string list -> mlopts:string list ->
+  val compile_ml : ppx_options:string list -> mlopts:string list ->
     cxxopts:string list -> local:bool -> trace:int -> verbose:bool ->
-    string list -> string -> unit
+    string list -> string list -> unit
 
   (** Compile a .c to a .hex *)
   val compile_c_to_hex : local: bool -> trace:int -> verbose:bool -> cxxopts:string list ->
@@ -27,13 +27,13 @@ let default_ocamlc_options = [ "-g"; "-w"; "A"; "-safe-string"; "-strict-sequenc
 
 (** Default config, when no device is selected *)
 module DefaultConfig : DEVICECONFIG = struct
-  let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
+  let compile_ml ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
       inputs output =
     let vars = [ ("CAMLLIB", Tools.libdir local) ] in
     let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ ppx_options @ [ "-custom" ] @ mlopts in
     let cmd = if trace > 0 then cmd @ [ "-ccopt"; "-DDEBUG=" ^ string_of_int trace ] else cmd in
     let cmd = cmd @ List.flatten (List.map (fun cxxopt -> [ "-ccopt"; cxxopt ]) cxxopts) in
-    let cmd = cmd @ inputs @ [ "-o"; output ] in
+    let cmd = cmd @ output @ inputs in
     run ~vars ~verbose cmd
 
   let compile_c_to_hex ~local:_ ~trace:_ ~verbose:_ ~cxxopts:_ _ _ =

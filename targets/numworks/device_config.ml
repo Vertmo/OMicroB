@@ -6,7 +6,7 @@ let default_arm_cxx_options = [ "-std=c99" ]
                               @ [ "-Os"; "-Wall"; "-ggdb"]
 
 module NumworksConfig : DEVICECONFIG = struct
-  let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
+  let compile_ml ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
         inputs output =
   let libdir = libdir local in
   let vars = [ ("CAMLLIB", libdir) ] in
@@ -19,11 +19,8 @@ module NumworksConfig : DEVICECONFIG = struct
   (* FIXED: this additional flag is here to allow references to the EADK lib values/functions to be added later, by the flashing website ? *)
   (* See: https://stackoverflow.com/questions/5555632/can-gcc-not-complain-about-undefined-references#5556948 for a reference *)
   let cmd = cmd @ [ "-ccopt"; "-Wl,--allow-shlib-undefined,--unresolved-symbols=ignore-all" ] in
-  let cmd = cmd @ inputs @ [ "-o"; output ] in
-  Printf.printf "################## Compile  a .ml into a .byte\n";
-  run ~vars ~verbose cmd;
-  Printf.printf "################## Compiled a .ml into a .byte\n"
-
+  let cmd = cmd @ output @ inputs in
+  run ~vars ~verbose cmd
 
 let compile_c_to_hex ~local ~trace:_ ~verbose ~cxxopts input output =
   let includedir = includedir local in

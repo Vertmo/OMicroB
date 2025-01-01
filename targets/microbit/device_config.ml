@@ -6,7 +6,7 @@ let default_arm_cxx_options = [ "-mthumb";
                                 "-fdata-sections"; "-ffunction-sections";
                                 "-Wl,--gc-sections" ]
 
-let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
+let compile_ml ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
     inputs output =
   let libdir = libdir local in
   let vars = [ ("CAMLLIB", libdir) ] in
@@ -16,7 +16,7 @@ let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
   let cmd = cmd @ [ "-I"; Filename.concat libdir "targets/microbit";
                     Filename.concat libdir "targets/microbit/microbit.cma";
                     "-open"; "Microbit" ] in
-  let cmd = cmd @ inputs @ [ "-o"; output ] in
+  let cmd = cmd @ output @ inputs in
   run ~vars ~verbose cmd
 
 let compile_c_to_hex ~cpu ~linkscript ~startup ~microbian ~local ~trace:_ ~verbose input output =
@@ -60,7 +60,7 @@ let compile_c_to_hex ~cpu ~linkscript ~startup ~microbian ~local ~trace:_ ~verbo
   run ~verbose cmd
 
 module MicroBitConfig : DEVICECONFIG = struct
-  let compile_ml_to_byte = compile_ml_to_byte
+  let compile_ml = compile_ml
 
   let compile_c_to_hex = compile_c_to_hex
       ~cpu:"cortex-m0" ~linkscript:"nRF51822.ld" ~startup:"startup1.o" ~microbian:"microbian1.a"
@@ -75,7 +75,7 @@ module MicroBitConfig : DEVICECONFIG = struct
 end
 
 module MicroBit2Config : DEVICECONFIG = struct
-  let compile_ml_to_byte = compile_ml_to_byte
+  let compile_ml = compile_ml
 
   let simul_flag = "__SIMUL_MICROBIT_2__"
 

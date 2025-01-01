@@ -69,7 +69,7 @@ end
 let default_avr_cxx_options = [ "-g"; "-fno-exceptions"; "-Wall"; "-std=c++11"; "-O2"; "-Wnarrowing"; "-Wl,-Os"; "-fdata-sections"; "-ffunction-sections"; "-Wl,-gc-sections" ]
 
 module AvrConfig(A : AVRCONFIG) : DEVICECONFIG = struct
-  let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
+  let compile_ml ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
       inputs output =
     let libdir = libdir local in
     let vars = [ ("CAMLLIB", libdir) ] in
@@ -91,7 +91,7 @@ module AvrConfig(A : AVRCONFIG) : DEVICECONFIG = struct
           "-open"; Printf.sprintf "Avr";
           "-open"; A.pins_module;
           "-open"; "McuConnection" ] in
-    let cmd = cmd @ inputs @ [ "-o"; output ] in
+    let cmd = cmd @ output @ inputs in
     run ~vars ~verbose cmd
 
   let compile_c_to_hex ~local ~trace ~verbose input output =

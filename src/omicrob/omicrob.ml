@@ -410,9 +410,9 @@ let () =
     match input_mls with
     | [] -> error "no input file"
     | _ ->
-      let vars = [ ("CAMLLIB", libdir) ] in
-      let cmd = [ Config.ocamlc ] @ default_ocamlc_options @ ppx_options @ [ "-c" ] @ mlopts @ input_mls in
-      run ~vars cmd;
+      DeviceConfig.compile_ml
+        ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
+        input_mls ["-c"];
       exit 0;
   )
 
@@ -485,9 +485,9 @@ let () =
 
     available_byte := Some output_path;
 
-    DeviceConfig.compile_ml_to_byte
+    DeviceConfig.compile_ml
       ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
-      input_paths output_path;
+      input_paths [ "-o"; output_path];
 
     let cmd = [ Config.ocamlclean; output_path; "-o"; output_path ] in
     run ~verbose ~just_print cmd;

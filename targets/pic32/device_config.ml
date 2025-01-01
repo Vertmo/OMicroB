@@ -53,7 +53,7 @@ end
 let default_xc32_cxx_options = [ "-nostartfiles"; "-Wl,--defsym=_min_heap_size=1024" ]
 
 module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
-  let compile_ml_to_byte ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
+  let compile_ml ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
       inputs output =
     let libdir = libdir local in
 
@@ -87,7 +87,7 @@ module Pic32Config(P : PIC32CONFIG) : DEVICECONFIG = struct
       | head::body -> append_module_name (head) @ add_module_name body in 
     let cmd = cmd @ add_module_name P.modules in 
     
-    let cmd = cmd @ inputs @ [ "-o"; output ] in
+    let cmd = cmd @ output @ inputs in
     run ~vars ~verbose cmd
 
   let compile_c_to_hex ~local ~trace:_ ~verbose input output =
