@@ -4,4 +4,4 @@ let rec fibonacci (n: int) :int =
   else
     fibonacci (n-1) + fibonacci (n-2)
 in
-fibonacci 20
+fibonacci 15

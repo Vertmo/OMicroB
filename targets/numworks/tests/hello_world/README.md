@@ -22,7 +22,7 @@ $ ./hello.byte
 If everything works out well, then you can run the `hello.elf` binary, which does use the OMicroB setup:
 
 ```bash
-$ ./hello.byte
+$ ./hello.elf
 ```
 
 ## Testing the NWA app on a Numworks
