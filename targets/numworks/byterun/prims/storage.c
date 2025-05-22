@@ -4,6 +4,7 @@
 // See https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c?ref_type=heads#L46
 //
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
