@@ -193,7 +193,7 @@ void delay(int ms) {
   return eadk_timing_msleep(ms);
 }
 
-void delay_usec(int us) {
+void delay_usec(uint64_t us) {
   return eadk_timing_usleep(us);
 }
 
@@ -207,24 +207,24 @@ int millis() {
 
 // TODO: write here some useful functions written as bindings for the eadk.h library
 
-void display_draw_string(const char * text, int x, int y) {
+void display_draw_string(const char * text, uint16_t x, uint16_t y) {
   return eadk_display_draw_string(text, (eadk_point_t){(uint16_t)x, (uint16_t)y}, true, eadk_color_black, eadk_color_white);
 }
 
-void display_draw_string_small(const char * text, int x, int y) {
+void display_draw_string_small(const char * text, uint16_t x, uint16_t y) {
   return eadk_display_draw_string(text, (eadk_point_t){(uint16_t)x, (uint16_t)y}, false, eadk_color_black, eadk_color_white);
 }
 
 // FIXME: this RESET the calculator?
-void display_draw_string_full(const char * text, int x, int y, bool large_font, int text_color, int background_color) {
+void display_draw_string_full(const char * text, uint16_t x, uint16_t y, bool large_font, uint16_t text_color, uint16_t background_color) {
   return eadk_display_draw_string(text, (eadk_point_t){(uint16_t)x, (uint16_t)y}, large_font, (eadk_color_t) text_color, (eadk_color_t) background_color);
 }
 
-void display_push_rect_uniform(int background_color, int x, int y, int width, int height) {
+void display_push_rect_uniform(uint16_t background_color, uint16_t x, uint16_t y, uint16_t width, uint16_t height) {
   return eadk_display_push_rect_uniform((eadk_rect_t){x, y, width, height}, (eadk_color_t) background_color);
 }
 
-void display_push_allscreen_uniform(int background_color) {
+void display_push_allscreen_uniform(uint16_t background_color) {
   return eadk_display_push_rect_uniform(eadk_screen_rect, (eadk_color_t) background_color);
 }
 

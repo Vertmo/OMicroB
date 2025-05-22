@@ -15,6 +15,7 @@
 #if defined(__OCAML__) || defined(__PC__) || defined(__NUMWORKS__)
 
 #include "prims.h"
+#include "eadk.h"
 #include "storage.h"
 
 
@@ -229,6 +230,7 @@ struct channel * numworks_caml_all_opened_channels = NULL;
    No locking is performed. */
 
 /* Functions shared between input and output */
+value caml_alloc_dummy(value ml_size);
 
 struct channel * numworks_caml_open_descriptor_in(int fd)
 {
