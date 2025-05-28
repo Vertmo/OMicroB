@@ -193,51 +193,54 @@ let is_true = onptr @@ function
   | Constructor ("false", _, None) -> false
   | _ -> assert false
 
-let rec pp_print_value ff = onptr @@ function
-  | Int n -> Format.fprintf ff "%d" n
-  | Int32 n -> Format.fprintf ff "%ldl" n
-  | Int64 n -> Format.fprintf ff "%LdL" n
-  | Nativeint n -> Format.fprintf ff "%ndn" n
-  | Fexpr _ -> Format.fprintf ff "<fexpr>"
-  | Fun _ | Function _ | Prim _ | Lz _ | Fun_with_extra_args _ ->
-    Format.fprintf ff "<function>"
-  | String s -> Format.fprintf ff "%S" (Bytes.to_string s)
-  | Float f -> Format.fprintf ff "%f" f
-  | Tuple l ->
-    Format.fprintf
-      ff
-      "(%a)"
-      (Format.pp_print_list
-         ~pp_sep:(fun ff () -> Format.fprintf ff ", ")
-         pp_print_value)
-      l
-  | Constructor (c, d, arg) ->
-    Format.fprintf ff "%s#%d%a" c d pp_print_arg arg
-  | Poly_variant (c, arg) ->
-    Format.fprintf ff "`%s%a" c pp_print_arg arg
-  | ModVal _ -> Format.fprintf ff "<module>"
-  | InChannel _ -> Format.fprintf ff "<in_channel>"
-  | OutChannel _ -> Format.fprintf ff "<out_channel>"
-  | Record r ->
-    Format.fprintf ff "{";
-    SMap.iter (fun k v -> Format.fprintf ff "%s = %a; " k pp_print_value !v) r;
-    Format.fprintf ff "}"
-  | Array a ->
-    Format.fprintf
-      ff
-      "[|%a|]"
-      (Format.pp_print_list
-         ~pp_sep:(fun ff () -> Format.fprintf ff "; ")
-         pp_print_value)
-      (Array.to_list a)
-  | Object _ -> Format.fprintf ff "<object>"
+let rec pp_print_value ff =
+  failwith "TODO"
+ (* onptr @@ function *)
+  (* | Int n -> Format.fprintf ff "%d" n *)
+  (* | Int32 n -> Format.fprintf ff "%ldl" n *)
+  (* | Int64 n -> Format.fprintf ff "%LdL" n *)
+  (* | Nativeint n -> Format.fprintf ff "%ndn" n *)
+  (* | Fexpr _ -> Format.fprintf ff "<fexpr>" *)
+  (* | Fun _ | Function _ | Prim _ | Lz _ | Fun_with_extra_args _ -> *)
+  (*   Format.fprintf ff "<function>" *)
+  (* | String s -> Format.fprintf ff "%S" (Bytes.to_string s) *)
+  (* | Float f -> Format.fprintf ff "%f" f *)
+  (* | Tuple l -> *)
+  (*   Format.fprintf *)
+  (*     ff *)
+  (*     "(%a)" *)
+  (*     (Format.pp_print_list *)
+  (*        ~pp_sep:(fun ff () -> Format.fprintf ff ", ") *)
+  (*        pp_print_value) *)
+  (*     l *)
+  (* | Constructor (c, d, arg) -> *)
+  (*   Format.fprintf ff "%s#%d%a" c d pp_print_arg arg *)
+  (* | Poly_variant (c, arg) -> *)
+  (*   Format.fprintf ff "`%s%a" c pp_print_arg arg *)
+  (* | ModVal _ -> Format.fprintf ff "<module>" *)
+  (* | InChannel _ -> Format.fprintf ff "<in_channel>" *)
+  (* | OutChannel _ -> Format.fprintf ff "<out_channel>" *)
+  (* | Record r -> *)
+  (*   Format.fprintf ff "{"; *)
+  (*   SMap.iter (fun k v -> Format.fprintf ff "%s = %a; " k pp_print_value !v) r; *)
+  (*   Format.fprintf ff "}" *)
+  (* | Array a -> *)
+  (*   Format.fprintf *)
+  (*     ff *)
+  (*     "[|%a|]" *)
+  (*     (Format.pp_print_list *)
+  (*        ~pp_sep:(fun ff () -> Format.fprintf ff "; ") *)
+  (*        pp_print_value) *)
+  (*     (Array.to_list a) *)
+  (* | Object _ -> Format.fprintf ff "<object>" *)
 
 and pp_print_arg ff = function
   | None -> ()
-  | Some v -> Format.fprintf ff " %a" pp_print_value v
+  | Some v -> print_string " "; pp_print_value ff v
 
 let pp_print_unit_id ppf (Path s) =
-  Format.fprintf ppf "%S" s
+  failwith "TODO"
+  (* Format.fprintf ppf "%S" s *)
 
 let read_caml_int s =
   let c = ref 0L in
@@ -269,7 +272,7 @@ let read_caml_int s =
           add (mul base !c) (of_int (int_of_char x - int_of_char 'A' + 10)))
     | '_' -> ()
     | _ ->
-      Format.eprintf "FIXME literal: %s@." s;
+      (* Format.eprintf "FIXME literal: %s@." s; *)
       assert false
   done;
   Int64.mul sign !c
@@ -280,7 +283,7 @@ let value_of_constant const = ptr @@ match const with
   | Pconst_integer (s, Some 'L') -> Int64 (read_caml_int s)
   | Pconst_integer (s, Some 'n') -> Nativeint (Int64.to_nativeint (read_caml_int s))
   | Pconst_integer (_s, Some c) ->
-    Format.eprintf "Unsupported suffix %c@." c;
+    (* Format.eprintf "Unsupported suffix %c@." c; *)
     assert false
   | Pconst_char c -> Int (int_of_char c)
   | Pconst_float (f, _) -> Float (float_of_string f)
@@ -397,26 +400,27 @@ exception No_module_data
 let get_module_data loc = function
   | Module data -> data
   | Functor _ ->
-     Format.eprintf "%a@.Tried to access the components of a functor@."
-       Location.print_loc loc;
+     (* Format.eprintf "%a@.Tried to access the components of a functor@." *)
+     (*   Location.print_loc loc; *)
      raise No_module_data
   | Unit (unit_id, unit_state) ->
      begin match !unit_state with
        | Initialized data -> data
        | exception Not_found ->
-          Format.eprintf "%a@.Tried to access the undeclared unit %a@."
-           Location.print_loc loc
-           pp_print_unit_id unit_id;
+          (* Format.eprintf "%a@.Tried to access the undeclared unit %a@." *)
+          (*  Location.print_loc loc *)
+          (*  pp_print_unit_id unit_id; *)
           raise No_module_data
        | Not_initialized_yet ->
-          Format.eprintf "%a@.unit %a is not yet initialized@."
-            Location.print_loc loc
-            pp_print_unit_id unit_id;
+          (* Format.eprintf "%a@.unit %a is not yet initialized@." *)
+          (*   Location.print_loc loc *)
+          (*   pp_print_unit_id unit_id; *)
           raise No_module_data
      end
 
 let module_name_of_unit_path path =
-  path
-  |> Filename.basename
-  |> Filename.remove_extension
-  |> String.capitalize_ascii
+  failwith "TODO module_name_of_unit_path"
+  (* path *)
+  (* |> Filename.basename *)
+  (* |> Filename.remove_extension *)
+  (* |> String.capitalize_ascii *)

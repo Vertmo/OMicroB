@@ -4,7 +4,7 @@ val wrap_array_id : value array -> value
 val unwrap_array_id : value -> value array
 val unwrap_position : value -> Lexing.position
 val wrap_position : Lexing.position -> value
-val wrap_gc_stat : Gc.stat -> value
+(* val wrap_gc_stat : Gc.stat -> value *)
 type parser_env = {
   mutable s_stack : int array;
   mutable v_stack : Obj.t array;
@@ -64,23 +64,23 @@ val apply_ref :
   ref
 val unwrap_parse_tables :
   value -> value -> parse_tables
-external parse_engine :
-  parse_tables -> parser_env -> parser_input -> Obj.t -> parser_output
-  = "caml_parse_engine"
+(* external parse_engine : *)
+(*   parse_tables -> parser_env -> parser_input -> Obj.t -> parser_output *)
+(*   = "caml_parse_engine" *)
 external lex_engine : Lexing.lex_tables -> int -> Lexing.lexbuf -> int
   = "caml_lex_engine"
-external new_lex_engine : Lexing.lex_tables -> int -> Lexing.lexbuf -> int
-  = "caml_new_lex_engine"
-val parse_engine_wrapper :
-  value ->
-  value -> parser_input -> value -> parser_output
+(* external new_lex_engine : Lexing.lex_tables -> int -> Lexing.lexbuf -> int *)
+(*   = "caml_new_lex_engine" *)
+(* val parse_engine_wrapper : *)
+(*   value -> *)
+(*   value -> parser_input -> value -> parser_output *)
 val unwrap_lexbuf : value -> Lexing.lexbuf
 val sync_lexbuf : value -> Lexing.lexbuf -> unit
 val unwrap_lex_tables : value -> Lexing.lex_tables
 val lex_engine_wrapper :
   value -> int -> value -> int
-val new_lex_engine_wrapper :
-  value -> int -> value -> int
-val parse_engine_prim : value
+(* val new_lex_engine_wrapper : *)
+(*   value -> int -> value -> int *)
+(* val parse_engine_prim : value *)
 val lex_engine_prim : value
-val new_lex_engine_prim : value
+(* val new_lex_engine_prim : value *)

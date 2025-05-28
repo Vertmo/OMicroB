@@ -1,6 +1,8 @@
 open Data
 
-let type_error expected got = Format.eprintf "Error: expected %s, got %a@." expected pp_print_value (Ptr.create got); assert false
+let type_error expected got =
+  failwith "TODO type_error"
+(* Format.eprintf "Error: expected %s, got %a@." expected pp_print_value (Ptr.create got); assert false *)
 
 let wrap_int n = ptr @@ Int n
 let unwrap_int  = onptr @@ function

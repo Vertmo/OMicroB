@@ -10,6 +10,10 @@ HEAP_SIZE = 2048
 
 TARGETS := $(PROG).hex $(PROG).elf
 
+INCLUDES := -I stdlib/ -I interpreter/
+CINCLUDES := $(shell echo $(INCLUDES) | sed -e 's/ /,/g')
+OMICROB_PARAMS := -v -mlopts $(CINCLUDES) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE)
+
 OCAMLOPT = ocamlopt.opt
 
 # Define intermediate files
@@ -17,21 +21,23 @@ BYTECODE = interp.byte
 C_SOURCE = interp.c
 
 # Directory containing the source files
+SRCS += stdlib/*.mli stdlib/*.ml
 SRCS += interpreter/*.mli interpreter/*.ml
 
 SSRCS = $(shell ocamldep -bytecode -sort $(INCLUDES) $(SRCS))
 
 MLS = $(filter %.ml,$(SSRCS))
-CMOS = $(patsubst %.ml,%.cmo, $(MLS))
+CMOS = $(patsubst %.ml,%.cmo,$(MLS))
+MLIS = $(filter %.mli,$(SSRCS))
+CMIS = $(patsubst %.mli,%.cmi,$(MLIS))
 
 .PHONY: all
 all: $(PROG).hex
 	cp -vf $(PROG).hex $(PROG).nwa
 
-# Step 1: Compile .cmo files to .byte using ocamlc
-$(TARGETS): $(CMOS) camlboot.cmo
+$(TARGETS): $(CMIS) $(CMOS) camlboot.cmo
 	@echo "Compiling .cmo files to .byte"
-	$(BIN)/omicrob -v -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
+	$(BIN)/omicrob -$(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
 
 %.cmi: %.mli
 	$(BIN)/omicrob $(OMICROB_PARAMS) -c $<
@@ -41,7 +47,7 @@ $(TARGETS): $(CMOS) camlboot.cmo
 
 .PHONY: clean
 clean:
-	rm -vf $(SRC_DIR)/*.byte $(SRC_DIR)/*.c  $(SRC_DIR)/*.hex $(SRC_DIR)/*.nwa $(SRC_DIR)/*.elf $(SRC_DIR)/*.bytecode $(SRC_DIR)/*.exe
+	rm -vf **/*.cm*
 
 NWLINK = npx --yes -- nwlink@0.0.17
 

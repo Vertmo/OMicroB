@@ -8,7 +8,7 @@ val wrap_open_flag : open_flag -> value
 val unwrap_open_flag : value -> open_flag
 val wrap_list : ('a -> value) -> 'a list -> value
 val unwrap_list : (value -> 'a) -> value -> 'a list
-val unwrap_marshal_flag : value -> Marshal.extern_flags
+(* val unwrap_marshal_flag : value -> Marshal.extern_flags *)
 
 external open_descriptor_out : int -> out_channel
   = "caml_ml_open_descriptor_out"
@@ -37,9 +37,9 @@ external digest_unsafe_string : string -> int -> int -> string
   = "caml_md5_string"
 external marshal_to_channel :
   out_channel -> 'a -> unit list -> unit = "caml_output_value"
-external caml_output_value_to_string :
-  'a -> Marshal.extern_flags list -> string
-  = "caml_output_value_to_string"
+(* external caml_output_value_to_string : *)
+(*   'a -> Marshal.extern_flags list -> string *)
+(*   = "caml_output_value_to_string" *)
 external append_prim : 'a array -> 'a array -> 'a array = "caml_array_append"
 external input_scan_line : in_channel -> int
   = "caml_ml_input_scan_line"

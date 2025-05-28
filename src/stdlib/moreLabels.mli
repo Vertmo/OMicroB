@@ -148,6 +148,8 @@ module Map : sig
       val find_last_opt : f:(key -> bool) -> 'a t -> (key * 'a) option
       val map : f:('a -> 'b) -> 'a t -> 'b t
       val mapi : f:(key -> 'a -> 'b) -> 'a t -> 'b t
+      val to_list: 'a t -> (key * 'a) list
+      val of_list: (key * 'a) list -> 'a t
   end
   module Make : functor (Ord : OrderedType) -> S with type key = Ord.t
 end

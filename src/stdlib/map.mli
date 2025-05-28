@@ -306,6 +306,8 @@ module type S =
     (** Same as {!Map.S.map}, but the function receives as arguments both the
        key and the associated value for each binding of the map. *)
 
+    val to_list: 'a t -> (key * 'a) list
+    val of_list: (key * 'a) list -> 'a t
 
   end
 (** Output signature of the functor {!Map.Make}. *)

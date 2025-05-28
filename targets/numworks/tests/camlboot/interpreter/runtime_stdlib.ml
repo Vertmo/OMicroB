@@ -52,11 +52,11 @@ let rec unwrap_list unwrapf = onptr @@ function
     end
   | _ -> assert false
 
-let unwrap_marshal_flag = onptr @@ function
-  | Constructor ("No_sharing", _, None) -> Marshal.No_sharing
-  | Constructor ("Closures", _, None) -> Marshal.Closures
-  | Constructor ("Compat_32", _, None) -> Marshal.Compat_32
-  | _ -> assert false
+(* let unwrap_marshal_flag = onptr @@ function *)
+(*   | Constructor ("No_sharing", _, None) -> Marshal.No_sharing *)
+(*   | Constructor ("Closures", _, None) -> Marshal.Closures *)
+(*   | Constructor ("Compat_32", _, None) -> Marshal.Compat_32 *)
+(*   | _ -> assert false *)
 
 external open_descriptor_out
   :  int ->
@@ -145,8 +145,8 @@ external marshal_to_channel
   unit
   = "caml_output_value"
 
-external caml_output_value_to_string : 'a -> Marshal.extern_flags list -> string
-  = "caml_output_value_to_string"
+(* external caml_output_value_to_string : 'a -> Marshal.extern_flags list -> string *)
+(*   = "caml_output_value_to_string" *)
 
 external append_prim : 'a array -> 'a array -> 'a array = "caml_array_append"
 external input_scan_line : in_channel -> int = "caml_ml_input_scan_line"

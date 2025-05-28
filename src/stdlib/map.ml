@@ -58,6 +58,8 @@ module type S =
     val find_last_opt: (key -> bool) -> 'a t -> (key * 'a) option
     val map: ('a -> 'b) -> 'a t -> 'b t
     val mapi: (key -> 'a -> 'b) -> 'a t -> 'b t
+    val to_list: 'a t -> (key * 'a) list
+    val of_list: (key * 'a) list -> 'a t
   end
 
 module Make(Ord: OrderedType) = struct
@@ -477,4 +479,8 @@ module Make(Ord: OrderedType) = struct
 
     let choose_opt = min_binding_opt
 
+    let to_list m = fold (fun k v acc -> (k, v)::acc) m []
+
+    let of_list l =
+      List.fold_left (fun acc (k, v) -> add k v acc) empty l
 end

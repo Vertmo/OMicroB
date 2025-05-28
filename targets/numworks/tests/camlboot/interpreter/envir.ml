@@ -57,19 +57,14 @@ let define_unit env unit_path mdl =
   let module_name = module_name_of_unit_path unit_path in
   match SMap.find module_name env.modules with
     | exception Not_found ->
-       Format.kasprintf invalid_arg
-         "define_unit: The module unit %s is not yet declared"
-         module_name
+       invalid_arg ("define_unit: The module unit "^module_name^" is not yet declared")
     | (_, (Module _ | Functor _)) ->
-       Format.kasprintf invalid_arg
-         "define_unit: The module %s is not a unit"
-         module_name
+       invalid_arg ("define_unit: The module"^module_name^"is not a unit")
     | (_, Unit (unit_id, unit_state)) ->
        begin match !unit_state with
          | Initialized _ ->
-            Format.kasprintf invalid_arg
-              "define_unit: The module unit %a is already defined"
-              pp_print_unit_id unit_id
+            invalid_arg ("define_unit: The module unit _ is already defined")
+              (* pp_print_unit_id unit_id *)
          | Not_initialized_yet ->
             unit_state := Initialized mdl;
             env
@@ -119,13 +114,13 @@ let decompose get_module_data env { txt = lident; loc } =
 let lookup object_name ~env_name object_env { txt = str; loc } =
   try snd (SMap.find str object_env)
   with Not_found ->
-    Format.eprintf
-      "%a@.%s not found in %s: %s@."
-      Location.print_loc
-      loc
-      (String.capitalize_ascii object_name)
-      env_name
-      str;
+    (* Format.eprintf *)
+    (*   "%a@.%s not found in %s: %s@." *)
+    (*   Location.print_loc *)
+    (*   loc *)
+    (*   (String.capitalize_ascii object_name) *)
+    (*   env_name *)
+    (*   str; *)
     raise Not_found
 
 let rec env_get_module env ({ loc; _ } as lid) =

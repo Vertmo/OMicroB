@@ -173,13 +173,13 @@ let prims =
         unwrap_int
         unwrap_int
         wrap_unit );
-    ( "caml_ml_output_int",
-      prim2 output_binary_int unwrap_out_channel unwrap_int wrap_unit );
+    (* ( "caml_ml_output_int", *)
+    (*   prim2 output_binary_int unwrap_out_channel unwrap_int wrap_unit ); *)
     ( "caml_ml_output_char",
       prim2 output_char unwrap_out_channel unwrap_char wrap_unit );
     ("caml_ml_flush", prim1 flush unwrap_out_channel wrap_unit);
     ("caml_ml_input_char", prim1 input_char unwrap_in_channel wrap_char);
-    ("caml_ml_input_int", prim1 input_binary_int unwrap_in_channel wrap_int);
+    (* ("caml_ml_input_int", prim1 input_binary_int unwrap_in_channel wrap_int); *)
     ( "caml_ml_input_scan_line",
       prim1 input_scan_line unwrap_in_channel wrap_int );
     ( "caml_ml_input",
@@ -191,9 +191,9 @@ let prims =
         unwrap_int
         wrap_int );
     ("caml_ml_seek_in", prim2 seek_in unwrap_in_channel unwrap_int wrap_unit);
-    ("caml_ml_pos_out", prim1 pos_out unwrap_out_channel wrap_int);
-    ("caml_ml_pos_in", prim1 pos_in unwrap_in_channel wrap_int);
-    ("caml_ml_seek_out", prim2 seek_out unwrap_out_channel unwrap_int wrap_unit);
+    (* ("caml_ml_pos_out", prim1 pos_out unwrap_out_channel wrap_int); *)
+    (* ("caml_ml_pos_in", prim1 pos_in unwrap_in_channel wrap_int); *)
+    (* ("caml_ml_seek_out", prim2 seek_out unwrap_out_channel unwrap_int wrap_unit); *)
     ("%makemutable",
      ptr @@ Prim (fun v -> ptr @@ Record (SMap.singleton "contents" (ref v))));
     ( "%field0",
@@ -251,42 +251,42 @@ let prims =
         id
         (unwrap_list unwrap_unit)
         wrap_unit );
-    ( "caml_output_value_to_buffer",
-      prim5
-        Marshal.to_buffer
-        unwrap_bytes
-        unwrap_int
-        unwrap_int
-        id
-        (unwrap_list unwrap_marshal_flag)
-        wrap_int );
-    ( "caml_output_value_to_string",
-      prim2
-        caml_output_value_to_string
-        id
-        (unwrap_list unwrap_marshal_flag)
-        wrap_string );
+    (* ( "caml_output_value_to_buffer", *)
+    (*   prim5 *)
+    (*     Marshal.to_buffer *)
+    (*     unwrap_bytes *)
+    (*     unwrap_int *)
+    (*     unwrap_int *)
+    (*     id *)
+    (*     (unwrap_list unwrap_marshal_flag) *)
+    (*     wrap_int ); *)
+    (* ( "caml_output_value_to_string", *)
+    (*   prim2 *)
+    (*     caml_output_value_to_string *)
+    (*     id *)
+    (*     (unwrap_list unwrap_marshal_flag) *)
+    (*     wrap_string ); *)
     ("caml_input_value", prim1 input_value unwrap_in_channel id);
-    ("caml_parse_engine", parse_engine_prim);
-    ("caml_lex_engine", lex_engine_prim);
-    ("caml_new_lex_engine", new_lex_engine_prim);
+    (* ("caml_parse_engine", parse_engine_prim); *)
+    (* ("caml_lex_engine", lex_engine_prim); *)
+    (* ("caml_new_lex_engine", new_lex_engine_prim); *)
     (* Sys *)
     ("caml_sys_exit", prim1 exit unwrap_int wrap_unit);
     ("caml_sys_executable_name",
      ptr @@ Prim
        (fun _ -> wrap_string "ocamlopt"));
-    ("caml_sys_read_directory",
-     prim1 Sys.readdir unwrap_string (wrap_array wrap_string));
-    ("caml_sys_get_argv",
-      ptr @@ Prim
-        (fun _ -> ptr @@
-          Tuple [ wrap_string "";
-                  wrap_array wrap_string Sys.argv ]) );
-    ("%sys_argv",
-      wrap_array wrap_string Sys.argv);
-    ( "caml_sys_get_config",
-      ptr @@ Prim
-      (fun _ -> ptr @@ Tuple [ wrap_string "Unix"; wrap_int 0; wrap_bool true ]) );
+    (* ("caml_sys_read_directory", *)
+    (*  prim1 Sys.readdir unwrap_string (wrap_array wrap_string)); *)
+    (* ("caml_sys_get_argv", *)
+    (*   ptr @@ Prim *)
+    (*     (fun _ -> ptr @@ *)
+    (*       Tuple [ wrap_string ""; *)
+    (*               wrap_array wrap_string Sys.argv ]) ); *)
+    (* ("%sys_argv", *)
+    (*   wrap_array wrap_string Sys.argv); *)
+    (* ( "caml_sys_get_config", *)
+    (*   ptr @@ Prim *)
+    (*   (fun _ -> ptr @@ Tuple [ wrap_string "Unix"; wrap_int 0; wrap_bool true ]) ); *)
     ("%big_endian", ptr @@ Prim (fun _ -> wrap_bool Sys.big_endian));
     ("%word_size", ptr @@ Prim (fun _ -> ptr @@ Int 64));
     ("%int_size", ptr @@ Prim (fun _ -> ptr @@ Int 64));
@@ -298,11 +298,11 @@ let prims =
       Prim (fun _ ->
           ptr @@ Constructor ("Other", 0, Some (wrap_string "Interpreter")))
     );
-    ("caml_sys_getenv", prim1 Sys.getenv unwrap_string wrap_string);
-    ("caml_sys_file_exists", prim1 Sys.file_exists unwrap_string wrap_bool);
-    ("caml_sys_getcwd", prim1 Sys.getcwd unwrap_unit wrap_string);
-    ("caml_sys_rename", prim2 Sys.rename unwrap_string unwrap_string wrap_unit);
-    ("caml_sys_remove", prim1 Sys.remove unwrap_string wrap_unit);
+    (* ("caml_sys_getenv", prim1 Sys.getenv unwrap_string wrap_string); *)
+    (* ("caml_sys_file_exists", prim1 Sys.file_exists unwrap_string wrap_bool); *)
+    (* ("caml_sys_getcwd", prim1 Sys.getcwd unwrap_unit wrap_string); *)
+    (* ("caml_sys_rename", prim2 Sys.rename unwrap_string unwrap_string wrap_unit); *)
+    (* ("caml_sys_remove", prim1 Sys.remove unwrap_string wrap_unit); *)
     (* String and Bytes *)
     ("caml_create_string", prim1 String.create unwrap_int wrap_bytes);
     ("caml_create_bytes", prim1 Bytes.create unwrap_int wrap_bytes);
@@ -383,26 +383,26 @@ let prims =
     ("%int32_of_int", prim1 Int32.of_int unwrap_int wrap_int32);
     ("%int32_to_int", prim1 Int32.to_int unwrap_int32 wrap_int);
     (* Nativeint *)
-    ("%nativeint_neg", prim1 Nativeint.neg unwrap_nativeint wrap_nativeint);
-    ("%nativeint_add", prim2 Nativeint.add unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ("%nativeint_sub", prim2 Nativeint.sub unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ("%nativeint_mul", prim2 Nativeint.mul unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ("%nativeint_div", prim2 Nativeint.div unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ("%nativeint_mod", prim2 Nativeint.rem unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ("%nativeint_and", prim2 Nativeint.logand unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ("%nativeint_or", prim2 Nativeint.logor unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ("%nativeint_xor", prim2 Nativeint.logxor unwrap_nativeint unwrap_nativeint wrap_nativeint);
-    ( "%nativeint_lsl",
-      prim2 Nativeint.shift_left unwrap_nativeint unwrap_int wrap_nativeint );
-    ( "%nativeint_lsr",
-      prim2 Nativeint.shift_right_logical unwrap_nativeint unwrap_int wrap_nativeint );
-    ( "%nativeint_asr",
-      prim2 Nativeint.shift_right unwrap_nativeint unwrap_int wrap_nativeint );
-    ("%nativeint_of_int", prim1 Nativeint.of_int unwrap_int wrap_nativeint);
-    ("%nativeint_to_int", prim1 Nativeint.to_int unwrap_nativeint wrap_int);
-    ("%nativeint_to_int32", prim1 Nativeint.to_int32 unwrap_nativeint wrap_int32);
-    ("%nativeint_of_int32", prim1 Nativeint.of_int32 unwrap_int32 wrap_nativeint);
-    ("caml_nativeint_of_string", prim1 Nativeint.of_string unwrap_string wrap_nativeint);
+    (* ("%nativeint_neg", prim1 Nativeint.neg unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_add", prim2 Nativeint.add unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_sub", prim2 Nativeint.sub unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_mul", prim2 Nativeint.mul unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_div", prim2 Nativeint.div unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_mod", prim2 Nativeint.rem unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_and", prim2 Nativeint.logand unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_or", prim2 Nativeint.logor unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ("%nativeint_xor", prim2 Nativeint.logxor unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
+    (* ( "%nativeint_lsl", *)
+    (*   prim2 Nativeint.shift_left unwrap_nativeint unwrap_int wrap_nativeint ); *)
+    (* ( "%nativeint_lsr", *)
+    (*   prim2 Nativeint.shift_right_logical unwrap_nativeint unwrap_int wrap_nativeint ); *)
+    (* ( "%nativeint_asr", *)
+    (*   prim2 Nativeint.shift_right unwrap_nativeint unwrap_int wrap_nativeint ); *)
+    (* ("%nativeint_of_int", prim1 Nativeint.of_int unwrap_int wrap_nativeint); *)
+    (* ("%nativeint_to_int", prim1 Nativeint.to_int unwrap_nativeint wrap_int); *)
+    (* ("%nativeint_to_int32", prim1 Nativeint.to_int32 unwrap_nativeint wrap_int32); *)
+    (* ("%nativeint_of_int32", prim1 Nativeint.of_int32 unwrap_int32 wrap_nativeint); *)
+    (* ("caml_nativeint_of_string", prim1 Nativeint.of_string unwrap_string wrap_nativeint); *)
     (* Array *)
     ("caml_make_vect", prim2 Array.make unwrap_int id wrap_array_id);
     ("%array_length", prim1 Array.length unwrap_array_id wrap_int);
@@ -471,7 +471,7 @@ let prims =
     ( "caml_spacetime_enabled",
       prim1 Prim.spacetime_enabled unwrap_unit wrap_bool );
     (* Gc *)
-    ("caml_gc_quick_stat", prim1 Gc.quick_stat unwrap_unit wrap_gc_stat);
+    (* ("caml_gc_quick_stat", prim1 Gc.quick_stat unwrap_unit wrap_gc_stat); *)
     (* utils/profile.ml *)
     ( "caml_sys_time_include_children",
       prim1 Prim.time_include_children unwrap_bool wrap_float );
@@ -479,51 +479,51 @@ let prims =
     ( "caml_sys_isatty",
       prim1 Prim.isatty unwrap_out_channel wrap_bool );
     (* Digest *)
-    ( "caml_md5_string",
-      prim3
-        digest_unsafe_string
-        unwrap_string
-        unwrap_int
-        unwrap_int
-        wrap_string );
-    ( "caml_md5_chan",
-      prim2 Digest.channel unwrap_in_channel unwrap_int wrap_string );
+    (* ( "caml_md5_string", *)
+    (*   prim3 *)
+    (*     digest_unsafe_string *)
+    (*     unwrap_string *)
+    (*     unwrap_int *)
+    (*     unwrap_int *)
+    (*     wrap_string ); *)
+    (* ( "caml_md5_chan", *)
+    (*   prim2 Digest.channel unwrap_in_channel unwrap_int wrap_string ); *)
     (* Ugly *)
-    ( "%obj_size",
-      prim1
-        (onptr @@ function
-          | Array a -> Array.length a + 2
-          | _ -> 4)
-        id
-        wrap_int );
-    ( "caml_obj_block",
-      prim2
-        (fun tag size ->
-          let block = ptr @@ Array (Array.init size (fun _ -> ptr @@ Int 0)) in
-          ptr @@ Constructor ("", tag, Some block))
-        unwrap_int
-        unwrap_int
-        id );
-    ( "%obj_set_field",
-      prim3 (fun data idx v ->
-          let err () =
-            Format.eprintf "obj_set_field (%a).(%d) <- (%a)@."
-              pp_print_value data
-              idx
-              pp_print_value v in
-          match Ptr.get data with
-            | Array arr -> arr.(idx) <- v
-            | Constructor(_, _, Some arg) ->
-               begin match Ptr.get arg with
-                 | Array arr -> arr.(idx) <- v
-                 | _ -> err (); assert false
-               end
-            | _ -> err (); assert false
-        )
-        id
-        unwrap_int
-        id
-        wrap_unit );
+    (* ( "%obj_size", *)
+    (*   prim1 *)
+    (*     (onptr @@ function *)
+    (*       | Array a -> Array.length a + 2 *)
+    (*       | _ -> 4) *)
+    (*     id *)
+    (*     wrap_int ); *)
+    (* ( "caml_obj_block", *)
+    (*   prim2 *)
+    (*     (fun tag size -> *)
+    (*       let block = ptr @@ Array (Array.init size (fun _ -> ptr @@ Int 0)) in *)
+    (*       ptr @@ Constructor ("", tag, Some block)) *)
+    (*     unwrap_int *)
+    (*     unwrap_int *)
+    (*     id ); *)
+    (* ( "%obj_set_field", *)
+    (*   prim3 (fun data idx v -> *)
+    (*       let err () = *)
+    (*         Format.eprintf "obj_set_field (%a).(%d) <- (%a)@." *)
+    (*           pp_print_value data *)
+    (*           idx *)
+    (*           pp_print_value v in *)
+    (*       match Ptr.get data with *)
+    (*         | Array arr -> arr.(idx) <- v *)
+    (*         | Constructor(_, _, Some arg) -> *)
+    (*            begin match Ptr.get arg with *)
+    (*              | Array arr -> arr.(idx) <- v *)
+    (*              | _ -> err (); assert false *)
+    (*            end *)
+    (*         | _ -> err (); assert false *)
+    (*     ) *)
+    (*     id *)
+    (*     unwrap_int *)
+    (*     id *)
+    (*     wrap_unit ); *)
   ]
 
 let prims =

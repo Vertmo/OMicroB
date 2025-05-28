@@ -25,13 +25,13 @@ let fun_label_shape = function
   | Prim _ -> [ (Nolabel, None) ]
   | _ -> []
 
-let mismatch loc =
-  Format.eprintf "%a: mismatch@."
-    Location.print_loc loc
+let mismatch loc = failwith "TODO mismatch"
+  (* Format.eprintf "%a: mismatch@." *)
+  (*   Location.print_loc loc *)
 
-let unsupported loc =
-  Format.eprintf "%a: unsupported@."
-    Location.print_loc loc
+let unsupported loc = failwith "TODO unsupported"
+  (* Format.eprintf "%a: unsupported@." *)
+  (*   Location.print_loc loc *)
 
 let rec take n li = match n, li with
     | 0, _ -> []
@@ -122,7 +122,7 @@ let rec apply prims vf args =
     | Function (cl, fenv) -> eval_match prims fenv cl (Ok arg)
     | Prim prim -> prim arg
     | _ ->
-      Format.eprintf "%a@." pp_print_value vf;
+      (* Format.eprintf "%a@." pp_print_value vf; *)
       assert false
   in
   if SMap.is_empty !with_label
@@ -169,7 +169,7 @@ and eval_expr prims env expr =
       let loc = expr.pexp_loc in
       (match fexpr loc l with
       | None ->
-        Format.eprintf "%a@.F-expr failure.@." Location.print_loc loc;
+        (* Format.eprintf "%a@.F-expr failure.@." Location.print_loc loc; *)
         assert false
       | Some expr -> eval_expr prims env expr)
     | func_value ->
@@ -182,8 +182,8 @@ and eval_expr prims env expr =
             match f.pexp_desc with
             | Pexp_ident lident -> String.concat "." (Longident.flatten lident.txt)
             | _ -> "<unknown>"
-          in
-          Format.eprintf "(%d) %a %s %s@." d Location.print_loc expr.pexp_loc name fname
+          in ()
+          (* Format.eprintf "(%d) %a %s %s@." d Location.print_loc expr.pexp_loc name fname *)
         in
         print_action "apply";
         match apply prims (ptr @@ func_value) args with
@@ -194,19 +194,19 @@ and eval_expr prims env expr =
       then (
         match f.pexp_desc with
         | Pexp_ident lident ->
-          Format.eprintf
-            "apply %s"
-            (String.concat "." (Longident.flatten lident.txt));
-          tracecur := Int64.succ !tracecur;
-          if !tracecur > tracearg_from
-          then
-            Format.eprintf
-              " %a"
-              (Format.pp_print_list
-                 ~pp_sep:(fun ff () -> Format.fprintf ff " ")
-                 (fun ff (_, v) -> Format.fprintf ff "%a" pp_print_value v))
-              args;
-          Format.eprintf "@."
+          (* Format.eprintf *)
+          (*   "apply %s" *)
+          (*   (String.concat "." (Longident.flatten lident.txt)); *)
+          tracecur := Int64.succ !tracecur(* ; *)
+          (* if !tracecur > tracearg_from *)
+          (* then *)
+          (*   Format.eprintf *)
+          (*     " %a" *)
+          (*     (Format.pp_print_list *)
+          (*        ~pp_sep:(fun ff () -> Format.fprintf ff " ") *)
+          (*        (fun ff (_, v) -> Format.fprintf ff "%a" pp_print_value v)) *)
+          (*     args; *)
+          (* Format.eprintf "@." *)
         | _ -> ());
       apply prims (ptr @@ func_value) args
       end)
@@ -445,7 +445,7 @@ and pattern_bind prims init_env pat v =
         in
         bind ~pat_env ~res_env p (ptr @@ Tuple [ fmt; v ])
       | _ ->
-        Format.eprintf "cn = %s@.v = %a@." cn pp_print_value v;
+        (* Format.eprintf "cn = %s@.v = %a@." cn pp_print_value v; *)
         assert false)
     | Ppat_variant (name, p) ->
       (match Ptr.get v with
@@ -610,13 +610,18 @@ and eval_class_expr prims env class_expr =
          let module M = struct class cl = <cle> end in
          new M.cl
      *)
-    let open Ast_helper in
+    let dloc = Location.none in
     let noloc = Location.mknoloc in
     let modname = "<class_exp_mod>" in
     let clname = "<class_exp>" in
-    Exp.letmodule (noloc modname)
-      (Mod.structure [Str.class_ [Ci.mk (noloc clname) class_exp]])
-      (Exp.new_ (noloc (Longident.(Ldot (Lident modname, clname)))))
+    let mk_exp d = { pexp_desc = d; pexp_loc = dloc; pexp_loc_stack = []; pexp_attributes = [] } in
+    let mk_mod d = { pmod_desc = d; pmod_loc = dloc; pmod_attributes = [] } in
+    let mk_str d = { pstr_desc = d; pstr_loc = dloc } in
+    let mk_ci name expr = { pci_virt = Concrete; pci_params = []; pci_name = name; pci_expr = expr; pci_attributes = []; pci_loc = dloc } in
+    mk_exp
+      (Pexp_letmodule (noloc modname,
+                       mk_mod (Pmod_structure [mk_str (Pstr_class [mk_ci (noloc clname) class_exp])]),
+                       mk_exp (Pexp_new (noloc (Longident.(Ldot (Lident modname, clname)))))))
   in
   match class_expr.pcl_desc with
   | Pcl_constr (lid, _type_args) ->
@@ -710,9 +715,9 @@ and eval_class_structure prims env loc class_structure =
               parent.variables
             in
             let set_of_keys dict =
-              SMap.to_seq dict
-              |> Seq.map fst
-              |> SSet.of_seq in
+              SMap.to_list dict
+              |> List.map fst
+              |> SSet.of_list in
             let variables_in_scope =
               (* first add the parent variables *)
               SSet.union variables_in_scope
@@ -808,7 +813,7 @@ and eval_structitem prims env it =
   match it.pstr_desc with
   | Pstr_eval (e, _) ->
     let v = eval_expr prims env e in
-    Format.printf "%a@." pp_print_value v;
+    (* Format.printf "%a@." pp_print_value v; *)
     env
   | Pstr_value (recflag, defs) -> eval_bindings prims env recflag defs
   | Pstr_primitive { pval_name = { txt = name; loc }; pval_prim = l; _ } ->
@@ -818,7 +823,7 @@ and eval_structitem prims env it =
       with Not_found ->
         ptr @@ Prim
           (fun _ ->
-            Format.eprintf "%a: Unimplemented primitive %s@." Location.print_loc loc prim_name;
+            (* Format.eprintf "%a: Unimplemented primitive %s@." Location.print_loc loc prim_name; *)
             failwith ("Unimplemented primitive " ^ prim_name))
     in
     env_set_value name prim env

@@ -20,54 +20,53 @@ let unwrap_position = onptr @@ function
 
 let wrap_position Lexing.{ pos_fname; pos_lnum; pos_bol; pos_cnum } =
   ptr @@ Record
-    (SMap.of_seq
-    @@ List.to_seq
-         [ ("pos_fname", ref (wrap_string pos_fname));
-           ("pos_lnum", ref (wrap_int pos_lnum));
-           ("pos_bol", ref (wrap_int pos_bol));
-           ("pos_cnum", ref (wrap_int pos_cnum))
-         ])
+    (SMap.of_list
+       [ ("pos_fname", ref (wrap_string pos_fname));
+         ("pos_lnum", ref (wrap_int pos_lnum));
+         ("pos_bol", ref (wrap_int pos_bol));
+         ("pos_cnum", ref (wrap_int pos_cnum))
+    ])
 
-let wrap_gc_stat
-    Gc.
-      { minor_words;
-        promoted_words;
-        major_words;
-        minor_collections;
-        major_collections;
-        heap_words;
-        heap_chunks;
-        live_words;
-        live_blocks;
-        free_words;
-        free_blocks;
-        largest_free;
-        fragments;
-        compactions;
-        top_heap_words;
-        stack_size
-      }
-  =
-  ptr @@ Record
-    (SMap.of_seq
-    @@ List.to_seq
-         [ ("minor_words", ref (wrap_float minor_words));
-           ("promoted_words", ref (wrap_float promoted_words));
-           ("major_words", ref (wrap_float major_words));
-           ("minor_collections", ref (wrap_int minor_collections));
-           ("major_collections", ref (wrap_int major_collections));
-           ("heap_words", ref (wrap_int heap_words));
-           ("heap_chunks", ref (wrap_int heap_chunks));
-           ("live_words", ref (wrap_int live_words));
-           ("live_blocks", ref (wrap_int live_blocks));
-           ("free_words", ref (wrap_int free_words));
-           ("free_blocks", ref (wrap_int free_blocks));
-           ("largest_free", ref (wrap_int largest_free));
-           ("fragments", ref (wrap_int fragments));
-           ("compactions", ref (wrap_int compactions));
-           ("top_heap_words", ref (wrap_int top_heap_words));
-           ("stack_size", ref (wrap_int stack_size))
-         ])
+(* let wrap_gc_stat *)
+(*     Gc. *)
+(*       { minor_words; *)
+(*         promoted_words; *)
+(*         major_words; *)
+(*         minor_collections; *)
+(*         major_collections; *)
+(*         heap_words; *)
+(*         heap_chunks; *)
+(*         live_words; *)
+(*         live_blocks; *)
+(*         free_words; *)
+(*         free_blocks; *)
+(*         largest_free; *)
+(*         fragments; *)
+(*         compactions; *)
+(*         top_heap_words; *)
+(*         stack_size *)
+(*       } *)
+(*   = *)
+(*   ptr @@ Record *)
+(*     (SMap.of_seq *)
+(*     @@ List.to_seq *)
+(*          [ ("minor_words", ref (wrap_float minor_words)); *)
+(*            ("promoted_words", ref (wrap_float promoted_words)); *)
+(*            ("major_words", ref (wrap_float major_words)); *)
+(*            ("minor_collections", ref (wrap_int minor_collections)); *)
+(*            ("major_collections", ref (wrap_int major_collections)); *)
+(*            ("heap_words", ref (wrap_int heap_words)); *)
+(*            ("heap_chunks", ref (wrap_int heap_chunks)); *)
+(*            ("live_words", ref (wrap_int live_words)); *)
+(*            ("live_blocks", ref (wrap_int live_blocks)); *)
+(*            ("free_words", ref (wrap_int free_words)); *)
+(*            ("free_blocks", ref (wrap_int free_blocks)); *)
+(*            ("largest_free", ref (wrap_int largest_free)); *)
+(*            ("fragments", ref (wrap_int fragments)); *)
+(*            ("compactions", ref (wrap_int compactions)); *)
+(*            ("top_heap_words", ref (wrap_int top_heap_words)); *)
+(*            ("stack_size", ref (wrap_int stack_size)) *)
+(*          ]) *)
 
 (* TODO: Menhir-using OCaml versions do not have a global parser state
    anymore, so we should be able to clean this up -- all indirect
@@ -244,13 +243,13 @@ let unwrap_parse_tables syncenv = onptr @@ function
     }
   | _ -> assert false
 
-external parse_engine
-  :  parse_tables ->
-  parser_env ->
-  parser_input ->
-  Obj.t ->
-  parser_output
-  = "caml_parse_engine"
+(* external parse_engine *)
+(*   :  parse_tables -> *)
+(*   parser_env -> *)
+(*   parser_input -> *)
+(*   Obj.t -> *)
+(*   parser_output *)
+(*   = "caml_parse_engine" *)
 
 external lex_engine
   :  Lexing.lex_tables ->
@@ -259,31 +258,31 @@ external lex_engine
   int
   = "caml_lex_engine"
 
-external new_lex_engine
-  :  Lexing.lex_tables ->
-  int ->
-  Lexing.lexbuf ->
-  int
-  = "caml_new_lex_engine"
+(* external new_lex_engine *)
+(*   :  Lexing.lex_tables -> *)
+(*   int -> *)
+(*   Lexing.lexbuf -> *)
+(*   int *)
+(*   = "caml_new_lex_engine" *)
 
-let parse_engine_wrapper tables env input token =
-  let nenv = unwrap_parser_env env in
-  let tbls = unwrap_parse_tables env tables in
-  let obj =
-    if input = Semantic_action_computed
-    then Obj.repr token
-    else (
-      match Ptr.get token with
-      | Constructor (_c, d, None) -> Obj.repr d
-      | Constructor (_c, d, Some arg) ->
-        let w = Obj.repr (Some arg) in
-        Obj.set_tag w d;
-        w
-      | _ -> assert false)
-  in
-  let res = parse_engine tbls nenv input obj in
-  sync_parser_env nenv env;
-  res
+(* let parse_engine_wrapper tables env input token = *)
+(*   let nenv = unwrap_parser_env env in *)
+(*   let tbls = unwrap_parse_tables env tables in *)
+(*   let obj = *)
+(*     if input = Semantic_action_computed *)
+(*     then Obj.repr token *)
+(*     else ( *)
+(*       match Ptr.get token with *)
+(*       | Constructor (_c, d, None) -> Obj.repr d *)
+(*       | Constructor (_c, d, Some arg) -> *)
+(*         let w = Obj.repr (Some arg) in *)
+(*         Obj.set_tag w d; *)
+(*         w *)
+(*       | _ -> assert false) *)
+(*   in *)
+(*   let res = parse_engine tbls nenv input obj in *)
+(*   sync_parser_env nenv env; *)
+(*   res *)
 
 let unwrap_lexbuf v =
   match Ptr.get v with
@@ -346,25 +345,25 @@ let lex_engine_wrapper tables n lexbuf =
   sync_lexbuf lexbuf nbuf;
   res
 
-let new_lex_engine_wrapper tables n lexbuf =
-  let nbuf = unwrap_lexbuf lexbuf in
-  let tbls = unwrap_lex_tables tables in
-  let res = new_lex_engine tbls n nbuf in
-  sync_lexbuf lexbuf nbuf;
-  res
+(* let new_lex_engine_wrapper tables n lexbuf = *)
+(*   let nbuf = unwrap_lexbuf lexbuf in *)
+(*   let tbls = unwrap_lex_tables tables in *)
+(*   let res = new_lex_engine tbls n nbuf in *)
+(*   sync_lexbuf lexbuf nbuf; *)
+(*   res *)
 
-let parse_engine_prim =
-  prim4
-    parse_engine_wrapper
-    wrap_exn
-    id
-    id
-    unwrap_parser_input
-    id
-    wrap_parser_output
+(* let parse_engine_prim = *)
+(*   prim4 *)
+(*     parse_engine_wrapper *)
+(*     wrap_exn *)
+(*     id *)
+(*     id *)
+(*     unwrap_parser_input *)
+(*     id *)
+(*     wrap_parser_output *)
 
 let lex_engine_prim =
   prim3 lex_engine_wrapper wrap_exn id unwrap_int id wrap_int
 
-let new_lex_engine_prim =
-  prim3 new_lex_engine_wrapper wrap_exn id unwrap_int id wrap_int
+(* let new_lex_engine_prim = *)
+(*   prim3 new_lex_engine_wrapper wrap_exn id unwrap_int id wrap_int *)
