@@ -22,7 +22,6 @@ and value_ =
     Int of int
   | Int32 of int32
   | Int64 of int64
-  | Nativeint of nativeint
   | Fun of Asttypes.arg_label * Parsetree.expression option *
       Parsetree.pattern * Parsetree.expression * env
   | Function of Parsetree.case list * env

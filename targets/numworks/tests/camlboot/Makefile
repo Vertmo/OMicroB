@@ -10,7 +10,7 @@ HEAP_SIZE = 2048
 
 TARGETS := $(PROG).hex $(PROG).elf
 
-INCLUDES := -I stdlib/ -I interpreter/
+INCLUDES := -I stdlib/ -I parsing/ -I interpreter/
 CINCLUDES := $(shell echo $(INCLUDES) | sed -e 's/ /,/g')
 OMICROB_PARAMS := -v -mlopts $(CINCLUDES) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE)
 
@@ -22,6 +22,7 @@ C_SOURCE = interp.c
 
 # Directory containing the source files
 SRCS += stdlib/*.mli stdlib/*.ml
+SRCS += parsing/*.mli parsing/*.ml
 SRCS += interpreter/*.mli interpreter/*.ml
 
 SSRCS = $(shell ocamldep -bytecode -sort $(INCLUDES) $(SRCS))
@@ -35,14 +36,14 @@ CMIS = $(patsubst %.mli,%.cmi,$(MLIS))
 all: $(PROG).hex
 	cp -vf $(PROG).hex $(PROG).nwa
 
-$(TARGETS): $(CMIS) $(CMOS) camlboot.cmo
+$(TARGETS): $(CMOS) camlboot.cmo
 	@echo "Compiling .cmo files to .byte"
-	$(BIN)/omicrob -$(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
+	$(BIN)/omicrob $(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
 
 %.cmi: %.mli
 	$(BIN)/omicrob $(OMICROB_PARAMS) -c $<
 
-%.cmo: %.ml
+%.cmo: %.ml $(CMIS)
 	$(BIN)/omicrob $(OMICROB_PARAMS) -c $<
 
 .PHONY: clean

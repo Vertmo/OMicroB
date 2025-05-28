@@ -7,8 +7,6 @@ val wrap_int32 : int32 -> value
 val unwrap_int32 : value -> int32
 val wrap_int64 : int64 -> value
 val unwrap_int64 : value -> int64
-val wrap_nativeint : nativeint -> value
-val unwrap_nativeint : value -> nativeint
 val wrap_float : float -> value
 val unwrap_float : value -> float
 val unwrap_bool : value -> bool

@@ -47,7 +47,6 @@ and value_ =
   | Int of int
   | Int32 of int32
   | Int64 of int64
-  | Nativeint of nativeint
   | Fun of arg_label * expression option * pattern * expression * env
   | Function of case list * env
   | String of bytes
@@ -281,7 +280,6 @@ let value_of_constant const = ptr @@ match const with
   | Pconst_integer (s, None) -> Int (Int64.to_int (read_caml_int s))
   | Pconst_integer (s, Some 'l') -> Int32 (Int64.to_int32 (read_caml_int s))
   | Pconst_integer (s, Some 'L') -> Int64 (read_caml_int s)
-  | Pconst_integer (s, Some 'n') -> Nativeint (Int64.to_nativeint (read_caml_int s))
   | Pconst_integer (_s, Some c) ->
     (* Format.eprintf "Unsupported suffix %c@." c; *)
     assert false
@@ -315,8 +313,6 @@ let rec value_compare v1 v2 = match Ptr.get v1, Ptr.get v2 with
   | Int64 n1, Int64 n2 -> compare n1 n2
   | Int64 _, _ -> assert false
 
-  | Nativeint n1, Nativeint n2 -> compare n1 n2
-  | Nativeint _, _ -> assert false
 
   | Float f1, Float f2 -> compare f1 f2
   | Float _, _ -> assert false

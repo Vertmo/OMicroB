@@ -115,82 +115,82 @@ let prims =
     ("%identity", ptr @@ Prim (fun x -> x));
     ("caml_register_named_value",
      ptr @@ Prim (fun _ -> ptr @@ Prim (fun _ -> unit)));
-    ( "caml_int64_float_of_bits",
-      prim1 Int64.float_of_bits unwrap_int64 wrap_float );
-    ( "caml_int64_bits_of_float",
-      prim1 Int64.bits_of_float unwrap_float wrap_int64 );
-    ( "caml_ml_open_descriptor_out",
-      prim1 open_descriptor_out unwrap_int wrap_out_channel );
-    ( "caml_ml_open_descriptor_in",
-      prim1 open_descriptor_in unwrap_int wrap_in_channel );
-    ( "caml_sys_open",
-      prim3
-        open_desc
-        unwrap_string
-        (unwrap_list unwrap_open_flag)
-        unwrap_int
-        wrap_int );
-    ( "caml_sys_close",
-      prim1
-        close_desc
-        unwrap_int
-        wrap_unit );
-    ( "caml_sys_system_command",
-      prim1 caml_sys_system_command unwrap_string wrap_int  );
-    ( "caml_ml_set_channel_name",
-      prim2
-        (fun v s ->
-          match Ptr.get v with
-          | InChannel ic -> set_in_channel_name ic s
-          | OutChannel oc -> set_out_channel_name oc s
-          | _ -> assert false)
-        id
-        unwrap_string
-        wrap_unit );
-    ( "caml_ml_close_channel",
-      prim1
-        (onptr @@ function
-          | InChannel ic -> close_in ic
-          | OutChannel oc -> close_out oc
-          | _ -> assert false)
-        id
-        wrap_unit );
-    ( "caml_ml_out_channels_list",
-      prim1 out_channels_list unwrap_unit (wrap_list wrap_out_channel) );
-    ( "caml_ml_output_bytes",
-      prim4
-        unsafe_output
-        unwrap_out_channel
-        unwrap_bytes
-        unwrap_int
-        unwrap_int
-        wrap_unit );
-    ( "caml_ml_output",
-      prim4
-        unsafe_output_string
-        unwrap_out_channel
-        unwrap_string
-        unwrap_int
-        unwrap_int
-        wrap_unit );
+    (* ( "caml_int64_float_of_bits", *)
+    (*   prim1 Int64.float_of_bits unwrap_int64 wrap_float ); *)
+    (* ( "caml_int64_bits_of_float", *)
+    (*   prim1 Int64.bits_of_float unwrap_float wrap_int64 ); *)
+    (* ( "caml_ml_open_descriptor_out", *)
+    (*   prim1 open_descriptor_out unwrap_int wrap_out_channel ); *)
+    (* ( "caml_ml_open_descriptor_in", *)
+    (*   prim1 open_descriptor_in unwrap_int wrap_in_channel ); *)
+    (* ( "caml_sys_open", *)
+    (*   prim3 *)
+    (*     open_desc *)
+    (*     unwrap_string *)
+    (*     (unwrap_list unwrap_open_flag) *)
+    (*     unwrap_int *)
+    (*     wrap_int ); *)
+    (* ( "caml_sys_close", *)
+    (*   prim1 *)
+    (*     close_desc *)
+    (*     unwrap_int *)
+    (*     wrap_unit ); *)
+    (* ( "caml_sys_system_command", *)
+    (*   prim1 caml_sys_system_command unwrap_string wrap_int  ); *)
+    (* ( "caml_ml_set_channel_name", *)
+    (*   prim2 *)
+    (*     (fun v s -> *)
+    (*       match Ptr.get v with *)
+    (*       | InChannel ic -> set_in_channel_name ic s *)
+    (*       | OutChannel oc -> set_out_channel_name oc s *)
+    (*       | _ -> assert false) *)
+    (*     id *)
+    (*     unwrap_string *)
+    (*     wrap_unit ); *)
+    (* ( "caml_ml_close_channel", *)
+    (*   prim1 *)
+    (*     (onptr @@ function *)
+    (*       | InChannel ic -> close_in ic *)
+    (*       | OutChannel oc -> close_out oc *)
+    (*       | _ -> assert false) *)
+    (*     id *)
+    (*     wrap_unit ); *)
+    (* ( "caml_ml_out_channels_list", *)
+    (*   prim1 out_channels_list unwrap_unit (wrap_list wrap_out_channel) ); *)
+    (* ( "caml_ml_output_bytes", *)
+    (*   prim4 *)
+    (*     unsafe_output *)
+    (*     unwrap_out_channel *)
+    (*     unwrap_bytes *)
+    (*     unwrap_int *)
+    (*     unwrap_int *)
+    (*     wrap_unit ); *)
+    (* ( "caml_ml_output", *)
+    (*   prim4 *)
+    (*     unsafe_output_string *)
+    (*     unwrap_out_channel *)
+    (*     unwrap_string *)
+    (*     unwrap_int *)
+    (*     unwrap_int *)
+    (*     wrap_unit ); *)
     (* ( "caml_ml_output_int", *)
     (*   prim2 output_binary_int unwrap_out_channel unwrap_int wrap_unit ); *)
-    ( "caml_ml_output_char",
-      prim2 output_char unwrap_out_channel unwrap_char wrap_unit );
-    ("caml_ml_flush", prim1 flush unwrap_out_channel wrap_unit);
-    ("caml_ml_input_char", prim1 input_char unwrap_in_channel wrap_char);
+    (* ( "caml_ml_output_char", *)
+    (*   prim2 output_char unwrap_out_channel unwrap_char wrap_unit ); *)
+    (* ("caml_ml_flush", prim1 flush unwrap_out_channel wrap_unit); *)
+    (* ("caml_ml_input_char", prim1 input_char unwrap_in_channel wrap_char); *)
     (* ("caml_ml_input_int", prim1 input_binary_int unwrap_in_channel wrap_int); *)
-    ( "caml_ml_input_scan_line",
-      prim1 input_scan_line unwrap_in_channel wrap_int );
-    ( "caml_ml_input",
-      prim4
-        unsafe_input
-        unwrap_in_channel
-        unwrap_bytes
-        unwrap_int
-        unwrap_int
-        wrap_int );
-    ("caml_ml_seek_in", prim2 seek_in unwrap_in_channel unwrap_int wrap_unit);
+    (* ( "caml_ml_input_scan_line", *)
+    (*   prim1 input_scan_line unwrap_in_channel wrap_int ); *)
+    (* ( "caml_ml_input", *)
+    (*   prim4 *)
+    (*     unsafe_input *)
+    (*     unwrap_in_channel *)
+    (*     unwrap_bytes *)
+    (*     unwrap_int *)
+    (*     unwrap_int *)
+    (*     wrap_int ); *)
+    (* ("caml_ml_seek_in", prim2 seek_in unwrap_in_channel unwrap_int wrap_unit); *)
     (* ("caml_ml_pos_out", prim1 pos_out unwrap_out_channel wrap_int); *)
     (* ("caml_ml_pos_in", prim1 pos_in unwrap_in_channel wrap_int); *)
     (* ("caml_ml_seek_out", prim2 seek_out unwrap_out_channel unwrap_int wrap_unit); *)
@@ -233,24 +233,24 @@ let prims =
           unit
         | _ -> assert false) );
     ("%ignore", ptr @@ Prim (fun _ -> unit));
-    ("caml_format_int", prim2 format_int unwrap_string unwrap_int wrap_string);
-    ( "caml_format_float",
-      prim2 format_float unwrap_string unwrap_float wrap_string );
-    ("caml_int32_format",
-     prim2 caml_int32_format unwrap_string unwrap_int32 wrap_string);
-    ("caml_int64_format",
-     prim2 caml_int64_format unwrap_string unwrap_int64 wrap_string);
-    ("caml_nativeint_format",
-     prim2 caml_nativeint_format unwrap_string unwrap_nativeint wrap_string);
-    ("caml_int_of_string", prim1 int_of_string unwrap_string wrap_int);
-    ("caml_float_of_string", prim1 float_of_string unwrap_string wrap_float);
-    ( "caml_output_value",
-      prim3
-        marshal_to_channel
-        unwrap_out_channel
-        id
-        (unwrap_list unwrap_unit)
-        wrap_unit );
+    (* ("caml_format_int", prim2 format_int unwrap_string unwrap_int wrap_string); *)
+    (* ( "caml_format_float", *)
+    (*   prim2 format_float unwrap_string unwrap_float wrap_string ); *)
+    (* ("caml_int32_format", *)
+    (*  prim2 caml_int32_format unwrap_string unwrap_int32 wrap_string); *)
+    (* ("caml_int64_format", *)
+    (*  prim2 caml_int64_format unwrap_string unwrap_int64 wrap_string); *)
+    (* ("caml_nativeint_format", *)
+    (*  prim2 caml_nativeint_format unwrap_string unwrap_nativeint wrap_string); *)
+    (* ("caml_int_of_string", prim1 int_of_string unwrap_string wrap_int); *)
+    (* ("caml_float_of_string", prim1 float_of_string unwrap_string wrap_float); *)
+    (* ( "caml_output_value", *)
+    (*   prim3 *)
+    (*     marshal_to_channel *)
+    (*     unwrap_out_channel *)
+    (*     id *)
+    (*     (unwrap_list unwrap_unit) *)
+    (*     wrap_unit ); *)
     (* ( "caml_output_value_to_buffer", *)
     (*   prim5 *)
     (*     Marshal.to_buffer *)
@@ -266,15 +266,15 @@ let prims =
     (*     id *)
     (*     (unwrap_list unwrap_marshal_flag) *)
     (*     wrap_string ); *)
-    ("caml_input_value", prim1 input_value unwrap_in_channel id);
+    (* ("caml_input_value", prim1 input_value unwrap_in_channel id); *)
     (* ("caml_parse_engine", parse_engine_prim); *)
     (* ("caml_lex_engine", lex_engine_prim); *)
     (* ("caml_new_lex_engine", new_lex_engine_prim); *)
     (* Sys *)
-    ("caml_sys_exit", prim1 exit unwrap_int wrap_unit);
-    ("caml_sys_executable_name",
-     ptr @@ Prim
-       (fun _ -> wrap_string "ocamlopt"));
+    (* ("caml_sys_exit", prim1 exit unwrap_int wrap_unit); *)
+    (* ("caml_sys_executable_name", *)
+    (*  ptr @@ Prim *)
+    (*    (fun _ -> wrap_string "ocamlopt")); *)
     (* ("caml_sys_read_directory", *)
     (*  prim1 Sys.readdir unwrap_string (wrap_array wrap_string)); *)
     (* ("caml_sys_get_argv", *)
@@ -357,52 +357,29 @@ let prims =
           v
         | _ -> assert false) );
     (* Int64 *)
-    ("%int64_neg", prim1 Int64.neg unwrap_int64 wrap_int64);
-    ("%int64_add", prim2 Int64.add unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_sub", prim2 Int64.sub unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_mul", prim2 Int64.mul unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_div", prim2 Int64.div unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_mod", prim2 Int64.rem unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_and", prim2 Int64.logand unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_or", prim2 Int64.logor unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_xor", prim2 Int64.logxor unwrap_int64 unwrap_int64 wrap_int64);
-    ("%int64_lsl", prim2 Int64.shift_left unwrap_int64 unwrap_int wrap_int64);
-    ( "%int64_lsr",
-      prim2 Int64.shift_right_logical unwrap_int64 unwrap_int wrap_int64 );
-    ("%int64_asr", prim2 Int64.shift_right unwrap_int64 unwrap_int wrap_int64);
-    ("%int64_of_int", prim1 Int64.of_int unwrap_int wrap_int64);
-    ("%int64_to_int", prim1 Int64.to_int unwrap_int64 wrap_int);
-    ("%int64_to_int32", prim1 Int64.to_int32 unwrap_int64 wrap_int32);
-    ("%int64_of_int32", prim1 Int64.of_int32 unwrap_int32 wrap_int64);
-    ("%int64_of_nativeint", prim1 Int64.of_nativeint unwrap_nativeint wrap_int64);
-    ("%int64_to_nativeint", prim1 Int64.to_nativeint unwrap_int64 wrap_nativeint);
-    ("caml_int64_of_string", prim1 Int64.of_string unwrap_string wrap_int64);
+    (* ("%int64_neg", prim1 Int64.neg unwrap_int64 wrap_int64); *)
+    (* ("%int64_add", prim2 Int64.add unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_sub", prim2 Int64.sub unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_mul", prim2 Int64.mul unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_div", prim2 Int64.div unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_mod", prim2 Int64.rem unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_and", prim2 Int64.logand unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_or", prim2 Int64.logor unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_xor", prim2 Int64.logxor unwrap_int64 unwrap_int64 wrap_int64); *)
+    (* ("%int64_lsl", prim2 Int64.shift_left unwrap_int64 unwrap_int wrap_int64); *)
+    (* ( "%int64_lsr", *)
+    (*   prim2 Int64.shift_right_logical unwrap_int64 unwrap_int wrap_int64 ); *)
+    (* ("%int64_asr", prim2 Int64.shift_right unwrap_int64 unwrap_int wrap_int64); *)
+    (* ("%int64_of_int", prim1 Int64.of_int unwrap_int wrap_int64); *)
+    (* ("%int64_to_int", prim1 Int64.to_int unwrap_int64 wrap_int); *)
+    (* ("%int64_to_int32", prim1 Int64.to_int32 unwrap_int64 wrap_int32); *)
+    (* ("%int64_of_int32", prim1 Int64.of_int32 unwrap_int32 wrap_int64); *)
+    (* ("caml_int64_of_string", prim1 Int64.of_string unwrap_string wrap_int64); *)
     (* Int32 *)
     ("caml_int32_of_string", prim1 Int32.of_string unwrap_string wrap_int32);
     ("%int32_neg", prim1 Int32.neg unwrap_int32 wrap_int32);
     ("%int32_of_int", prim1 Int32.of_int unwrap_int wrap_int32);
     ("%int32_to_int", prim1 Int32.to_int unwrap_int32 wrap_int);
-    (* Nativeint *)
-    (* ("%nativeint_neg", prim1 Nativeint.neg unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_add", prim2 Nativeint.add unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_sub", prim2 Nativeint.sub unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_mul", prim2 Nativeint.mul unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_div", prim2 Nativeint.div unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_mod", prim2 Nativeint.rem unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_and", prim2 Nativeint.logand unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_or", prim2 Nativeint.logor unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ("%nativeint_xor", prim2 Nativeint.logxor unwrap_nativeint unwrap_nativeint wrap_nativeint); *)
-    (* ( "%nativeint_lsl", *)
-    (*   prim2 Nativeint.shift_left unwrap_nativeint unwrap_int wrap_nativeint ); *)
-    (* ( "%nativeint_lsr", *)
-    (*   prim2 Nativeint.shift_right_logical unwrap_nativeint unwrap_int wrap_nativeint ); *)
-    (* ( "%nativeint_asr", *)
-    (*   prim2 Nativeint.shift_right unwrap_nativeint unwrap_int wrap_nativeint ); *)
-    (* ("%nativeint_of_int", prim1 Nativeint.of_int unwrap_int wrap_nativeint); *)
-    (* ("%nativeint_to_int", prim1 Nativeint.to_int unwrap_nativeint wrap_int); *)
-    (* ("%nativeint_to_int32", prim1 Nativeint.to_int32 unwrap_nativeint wrap_int32); *)
-    (* ("%nativeint_of_int32", prim1 Nativeint.of_int32 unwrap_int32 wrap_nativeint); *)
-    (* ("caml_nativeint_of_string", prim1 Nativeint.of_string unwrap_string wrap_nativeint); *)
     (* Array *)
     ("caml_make_vect", prim2 Array.make unwrap_int id wrap_array_id);
     ("%array_length", prim1 Array.length unwrap_array_id wrap_int);
@@ -424,11 +401,11 @@ let prims =
         unwrap_int
         unwrap_int
         wrap_unit );
-    ( "caml_array_append",
-      prim2 append_prim unwrap_array_id unwrap_array_id wrap_array_id );
+    (* ( "caml_array_append", *)
+    (*   prim2 append_prim unwrap_array_id unwrap_array_id wrap_array_id ); *)
     (* Hashtbl *)
-    ( "caml_hash",
-      prim4 seeded_hash_param unwrap_int unwrap_int unwrap_int id wrap_int );
+    (* ( "caml_hash", *)
+    (*   prim4 seeded_hash_param unwrap_int unwrap_int unwrap_int id wrap_int ); *)
     (* TODO: records defined in different order... *)
 
     (* Weak *)
@@ -465,19 +442,19 @@ let prims =
         unwrap_int
         wrap_unit );
     (* Random *)
-    ( "caml_sys_random_seed",
-      prim1 random_seed unwrap_unit (wrap_array wrap_int) );
+    (* ( "caml_sys_random_seed", *)
+    (*   prim1 random_seed unwrap_unit (wrap_array wrap_int) ); *)
     (* Spacetime *)
-    ( "caml_spacetime_enabled",
-      prim1 Prim.spacetime_enabled unwrap_unit wrap_bool );
+    (* ( "caml_spacetime_enabled", *)
+    (*   prim1 Prim.spacetime_enabled unwrap_unit wrap_bool ); *)
     (* Gc *)
     (* ("caml_gc_quick_stat", prim1 Gc.quick_stat unwrap_unit wrap_gc_stat); *)
     (* utils/profile.ml *)
-    ( "caml_sys_time_include_children",
-      prim1 Prim.time_include_children unwrap_bool wrap_float );
+    (* ( "caml_sys_time_include_children", *)
+    (*   prim1 Prim.time_include_children unwrap_bool wrap_float ); *)
     (* utils/misc.ml *)
-    ( "caml_sys_isatty",
-      prim1 Prim.isatty unwrap_out_channel wrap_bool );
+    (* ( "caml_sys_isatty", *)
+    (*   prim1 Prim.isatty unwrap_out_channel wrap_bool ); *)
     (* Digest *)
     (* ( "caml_md5_string", *)
     (*   prim3 *)

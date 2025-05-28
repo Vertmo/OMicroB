@@ -19,11 +19,6 @@ let unwrap_int64 = onptr @@ function
   | Int64 n -> n
   | v -> type_error "int64" v
 
-let wrap_nativeint n = ptr @@ Nativeint n
-let unwrap_nativeint = onptr @@ function
-  | Nativeint n -> n
-  | v -> type_error "nativeint" v
-
 let wrap_float f = ptr @@ Float f
 let unwrap_float = onptr @@ function
   | Float f -> f

@@ -95,7 +95,7 @@ let load_rec_units env flags_and_units =
   List.fold_left
     (fun global_env (flags, unit_path) ->
       let module_name = module_name_of_unit_path unit_path in
-      if debug then Format.eprintf "Loading %s from %s@." module_name unit_path;
+      (* if debug then Format.eprintf "Loading %s from %s@." module_name unit_path; *)
       let module_contents =
         let loc = Location.in_file unit_path in
         let local_env = List.fold_left (eval_env_flag ~loc) global_env flags in
@@ -372,26 +372,26 @@ let run_ocamlc () =
 let run_ocamlopt () =
   ignore (load_rec_units stdlib_env native_compiler_units)
 
-let run_files () =
-  let rev_files = ref [] in
-  let anon_fun file = rev_files := file :: !rev_files in
-  Arg.parse [] anon_fun "";
-  let files = List.rev !rev_files in
-  files
-  |> List.map (fun file -> stdlib_flag, file)
-  |> load_rec_units stdlib_env
-  |> ignore
+(* let run_files () = *)
+(*   let rev_files = ref [] in *)
+(*   let anon_fun file = rev_files := file :: !rev_files in *)
+(*   Arg.parse [] anon_fun ""; *)
+(*   let files = List.rev !rev_files in *)
+(*   files *)
+(*   |> List.map (fun file -> stdlib_flag, file) *)
+(*   |> load_rec_units stdlib_env *)
+(*   |> ignore *)
 
-(* let _ = load_rec_units stdlib_env [stdlib_flag, "test.ml"] *)
-let () =
-  let open Conf in
-  try match Conf.command () with
-    | Some cmd ->
-      begin match cmd with
-        | Ocamlc -> run_ocamlc ()
-        | Ocamlopt -> run_ocamlopt ()
-        | Files -> run_files ()
-      end
-    | None -> run_ocamlc ()
-  with InternalException e ->
-    Format.eprintf "Code raised exception: %a@." pp_print_value e
+(* (\* let _ = load_rec_units stdlib_env [stdlib_flag, "test.ml"] *\) *)
+(* let () = *)
+(*   let open Conf in *)
+(*   try match Conf.command () with *)
+(*     | Some cmd -> *)
+(*       begin match cmd with *)
+(*         | Ocamlc -> run_ocamlc () *)
+(*         | Ocamlopt -> run_ocamlopt () *)
+(*         | Files -> run_files () *)
+(*       end *)
+(*     | None -> run_ocamlc () *)
+(*   with InternalException e -> *)
+(*     Format.eprintf "Code raised exception: %a@." pp_print_value e *)
