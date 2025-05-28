@@ -1,0 +1,98 @@
+conf.cmo : \
+    conf.cmi
+conf.cmx : \
+    conf.cmi
+data.cmo : \
+    data.cmi
+data.cmx : \
+    data.cmi
+envir.cmo : \
+    data.cmi \
+    conf.cmi \
+    envir.cmi
+envir.cmx : \
+    data.cmx \
+    conf.cmx \
+    envir.cmi
+eval.cmo : \
+    runtime_base.cmi \
+    envir.cmi \
+    data.cmi \
+    conf.cmi \
+    eval.cmi
+eval.cmx : \
+    runtime_base.cmx \
+    envir.cmx \
+    data.cmx \
+    conf.cmx \
+    eval.cmi
+interp.cmo : \
+    runtime_base.cmi \
+    primitives.cmi \
+    eval.cmi \
+    envir.cmi \
+    data.cmi \
+    conf.cmi \
+    interp.cmi
+interp.cmx : \
+    runtime_base.cmx \
+    primitives.cmx \
+    eval.cmx \
+    envir.cmx \
+    data.cmx \
+    conf.cmx \
+    interp.cmi
+primitives.cmo : \
+    runtime_stdlib.cmi \
+    runtime_lib.cmi \
+    runtime_compiler.cmi \
+    runtime_base.cmi \
+    eval.cmi \
+    envir.cmi \
+    data.cmi \
+    primitives.cmi
+primitives.cmx : \
+    runtime_stdlib.cmx \
+    runtime_lib.cmx \
+    runtime_compiler.cmx \
+    runtime_base.cmx \
+    eval.cmx \
+    envir.cmx \
+    data.cmx \
+    primitives.cmi
+runtime_base.cmo : \
+    runtime_lib.cmi \
+    envir.cmi \
+    data.cmi \
+    runtime_base.cmi
+runtime_base.cmx : \
+    runtime_lib.cmx \
+    envir.cmx \
+    data.cmx \
+    runtime_base.cmi
+runtime_compiler.cmo : \
+    runtime_lib.cmi \
+    runtime_base.cmi \
+    data.cmi \
+    runtime_compiler.cmi
+runtime_compiler.cmx : \
+    runtime_lib.cmx \
+    runtime_base.cmx \
+    data.cmx \
+    runtime_compiler.cmi
+runtime_lib.cmo : \
+    envir.cmi \
+    data.cmi \
+    runtime_lib.cmi
+runtime_lib.cmx : \
+    envir.cmx \
+    data.cmx \
+    runtime_lib.cmi
+runtime_stdlib.cmo : \
+    runtime_lib.cmi \
+    data.cmi \
+    runtime_stdlib.cmi
+runtime_stdlib.cmx : \
+    runtime_lib.cmx \
+    data.cmx \
+    runtime_stdlib.cmi

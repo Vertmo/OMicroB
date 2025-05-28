@@ -7,7 +7,7 @@ let short_delay = 500
 let delta_y = 18
 let exit (code:int) = ()
 
-let filename = "minicaml.py"
+let filename = "while.py"
 
 let default_program = "let rec fib (n: int) :int =
   if n <= 2 then

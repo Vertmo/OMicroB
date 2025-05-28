@@ -74,7 +74,7 @@ check_command "rm"
 check_command "ar"
 check_command "cp"
 
-check_directory "$(ocamlc -where)/../obytelib" "the OByteLib library (ex: opam install obytelib)"
+check_directory "$(opam var obytelib:lib 2>/dev/null)" "the OByteLib library (ex: opam install obytelib)"
 
 ################################################################################
 
