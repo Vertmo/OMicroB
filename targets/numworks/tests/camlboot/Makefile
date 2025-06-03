@@ -1,12 +1,13 @@
 include ../../../../etc/Makefile.conf
 
-PROG = interp
-EADK_APP_NAME = "camlboot"
+VERSION = 0.0.1
+EADK_APP_NAME = OMicroB-camlboot
+PROG = $(EADK_APP_NAME)-$(VERSION)
 DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these?
 STACK_SIZE = 16192
-HEAP_SIZE = 2048
+HEAP_SIZE = 8192
 
 TARGETS := $(PROG).hex $(PROG).elf
 
