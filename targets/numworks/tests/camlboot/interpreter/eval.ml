@@ -359,7 +359,11 @@ and eval_expr prims env expr =
   | Pexp_extension _ -> unsupported expr.pexp_loc; assert false
 
 and eval_expr_exn prims env expr =
-  try Ok (eval_expr prims env expr) with InternalException v -> Error v
+  try Ok (eval_expr prims env expr) with InternalException v ->
+    begin
+      print_endline "Error: here in eval_expr_exn.";
+      Error v
+    end
 
 and bind_value prims env vb =
   let v = eval_expr prims env vb.pvb_expr in
@@ -813,7 +817,9 @@ and eval_structitem prims env it =
   match it.pstr_desc with
   | Pstr_eval (e, _) ->
     let v = eval_expr prims env e in
+    (* FIXED: I need to bring back the printing of this value! *)
     (* Format.printf "%a@." pp_print_value v; *)
+    print_value_to_stdout v;
     env
   | Pstr_value (recflag, defs) -> eval_bindings prims env recflag defs
   | Pstr_primitive { pval_name = { txt = name; loc }; pval_prim = l; _ } ->
