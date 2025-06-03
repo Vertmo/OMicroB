@@ -62,7 +62,7 @@ let weed cmp xs =
 (* Streams. *)
 
 type 'a stream =
-    'a head Lazy.t
+    ('a head) Lazy.t
 
 and 'a head =
   | Nil
@@ -1742,7 +1742,7 @@ module Make (T : TABLE) = struct
      of elements. *)
 
   let rec stack cell current : element stream =
-    lazy (
+    Lazy.from_val (
       (* The stack is empty iff the top stack cell is its own successor. In
          that case, the current state [current] should be an initial state
          (which has no incoming symbol).

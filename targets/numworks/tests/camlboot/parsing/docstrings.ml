@@ -119,7 +119,7 @@ let add_info_attrs info attrs =
 type text = docstring list
 
 let empty_text = []
-let empty_text_lazy = lazy []
+let empty_text_lazy = Lazy.from_val []
 
 let text_loc = {txt = "ocaml.text"; loc = Location.none}
 
@@ -276,7 +276,7 @@ let symbol_docs () =
 let symbol_docs_lazy () =
   let p1 = Parsing.symbol_start_pos () in
   let p2 = Parsing.symbol_end_pos () in
-    lazy { docs_pre = get_pre_docs p1;
+    Lazy.from_val{ docs_pre = get_pre_docs p1;
            docs_post = get_post_docs p2; }
 
 let rhs_docs pos1 pos2 =
@@ -286,7 +286,7 @@ let rhs_docs pos1 pos2 =
 let rhs_docs_lazy pos1 pos2 =
   let p1 = Parsing.rhs_start_pos pos1 in
   let p2 = Parsing.rhs_end_pos pos2 in
-    lazy { docs_pre = get_pre_docs p1;
+    Lazy.from_val{ docs_pre = get_pre_docs p1;
            docs_post = get_post_docs p2; }
 
 let mark_symbol_docs () =
@@ -308,7 +308,7 @@ let symbol_text () =
 
 let symbol_text_lazy () =
   let pos = Parsing.symbol_start_pos () in
-    lazy (get_text pos)
+    Lazy.from_val(get_text pos)
 
 let rhs_text pos =
   get_text (Parsing.rhs_start_pos pos)
@@ -318,7 +318,7 @@ let rhs_post_text pos =
 
 let rhs_text_lazy pos =
   let pos = Parsing.rhs_start_pos pos in
-    lazy (get_text pos)
+    Lazy.from_val(get_text pos)
 
 let symbol_pre_extra_text () =
   get_pre_extra_text (Parsing.symbol_start_pos ())
@@ -341,7 +341,7 @@ let symbol_docs (startpos, endpos) =
     docs_post = get_post_docs endpos; }
 
 let symbol_docs_lazy (p1, p2) =
-  lazy { docs_pre = get_pre_docs p1;
+  Lazy.from_val{ docs_pre = get_pre_docs p1;
          docs_post = get_post_docs p2; }
 
 let rhs_docs pos1 pos2 =
@@ -349,7 +349,7 @@ let rhs_docs pos1 pos2 =
     docs_post = get_post_docs pos2; }
 
 let rhs_docs_lazy p1 p2 =
-    lazy { docs_pre = get_pre_docs p1;
+    Lazy.from_val{ docs_pre = get_pre_docs p1;
            docs_post = get_post_docs p2; }
 
 let mark_symbol_docs (startpos, endpos) =
@@ -372,7 +372,7 @@ let symbol_text startpos =
   get_text startpos
 
 let symbol_text_lazy startpos =
-  lazy (get_text startpos)
+  Lazy.from_val(get_text startpos)
 
 let rhs_text pos =
   get_text pos
@@ -381,7 +381,7 @@ let rhs_post_text pos =
   get_post_text pos
 
 let rhs_text_lazy pos =
-  lazy (get_text pos)
+  Lazy.from_val(get_text pos)
 
 let symbol_pre_extra_text startpos =
   get_pre_extra_text startpos
