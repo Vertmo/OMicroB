@@ -4,7 +4,14 @@ open Eval
 open Envir
 
 let parse filename =
-  let inc = try open_in filename with e -> (* Format.eprintf "Error opening file: %s@." filename; *) raise e in
+  let inc = try open_in filename with e ->
+    begin
+      (* Printf.eprintf "Error opening file: %s@." filename; *)
+      print_string "Error opening file: ";
+      print_string filename;
+      raise e
+    end
+  in
   let lexbuf = Lexing.from_channel inc in
   Location.init lexbuf filename;
 (*  let parsed = Parser.implementation Lexer.real_token lexbuf in *)
@@ -12,75 +19,115 @@ let parse filename =
   close_in inc;
   parsed
 
+let parse_ml_or_mlpy filename =
+  try
+    parse filename
+  with e1 ->
+    parse (filename ^ ".py")
+
+let parse_from_string ?(filename="<string>") code =
+  (* FIXME: this was simply to debug and check that both standardlib.ml and ocaml.py file were read *)
+  (* print_endline "filename ="; *)
+  (* print_endline filename; *)
+  (* print_endline "code ="; *)
+  (* print_endline code; *)
+  (* now we do the lexing and parsing *)
+  let lexbuf = Lexing.from_string code in
+  Location.init lexbuf filename;
+  let parsed = Parse.implementation lexbuf in
+  parsed
+
+let default_filename = "ocaml.py"
+
+let default_program = "
+(* Example of an OCaml script to use
+   with the OMicroB-camlboot app *)
+let rec fibonacci n =
+  if n <= 1 then
+    n
+  else
+    fibonacci (n-1) + fibonacci (n-2)
+in
+\"default program\", fibonacci, fibonacci 15;;
+"
+
+let parse_from_numworks_localstorage filename =
+  let file_content =
+    try
+      read_any_file filename
+    with e1 ->
+      ""
+  in
+  let file_content = if file_content = "" then default_program else file_content in
+  parse_from_string ~filename:filename file_content
+
+(** Previous content of the interp.ml file *)
 type env_flag = Open of Longident.t
 
-let stdlib_flag = [Open (Longident.Lident "Stdlib")]
+let stdlib_flag = [Open (Longident.Lident "Standardlib")]
 let no_stdlib_flag = []
 
 let stdlib_units =
   let stdlib_path = stdlib_path () in
   let fullpath file = Filename.concat stdlib_path file in
-  (no_stdlib_flag, fullpath "stdlib.ml")
+  (no_stdlib_flag, fullpath "standardlib")
+  (* (no_stdlib_flag, "stdlib") *)  (* FIXME: the real name should be "stdlib", not "standardlib" *)
   ::
   List.map (fun file -> stdlib_flag, fullpath file) [
-    "bool.ml";
-    "fun.ml";
-    "int.ml";
-    "unit.ml";
-    "option.ml";
-    "pervasives.ml";
-    "result.ml";
+  (*
     "sys.ml";
-    "callback.ml";
-    "complex.ml";
-    "float.ml";
-    "char.ml";
+    (* "callback.ml"; *)
+    (* "complex.ml"; *)
+    (* "float.ml"; *)
+    (* "char.ml"; *)
     "bytes.ml";
     "string.ml";
-    "bytesLabels.ml";
-    "stringLabels.ml";
-    "seq.ml";
+    (* "bytesLabels.ml"; *)
+    (* "stringLabels.ml"; *)
+    (* "seq.ml"; *)
     "list.ml";
-    "listLabels.ml";
-    "set.ml";
-    "map.ml";
-    "uchar.ml";
-    "buffer.ml";
-    "stream.ml";
-    "genlex.ml";
-    "camlinternalFormatBasics.ml";
-    "camlinternalFormat.ml";
-    "printf.ml";
-    "scanf.ml";
-    "queue.ml";
-    "stack.ml";
-    "format.ml";
-    "obj.ml";
-    "gc.ml";
-    "camlinternalOO.ml";
-    "oo.ml";
-    "camlinternalLazy.ml";
-    "lazy.ml";
-    "printexc.ml";
+    (* "listLabels.ml"; *)
+    (* "set.ml"; *)
+    (* "map.ml"; *)
+    (* "uchar.ml"; *)
+    (* "buffer.ml"; *)
+    (* "stream.ml"; *)
+    (* "genlex.ml"; *)
+    (* "camlinternalFormatBasics.ml"; *)
+    (* "camlinternalFormat.ml"; *)
+    (* "printf.ml"; *)
+    (* "scanf.ml"; *)
+    (* "format.ml"; *)
+    (* "obj.ml"; *)
+    (* "gc.ml"; *)
+    (* "camlinternalOO.ml"; *)
+    (* "oo.ml"; *)
+    (* "camlinternalLazy.ml"; *)
+    (* "lazy.ml"; *)
+    (* "printexc.ml"; *)
     "array.ml";
-    "arrayLabels.ml";
-    "int64.ml";
-    "int32.ml";
+    (* "arrayLabels.ml"; *)
+    (* "sort.ml"; *)
+    "queue.ml";
+    (* "int64.ml"; *)
+    (* "int32.ml"; *)
     "nativeint.ml";
-    "digest.ml";
+    (* "digest.ml"; *)
     "random.ml";
     "hashtbl.ml";
-    "lexing.ml";
-    "parsing.ml";
-    "weak.ml";
-    "ephemeron.ml";
-    "spacetime.ml";
-    "arg.ml";
-    "filename.ml";
-    "marshal.ml";
-    "bigarray.ml";
-    "moreLabels.ml";
-    "stdLabels.ml";
+    (* "lexing.ml"; *)
+    (* "parsing.ml"; *)
+    (* "weak.ml"; *)
+    (* "ephemeron.ml"; *)
+    (* "spacetime.ml"; *)
+    "stack.ml";
+    (* "arg.ml"; *)
+    (* "filename.ml"; *)
+    (* "marshal.ml"; *)
+    (* "bigarray.ml"; *)
+    (* "moreLabels.ml"; *)
+    (* "stdLabels.ml"; *)
+  *)
   ]
 
 let eval_env_flag ~loc env flag =
@@ -89,17 +136,28 @@ let eval_env_flag ~loc env flag =
      let module_ident = Location.mkloc module_ident loc in
      env_extend false env (env_get_module_data env module_ident)
 
+(* let debug = true *)
+let debug = false
+
 let load_rec_units env flags_and_units =
   let unit_paths = List.map snd flags_and_units in
   let env = List.fold_left declare_unit env unit_paths in
   List.fold_left
     (fun global_env (flags, unit_path) ->
       let module_name = module_name_of_unit_path unit_path in
-      (* if debug then Format.eprintf "Loading %s from %s@." module_name unit_path; *)
+      if debug then begin
+        (* Printf.eprintf "Loading %s from %s (or %s.py) @." module_name unit_path unit_path; *)
+        print_endline ("Loading " ^ module_name ^ " from " ^ unit_path ^ " (or " ^ unit_path ^ ".py)");
+      end;
       let module_contents =
         let loc = Location.in_file unit_path in
         let local_env = List.fold_left (eval_env_flag ~loc) global_env flags in
-        eval_structure Primitives.prims local_env (parse unit_path)
+        (* eval_structure Primitives.prims local_env (parse unit_path) *)
+        try
+          eval_structure Primitives.prims local_env (parse_from_numworks_localstorage unit_path)
+        with e1 ->
+          print_endline "\nparse_from_numworks failed: trying parse_ml_or_mlpy";
+          eval_structure Primitives.prims local_env (parse_ml_or_mlpy unit_path)
       in
       define_unit global_env unit_path (make_module_data module_contents))
     env
@@ -118,6 +176,7 @@ module Compiler_files = struct
     "numbers.ml";
     "arg_helper.ml";
     "clflags.ml";
+    "tbl.ml";
     "profile.ml";
     "terminfo.ml";
     "ccomp.ml";
@@ -126,12 +185,9 @@ module Compiler_files = struct
     "strongly_connected_components.ml";
     "build_path_prefix_map.ml";
     "targetint.ml";
-    "int_replace_polymorphic_compare.ml";
-    "load_path.ml";
   ]
 
   let parsing = List.map (Filename.concat "parsing") [
-    "camlinternalMenhirLib.ml";
     "asttypes.mli";
     "location.ml";
     "longident.ml";
@@ -152,10 +208,6 @@ module Compiler_files = struct
     "depend.ml";
   ]
 
-  let file_formats = List.map (Filename.concat "file_formats") [
-    "cmi_format.ml";
-  ]
-
   let pure_typing = List.map (Filename.concat "typing") [
     "ident.ml";
     "outcometree.mli";
@@ -168,7 +220,7 @@ module Compiler_files = struct
     "subst.ml";
     "predef.ml";
     "datarepr.ml";
-    "persistent_env.ml";
+    "cmi_format.ml";
     "env.ml";
     "typedtree.ml";
     "printtyped.ml";
@@ -178,25 +230,20 @@ module Compiler_files = struct
     "mtype.ml";
     "envaux.ml";
     "includecore.ml";
+    "typedtreeIter.ml";
+    "typedtreeMap.ml";
     "tast_mapper.ml";
+    "cmt_format.ml";
     "untypeast.ml";
     "includemod.ml";
     "typetexp.ml";
     "printpat.ml";
     "parmatch.ml";
     "stypes.ml";
-    "typedecl_unboxed.ml";
     "typedecl.ml";
   ]
 
-  let more_file_formats = List.map (Filename.concat "file_formats") [
-    "cmt_format.ml";
-    "cmo_format.mli";
-    "cmx_format.mli";
-    "cmxs_format.mli";
-  ]
-
-  let lambda = List.map (Filename.concat "lambda") [
+  let lambda = List.map (Filename.concat "bytecomp") [
     "lambda.ml";
   ]
 
@@ -207,8 +254,10 @@ module Compiler_files = struct
     "typemod.ml";
   ]
 
-  let more_lambda = List.map (Filename.concat "lambda") [
+  let bytecomp = List.map (Filename.concat "bytecomp") [
+    "cmo_format.mli";
     "printlambda.ml";
+    "semantics_of_primitives.ml";
     "switch.ml";
     "matching.ml";
     "translobj.ml";
@@ -219,10 +268,6 @@ module Compiler_files = struct
     "translmod.ml";
     "simplif.ml";
     "runtimedef.ml";
-    "debuginfo.ml";
-  ]
-
-  let bytecomp = List.map (Filename.concat "bytecomp") [
     "meta.ml";
     "opcodes.ml";
     "bytesections.ml";
@@ -235,33 +280,33 @@ module Compiler_files = struct
     "main_args.ml";
     "compenv.ml";
     "compmisc.ml";
+    "compdynlink.mlno";
+    "compplugin.ml";
     "makedepend.ml";
-    "compile_common.ml";
   ]
 
   let middle_end = List.map (Filename.concat "middle_end") [
-    "semantics_of_primitives.ml";
-    "flambda/base_types/id_types.ml";
-    "compilation_unit.ml";
-    "flambda/base_types/set_of_closures_id.ml";
-    "symbol.ml";
-    "variable.ml";
-    "flambda/base_types/closure_element.ml";
-    "flambda/base_types/closure_id.ml";
-    "flambda/base_types/var_within_closure.ml";
-    "linkage_name.ml";
-    "flambda/flambda_utils.ml";
-    "flambda/simple_value_approx.ml";
-    "clambda.ml";
-    "flambda/export_info.ml";
-    "compilenv.ml";
-    "flambda/import_approx.ml";
-    "backend_var.ml";
-    "clambda_primitives.ml";
-    "closure/closure.ml";
+    "base_types/id_types.ml";
+    "base_types/compilation_unit.ml";
+    "base_types/set_of_closures_id.ml";
+    "base_types/symbol.ml";
+    "base_types/variable.ml";
+    "base_types/closure_element.ml";
+    "base_types/closure_id.ml";
+    "base_types/var_within_closure.ml";
+    "base_types/linkage_name.ml";
+    "flambda_utils.ml";
+    "simple_value_approx.ml";
+    "debuginfo.ml";
   ]
 
   let asmcomp = List.map (Filename.concat "asmcomp") [
+    "cmx_format.mli";
+    "clambda.ml";
+    "export_info.ml";
+    "compilenv.ml";
+    "import_approx.ml";
+
     "debug/reg_with_debug_info.ml";
     "debug/reg_availability_set.ml";
     "debug/available_regs.ml";
@@ -281,6 +326,7 @@ module Compiler_files = struct
     "spacetime_profiling.ml";
     "selection.ml";
 
+    "closure.ml";
     "strmatch.ml";
     "cmmgen.ml";
     "linearize.ml";
@@ -335,12 +381,9 @@ let bytecode_compiler_units =
   List.map (fun modfile -> stdlib_flag, fullpath modfile)
   ( Compiler_files.utils
   @ Compiler_files.parsing
-  @ Compiler_files.file_formats
   @ Compiler_files.pure_typing
-  @ Compiler_files.more_file_formats
   @ Compiler_files.lambda
   @ Compiler_files.more_typing
-  @ Compiler_files.more_lambda
   @ Compiler_files.bytecomp
   @ Compiler_files.driver
   @ Compiler_files.bytegen
@@ -353,12 +396,9 @@ let native_compiler_units =
   List.map (fun modfile -> stdlib_flag, fullpath modfile)
   ( Compiler_files.utils
   @ Compiler_files.parsing
-  @ Compiler_files.file_formats
   @ Compiler_files.pure_typing
-  @ Compiler_files.more_file_formats
   @ Compiler_files.lambda
   @ Compiler_files.more_typing
-  @ Compiler_files.more_lambda
   @ Compiler_files.bytecomp
   @ Compiler_files.driver
   @ Compiler_files.middle_end
@@ -372,26 +412,37 @@ let run_ocamlc () =
 let run_ocamlopt () =
   ignore (load_rec_units stdlib_env native_compiler_units)
 
-(* let run_files () = *)
-(*   let rev_files = ref [] in *)
-(*   let anon_fun file = rev_files := file :: !rev_files in *)
-(*   Arg.parse [] anon_fun ""; *)
-(*   let files = List.rev !rev_files in *)
-(*   files *)
-(*   |> List.map (fun file -> stdlib_flag, file) *)
-(*   |> load_rec_units stdlib_env *)
-(*   |> ignore *)
+let run_files () =
+  let rev_files = ref [default_filename] in
+  let anon_fun file = rev_files := file :: !rev_files in
+  (* Arg.parse [] anon_fun ""; *)
+  let files = List.rev !rev_files in
+  files
+  |> List.map (fun file -> stdlib_flag, file)
+  |> load_rec_units stdlib_env
+  |> ignore
 
-(* (\* let _ = load_rec_units stdlib_env [stdlib_flag, "test.ml"] *\) *)
-(* let () = *)
-(*   let open Conf in *)
-(*   try match Conf.command () with *)
-(*     | Some cmd -> *)
-(*       begin match cmd with *)
-(*         | Ocamlc -> run_ocamlc () *)
-(*         | Ocamlopt -> run_ocamlopt () *)
-(*         | Files -> run_files () *)
-(*       end *)
-(*     | None -> run_ocamlc () *)
-(*   with InternalException e -> *)
-(*     Format.eprintf "Code raised exception: %a@." pp_print_value e *)
+(* let _ = load_rec_units stdlib_env [stdlib_flag, "ocaml.py"] *)
+
+let main () =
+  let open Conf in
+  try match Conf.command () with
+    | Some cmd ->
+      begin match cmd with
+        | Ocamlc -> run_ocamlc ()
+        | Ocamlopt -> run_ocamlopt ()
+        | Files -> run_files ()
+      end
+    | None -> run_ocamlc ()
+  with InternalException e ->
+    (* Printf.eprintf "Code raised exception: %a@." pp_print_value e *)
+    print_string "Code raised internal exception."
+
+(* let () = main () *)
+
+let () =
+  try
+    run_files ()
+  with InternalException e ->
+    (* Printf.eprintf "Code raised exception: %a@." pp_print_value e *)
+    print_string "Code raised internal exception."
