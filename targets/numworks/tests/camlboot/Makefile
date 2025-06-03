@@ -34,8 +34,18 @@ MLIS = $(filter %.mli,$(SSRCS))
 CMIS = $(patsubst %.mli,%.cmi,$(MLIS))
 
 .PHONY: all
-all: $(PROG).hex
+all: hex elf
+	file $(PROG).byte
+	file $(PROG).hex
 	cp -vf $(PROG).hex $(PROG).nwa
+	file $(PROG).nwa
+
+.PHONY: hex
+hex: $(PROG).hex
+	cp -vf $(PROG).hex $(PROG).nwa
+
+.PHONY: elf
+elf: $(PROG).elf
 
 $(TARGETS): $(CMOS) camlboot.cmo
 	@echo "Compiling .cmo files to .byte"
