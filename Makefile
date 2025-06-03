@@ -120,5 +120,6 @@ clean:
 	$(call clean, targets/avr)
 	$(call clean, targets/pic32)
 	$(call clean, targets/microbit)
+	$(call clean, targets/numworks)
 
 .PHONY: all config install uninstall tests clean
