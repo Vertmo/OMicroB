@@ -19,26 +19,26 @@ let tracedepth = ref 0
 
 let debug = bool_of_env ~default:false "OCAMLINTERP_DEBUG"
 
-let stdlib_path () =
+let stdlib_path () = "./"
   (* match Sys.getenv_opt "OCAMLINTERP_STDLIB_PATH" with *)
   (* | Some path -> path *)
   (* | None -> *)
-    failwith "Error: standard library location must be specified"
+    (* failwith "Error: standard library location must be specified" *)
 
-let compiler_source_path () =
+let compiler_source_path () = "./"
   (* match Sys.getenv_opt "OCAMLINTERP_SRC_PATH" with *)
   (* | Some path -> path *)
   (* | None -> *)
-    failwith
+    (* failwith
       "Error: please set an OCAMLINTERP_SRC_PATH variable pointing to a \
-       checkout of the OCaml compiler distribution sources"
+       checkout of the OCaml compiler distribution sources" *)
 
 type command =
 | Ocamlc
 | Ocamlopt
 | Files
 
-let command () =
+let command () = Some Files
   (* match Sys.getenv_opt "OCAMLINTERP_COMMAND" with *)
   (*   | Some "ocamlc" -> Some Ocamlc *)
   (*   | Some "ocamlopt" -> Some Ocamlopt *)
@@ -47,4 +47,4 @@ let command () =
   (*      Format.eprintf "Unexpected OCAMLINTERP_COMMAND command %S, \ *)
   (*                      expected ocamlc|ocamlopt|files.@." *)
   (*       cmd; exit 1 *)
-  (*   | None -> *) None
+  (*   | None -> *)
