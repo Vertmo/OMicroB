@@ -104,6 +104,9 @@ val unit : value_ Ptr.t
 val is_true : value_ Ptr.t -> bool
 val pp_print_value : Format.formatter -> value_ Ptr.t -> unit
 val pp_print_unit_id : Format.formatter -> module_unit_id -> unit
+val string_of_value : value -> string
+val string_of_arg : value option -> string
+val print_value_to_stdout : value -> unit
 val read_caml_int : string -> int64
 val value_of_constant : Parsetree.constant -> value_ Ptr.t
 val value_compare : value_ Ptr.t -> value_ Ptr.t -> int

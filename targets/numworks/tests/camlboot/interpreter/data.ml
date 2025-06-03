@@ -237,6 +237,46 @@ and pp_print_arg ff = function
   | None -> ()
   | Some v -> print_string " "; pp_print_value ff v
 
+let rec string_of_value (arg : value) : string =
+  match (Ptr.get arg) with
+  | Int n -> string_of_int n
+  | Int32 n -> Int32.to_string n ^ "l" (* Standard way to represent int32 literals *)
+  | Int64 n -> Int64.to_string n ^ "L" (* Standard way to represent int64 literals *)
+  (* | Nativeint n -> Nativeint.to_string n ^ "n" (* Standard way to represent nativeint literals *) *)
+  | Fexpr _ -> "<fexpr>"
+  | Fun _ | Function _ | Prim _ | Lz _ | Fun_with_extra_args _ ->
+    "<function>"
+  | String s -> (Bytes.to_string (Bytes.escaped s)) (* %S formats with quotes and escapes *)
+  | Float f -> string_of_float f
+  | Tuple l ->
+    "(" ^ (String.concat ", " (List.map string_of_value l)) ^ ")"
+  | Constructor (c, d, arg) ->
+    c ^ "#" ^ (string_of_int d) ^ (string_of_arg arg)
+  | Poly_variant (c, arg) ->
+    "`" ^ c ^ (string_of_arg arg)
+  | ModVal _ -> "<module>"
+  | InChannel _ -> "<in_channel>"
+  | OutChannel _ -> "<out_channel>"
+  | Record r ->
+    let fields =
+      SMap.fold (fun k v acc ->
+        (k ^ " = " ^ (string_of_value !v)) :: acc
+      ) r []
+    in
+    "{ " ^ (String.concat "; " (List.rev fields)) ^ " }" (* List.rev to maintain insertion order if any *)
+  | Array a ->
+    "[|" ^ (String.concat "; " (List.map string_of_value (Array.to_list a))) ^ "|]"
+  | Object _ -> "<object>"
+
+and string_of_arg (arg : value option) : string =
+  match arg with
+  | None -> ""
+  | Some v -> " " ^ (string_of_value v)
+
+let print_value_to_stdout (v : value) : unit =
+  print_string (string_of_value v);
+  print_newline ()
+
 let pp_print_unit_id ppf (Path s) =
   failwith "TODO"
   (* Format.fprintf ppf "%S" s *)
@@ -275,6 +315,127 @@ let read_caml_int s =
       assert false
   done;
   Int64.mul sign !c
+
+
+(* XXX Manual implementation of x ** (float_of_int n). *)
+let rec power_float_of_int x n =
+  if n = 0 then 1.0
+  else if n < 0 then 1.0 /. power_float_of_int x (-n)
+  else
+    let rec aux acc x n =
+      if n = 0 then acc
+      else if n mod 2 = 1 then aux (acc *. x) (x *. x) (n / 2)
+      else aux acc (x *. x) (n / 2)
+    in
+    aux 1.0 x n
+
+
+(* XXX Manual implementation of float_of_string, helped by Google's AI Gemini and tested manually. *)
+let float_of_string (s : string) : float =
+  let len = String.length s in
+  if len = 0 then invalid_arg "float_of_string: empty string";
+
+  let i = ref 0 in
+
+  (* Skip leading whitespace *)
+  while !i < len && (s.[!i] = ' ' || s.[!i] = '\t' || s.[!i] = '\n' || s.[!i] = '\r') do
+    incr i
+  done;
+
+  (* Handle sign *)
+  let sign =
+    if !i < len && s.[!i] = '-' then (incr i; -1.0)
+    else if !i < len && s.[!i] = '+' then (incr i; 1.0)
+    else 1.0
+  in
+
+  (* Check for special values: NaN, Inf, Infinity *)
+  let parse_special () =
+    let remaining_len = len - !i in
+    if remaining_len >= 3 then
+      let sub_lower = String.lowercase_ascii (String.sub s !i remaining_len) in
+      if sub_lower = "nan" then (
+        i := len; (* Consume the rest of the string *)
+        Some nan
+      ) else if remaining_len >= 3 && sub_lower = "inf" then (
+        i := len; (* Consume the rest of the string *)
+        Some (sign *. infinity)
+      ) else if remaining_len >= 8 && sub_lower = "infinity" then (
+        i := len; (* Consume the rest of the string *)
+        Some (sign *. infinity)
+      ) else
+        None (* Not a special value *)
+    else
+      None
+  in
+
+  match parse_special () with
+  | Some special_val -> special_val
+  | None ->
+    let current_val = ref 0.0 in
+    let decimal_found = ref false in
+    let decimal_place = ref 0.1 in (* For fractional part *)
+    let digits_read = ref 0 in
+    let parsing_digits = ref true in
+
+    (* Parse integer and fractional part *)
+    while !i < len && !parsing_digits do
+      let c = s.[!i] in
+      if c >= '0' && c <= '9' then (
+        digits_read := !digits_read + 1;
+        if not !decimal_found then
+          current_val := !current_val *. 10.0 +. (float_of_int (Char.code c - Char.code '0'))
+        else (
+          current_val := !current_val +. (float_of_int (Char.code c - Char.code '0')) *. !decimal_place;
+          decimal_place := !decimal_place *. 0.1;
+        );
+        incr i
+      ) else if c = '.' && not !decimal_found then (
+        decimal_found := true;
+        incr i
+      ) else
+        parsing_digits := false (* Stop parsing digits *)
+    done;
+
+    if !digits_read = 0 then invalid_arg "float_of_string: no digits found";
+
+    (* Handle exponent part *)
+    let exponent_val = ref 0 in
+    let exponent_sign = ref 1 in
+    let parsing_exponent = ref true in
+
+    if !i < len && (s.[!i] = 'e' || s.[!i] = 'E') then (
+      incr i; (* Consume 'e' or 'E' *)
+      if !i < len && s.[!i] = '-' then (exponent_sign := -1; incr i)
+      else if !i < len && s.[!i] = '+' then (incr i);
+
+      let exponent_digits_read = ref 0 in
+      while !i < len && !parsing_exponent do
+        let c = s.[!i] in
+        if c >= '0' && c <= '9' then (
+          exponent_digits_read := !exponent_digits_read + 1;
+          exponent_val := !exponent_val * 10 + (Char.code c - Char.code '0');
+          incr i
+        ) else
+          parsing_exponent := false (* Stop parsing exponent digits *)
+      done;
+      if !exponent_digits_read = 0 then
+        invalid_arg "float_of_string: exponent has no digits"
+    );
+
+    (* Apply exponent *)
+    (* let final_val = !current_val *. (10.0 ** (float_of_int (!exponent_val * !exponent_sign))) in *)
+    let final_val = !current_val *. (power_float_of_int 10.0 (!exponent_val * !exponent_sign)) in
+    let result = sign *. final_val in
+
+    (* Skip trailing whitespace *)
+    while !i < len && (s.[!i] = ' ' || s.[!i] = '\t' || s.[!i] = '\n' || s.[!i] = '\r') do
+      incr i
+    done;
+
+    if !i <> len then invalid_arg "float_of_string: extraneous characters";
+
+    result
 
 let value_of_constant const = ptr @@ match const with
   | Pconst_integer (s, None) -> Int (Int64.to_int (read_caml_int s))
@@ -415,7 +576,53 @@ let get_module_data loc = function
      end
 
 let module_name_of_unit_path path =
-  failwith "TODO module_name_of_unit_path"
+  if path = "ocaml.py" then
+    "Ocaml"
+  else begin
+
+    (* print_string "path = ";
+    print_endline path; *)
+
+    (* This function is used to convert a unit path (e.g. "foo/bar/baz.ml") *)
+    (* into a module name (e.g. "Foo_bar_baz"). It is used to create the *)
+    (* module name for the unit when it is loaded into the environment. *)
+    (* The module name is derived from the path by capitalizing each part *)
+    (* of the path and joining them with underscores. *)
+    (* The path is expected to be a valid unit path, i.e. it should not contain *)
+    (* any invalid characters or be empty. *)
+    (* The function currently raises an exception, as it is not yet implemented. *)
+    (* failwith "TODO module_name_of_unit_path" *)
+    let n = String.length path in
+    let guessed_ml_extension = String.sub path (n - 3) 3 in
+    let path_without_extension =
+      if guessed_ml_extension = ".ml" then
+        String.sub path 3 (n - 6)
+      else
+        String.sub path 3 (n - 3)
+    in
+
+    (* print_string "=> path_without_extension = ";
+    print_endline path_without_extension; *)
+
+    (* We remove the ".ml" extension from the path, as it is not needed for the module name. *)
+    (* The module name is derived from the path by capitalizing each part and joining them with underscores. *)
+    (* The path is expected to be a valid unit path, i.e. it should not contain any invalid characters or be empty. *)
+    (* The function currently raises an exception, as it is not yet implemented. *)
+    (* failwith "TODO module_name_of_unit_path" *)
+    let module_name = String.split_on_char '/' path_without_extension
+      |> List.map String.capitalize_ascii
+      |> String.concat "_"
+      |> String.capitalize_ascii
+      |> String.map (function ' ' -> '_' | c -> c)
+      |> String.trim
+    in
+
+    (* print_string "==> module_name = ";
+    print_endline module_name; *)
+
+    module_name
+  end
+  (* XXX: this was the previous implementation, but the Filename module is not available, so we hack it away (see above). *)
   (* path *)
   (* |> Filename.basename *)
   (* |> Filename.remove_extension *)
