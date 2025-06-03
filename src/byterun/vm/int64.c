@@ -118,7 +118,7 @@ value caml_int64_to_int(value v) {
 }
 
 value caml_int64_to_int32(value v) {
-  return Val_int32(Int64_val(v));
+  return Val_int(Int64_val(v));
 }
 
 value caml_int64_of_float(value v) {
