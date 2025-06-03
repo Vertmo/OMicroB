@@ -102,8 +102,8 @@ external ( +. ) : float -> float -> float = "%addfloat"
 external ( -. ) : float -> float -> float = "%subfloat"
 external ( *. ) : float -> float -> float = "%mulfloat"
 external ( /. ) : float -> float -> float = "%divfloat"
-external ( ** ) : float -> float -> float = "caml_power_float" "pow"
-  [@@unboxed] [@@noalloc]
+(* external ( ** ) : float -> float -> float = "caml_power_float" "pow"
+  [@@unboxed] [@@noalloc] *)
 external exp : float -> float = "caml_exp_float" "exp" [@@unboxed] [@@noalloc]
 external expm1 : float -> float = "caml_expm1_float" "caml_expm1"
   [@@unboxed] [@@noalloc]

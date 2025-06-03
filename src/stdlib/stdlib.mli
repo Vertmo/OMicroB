@@ -362,8 +362,8 @@ external ( /. ) : float -> float -> float = "%divfloat"
 (** Floating-point division.
     Left-associative operator at precedence level 7/11. *)
 
-external ( ** ) : float -> float -> float = "caml_power_float" "pow"
-  [@@unboxed] [@@noalloc]
+(* external ( ** ) : float -> float -> float = "caml_power_float" "pow"
+  [@@unboxed] [@@noalloc] *)
 (** Exponentiation.
     Right-associative operator at precedence level 8/11. *)
 
@@ -626,6 +626,7 @@ val string_of_float : float -> string
 (** Return the string representation of a floating-point number. *)
 
 external float_of_string : string -> float = "caml_float_of_string"
+(* val float_of_string : string -> float *)
 (** Convert the given string to a float.  The string is read in decimal
    (by default) or in hexadecimal (marked by [0x] or [0X]).
    The format of decimal floating-point numbers is
