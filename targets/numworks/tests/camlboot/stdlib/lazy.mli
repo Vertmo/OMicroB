@@ -15,7 +15,9 @@
 
 (** Deferred computations. *)
 
-type 'a t = 'a lazy_t
+type 'a t = private
+  | Value of 'a
+  | Thunk of (unit -> 'a) ref
 (** A value of type ['a Lazy.t] is a deferred computation, called
    a suspension, that has a result of type ['a].  The special
    expression syntax [lazy (expr)] makes a suspension of the
@@ -43,7 +45,7 @@ type 'a t = 'a lazy_t
 exception Undefined
 
 (* val force : 'a t -> 'a  *)
-external force : 'a t -> 'a = "%lazy_force"
+val force : 'a t -> 'a 
 (** [force x] forces the suspension [x] and returns its result.
    If [x] has already been forced, [Lazy.force x] returns the
    same value again without recomputing it.  If it raised an exception,

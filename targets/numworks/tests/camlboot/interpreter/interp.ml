@@ -59,7 +59,6 @@ let stdlib_units =
     "gc.ml";
     "camlinternalOO.ml";
     "oo.ml";
-    "camlinternalLazy.ml";
     "lazy.ml";
     "printexc.ml";
     "array.ml";

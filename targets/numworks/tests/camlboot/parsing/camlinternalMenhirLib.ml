@@ -61,6 +61,8 @@ let weed cmp xs =
 
 (* Streams. *)
 
+open Lazy
+
 type 'a stream =
     'a head Lazy.t
 
@@ -1742,14 +1744,14 @@ module Make (T : TABLE) = struct
      of elements. *)
 
   let rec stack cell current : element stream =
-    lazy (
+    Lazy.from_fun (
       (* The stack is empty iff the top stack cell is its own successor. In
          that case, the current state [current] should be an initial state
          (which has no incoming symbol).
          We do not allow the user to inspect this state. *)
       let next = cell.next in
       if next == cell then
-        Nil
+        fun () -> Nil
       else
         (* Construct an element containing the current state [current] as well
            as the semantic value contained in the top stack cell. This semantic
@@ -1765,7 +1767,7 @@ module Make (T : TABLE) = struct
           cell.startp,
           cell.endp
         ) in
-        Cons (element, stack next cell.state)
+        fun () -> Cons (element, stack next next.state)
     )
 
   let stack env : element stream =

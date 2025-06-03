@@ -171,6 +171,7 @@ value caml_bytes_of_string(value v){
 }
 
 #define INT_ERRMSG "int_of_string"
+#define FLOAT_ERRMSG "float_of_string"
 
 static int parse_sign_and_base(/*in*/  value v,
                                /*out*/ int * base,
@@ -248,4 +249,53 @@ static int parse_intnat(value s, int nbits, const char *errmsg) {
 
 value caml_int_of_string(value v) {
   return Val_int(parse_intnat(v, 8 * sizeof(value) - 1, INT_ERRMSG));
+}
+
+static float parse_float(value s, const char *errmsg) {
+  int pos = 0;
+  int sign = 1;
+  float res = 0.0;
+  float factor = 1.0;
+  int has_decimal = 0;
+
+  if (String_field(s, pos) == '-') {
+    sign = -1;
+    pos++;
+  } else if (String_field(s, pos) == '+') {
+    pos++;
+  }
+
+  for (; pos < caml_string_length(s); pos++) {
+    char c = String_field(s, pos);
+
+    if (c == '_') {
+      continue;
+    } else if (c == '.') {
+      if (has_decimal) caml_raise_failure(errmsg);
+      has_decimal = 1;
+      continue;
+    }
+
+    int d = parse_digit(c);
+    if (d < 0 || d >= 10) {
+      break;
+    }
+
+    if (has_decimal) {
+      factor /= 10.0;
+      res += d * factor;
+    } else {
+      res = res * 10.0 + d;
+    }
+  }
+
+  if (pos != caml_string_length(s)) {
+    caml_raise_failure(errmsg);
+  }
+
+  return sign * res;
+}
+
+value caml_float_of_string(value v) {
+  return Val_float(parse_float(v, FLOAT_ERRMSG));
 }

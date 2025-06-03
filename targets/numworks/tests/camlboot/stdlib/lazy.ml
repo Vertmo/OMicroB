@@ -47,37 +47,30 @@
    rules for the [lazy] keyword.
 *)
 
-type 'a t = 'a lazy_t
+type 'a t =
+  | Value of 'a
+  | Thunk of (unit -> 'a) ref
 
-exception Undefined = CamlinternalLazy.Undefined
+exception Undefined
 
-external make_forward : 'a -> 'a lazy_t = "caml_lazy_make_forward"
+let from_fun f = Thunk (ref f)
 
-external force : 'a t -> 'a = "%lazy_force"
+let from_val v = Value v
 
-(* let force = force *)
+let is_val = function
+  | Value _ -> true
+  | Thunk _ -> false
 
-let force_val = CamlinternalLazy.force_val
-
-let from_fun (f : unit -> 'arg) =
-  let x = Obj.new_block Obj.lazy_tag 1 in
-  Obj.set_field x 0 (Obj.repr f);
-  (Obj.obj x : 'arg t)
-
-
-let from_val (v : 'arg) =
-  let t = Obj.tag (Obj.repr v) in
-  if t = Obj.forward_tag || t = Obj.lazy_tag || t = Obj.double_tag then begin
-    make_forward v
-  end else begin
-    (Obj.magic v : 'arg t)
-  end
-
-
-let is_val (l : 'arg t) = Obj.tag (Obj.repr l) <> Obj.lazy_tag
+let force l =
+  match l with
+  | Value v -> v
+  | Thunk r ->
+      let v = !r () in
+      r := (fun () -> v);
+      v
 
 let lazy_from_fun = from_fun
-
 let lazy_from_val = from_val
-
 let lazy_is_val = is_val
+let force_val = force
+
