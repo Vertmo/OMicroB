@@ -1,6 +1,6 @@
-# 
+#
 # Makefile for the OMicroB-camlboot application
-# 
+#
 include ../../../../etc/Makefile.conf
 
 VERSION = 0.0.1
@@ -10,14 +10,14 @@ DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these? Apparently above 16192 it doesn't get flashed on the NumWorks flashing website
 # STACK_SIZE = 8192
-# STACK_SIZE = 16192
+STACK_SIZE = 16192
 # STACK_SIZE = 32384
-STACK_SIZE = 64768
+# STACK_SIZE = 64768
 
 # HEAP_SIZE = 8192
-# HEAP_SIZE = 16192
+HEAP_SIZE = 16192
 # HEAP_SIZE = 32384
-HEAP_SIZE = 64768
+# HEAP_SIZE = 64768
 
 TARGETS := $(PROG).hex $(PROG).elf
 
@@ -37,7 +37,7 @@ SRCS += parsing/*.mli parsing/*.ml
 SRCS += interpreter/*.mli interpreter/*.ml
 SSRCS = $(shell ocamldep -bytecode -sort $(INCLUDES) $(SRCS))
 
-# Small test to test only the functors in interpreter/data.ml
+# # Small test to test only the functors in interpreter/data.ml
 # SRCS += interpreter/smap.mli interpreter/smap.ml
 # SRCS += test.ml
 # SSRCS = $(shell ocamldep -bytecode -sort $(SRCS))
