@@ -132,13 +132,13 @@ let index_opt s c = index_rec_opt s (length s) 0 c
 (* duplicated in bytes.ml *)
 let index_from s i c =
   let l = length s in
-  if i < 0 || i > l then invalid_arg "String.index_from / Bytes.index_from" else
+  if i < 0 || i > l then invalid_arg "String.index_from" else
     index_rec s l i c
 
 (* duplicated in bytes.ml *)
 let index_from_opt s i c =
   let l = length s in
-  if i < 0 || i > l then invalid_arg "String.index_from_opt / Bytes.index_from_opt" else
+  if i < 0 || i > l then invalid_arg "String.index_from_opt" else
   index_rec_opt s l i c
 
 (* duplicated in bytes.ml *)
@@ -152,7 +152,7 @@ let rindex s c = rindex_rec s (length s - 1) c
 (* duplicated in bytes.ml *)
 let rindex_from s i c =
   if i < -1 || i >= length s then
-    invalid_arg "String.rindex_from / Bytes.rindex_from"
+    invalid_arg "String.rindex_from"
   else
     rindex_rec s i c
 
@@ -167,7 +167,7 @@ let rindex_opt s c = rindex_rec_opt s (length s - 1) c
 (* duplicated in bytes.ml *)
 let rindex_from_opt s i c =
   if i < -1 || i >= length s then
-    invalid_arg "String.rindex_from_opt / Bytes.rindex_from_opt"
+    invalid_arg "String.rindex_from_opt"
   else
     rindex_rec_opt s i c
 
@@ -175,7 +175,7 @@ let rindex_from_opt s i c =
 let contains_from s i c =
   let l = length s in
   if i < 0 || i > l then
-    invalid_arg "String.contains_from / Bytes.contains_from"
+    invalid_arg "String.contains_from"
   else
     try ignore (index_rec s l i c); true with Not_found -> false
 
@@ -185,7 +185,7 @@ let contains s c = contains_from s 0 c
 (* duplicated in bytes.ml *)
 let rcontains_from s i c =
   if i < 0 || i >= length s then
-    invalid_arg "String.rcontains_from / Bytes.rcontains_from"
+    invalid_arg "String.rcontains_from"
   else
     try ignore (rindex_rec s i c); true with Not_found -> false
 
