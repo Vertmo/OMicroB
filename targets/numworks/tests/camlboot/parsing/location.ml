@@ -302,6 +302,22 @@ let print_loc ppf loc = failwith "TODO print_loc"
 (*   end *)
 (* ;; *)
 
+let string_of_loc loc =
+  let (file, line, startchar) = get_pos_info loc.loc_start in
+  let endchar = loc.loc_end.pos_cnum - loc.loc_start.pos_cnum + startchar in
+  if file = "//toplevel//" then begin
+    "Characters " ^ (string_of_int loc.loc_start.pos_cnum) ^ "-" ^ (string_of_int loc.loc_end.pos_cnum)
+  end else begin
+    "File \"" ^ file ^ "\", line " ^ (string_of_int line)
+    ^ (
+      if startchar >= 0 then
+        ", characters " ^ (string_of_int startchar) ^ "-" ^ (string_of_int endchar)
+      else
+        ""
+      )
+  end
+;;
+
 (* let default_printer ppf loc = *)
 (*   (\* setup_colors (); *\) *)
 (*   if loc.loc_start.pos_fname = "//toplevel//" *)
