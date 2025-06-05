@@ -1,7 +1,11 @@
 open Data
 
+exception Exit
+
 let type_error expected got =
-  failwith "TODO type_error"
+  (* failwith "TODO type_error" *)
+  print_endline ("Error: expected " ^ expected ^ ", got " ^ (string_of_value (Ptr.create got)));
+  assert false
 (* Format.eprintf "Error: expected %s, got %a@." expected pp_print_value (Ptr.create got); assert false *)
 
 let wrap_int n = ptr @@ Int n

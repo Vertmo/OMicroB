@@ -1742,7 +1742,8 @@ module Make (T : TABLE) = struct
      of elements. *)
 
   let rec stack cell current : element stream =
-    Lazy.from_fun (fun () ->
+   (* Lazy.from_val ( *)
+   Lazy.from_fun (fun () ->
       (* The stack is empty iff the top stack cell is its own successor. In
          that case, the current state [current] should be an initial state
          (which has no incoming symbol).

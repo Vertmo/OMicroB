@@ -1,5 +1,5 @@
 # 18 "parsing/lexer.mll"
- 
+
 open Lexing
 open Misc
 open Parser
@@ -118,8 +118,13 @@ let with_comment_buffer comment lexbuf =
   let loc = { start_loc with Location.loc_end = end_loc.Location.loc_end } in
   s, loc
 
-let error lexbuf e = raise (Error(e, Location.curr lexbuf))
-let error_loc loc e = raise (Error(e, loc))
+let error lexbuf e =
+  print_endline "\nError: raising Lexer.Error from error ...";
+  raise (Error(e, Location.curr lexbuf))
+
+let error_loc loc e =
+  print_endline "\nError: raising Lexer.Error from error_loc ...";
+  raise (Error(e, loc))
 
 (* to translate escape sequences *)
 
@@ -148,6 +153,7 @@ let char_for_backslash = function
 
 let illegal_escape lexbuf reason =
   let error = Illegal_escape (Lexing.lexeme lexbuf, Some reason) in
+  print_endline "\nError: raising Lexer.Error from illegal_escape ...";
   raise (Error (error, Location.curr lexbuf))
 
 let char_for_decimal_code lexbuf i =
@@ -3241,7 +3247,7 @@ and __ocaml_lex_skip_hash_bang_rec lexbuf __ocaml_lex_state =
 ;;
 
 # 714 "parsing/lexer.mll"
- 
+
 
   let token_with_comments lexbuf =
     match !preprocessor with
