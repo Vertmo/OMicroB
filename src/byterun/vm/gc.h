@@ -18,6 +18,8 @@ void gc(void);
     if (heap_ptr + (wosize) + 1 > heap_end) {                          \
       gc();                                                            \
       if (heap_ptr + (wosize) + 1 > heap_end) {                        \
+        printf("Out of memory: cannot allocate %lu words for tag %u\n",\
+               (unsigned long)(wosize), (unsigned int)(tag));          \
         caml_raise_out_of_memory();                                    \
       }                                                                \
     }                                                                  \
