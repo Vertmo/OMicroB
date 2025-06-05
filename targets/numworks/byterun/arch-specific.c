@@ -154,14 +154,17 @@ void format_long(char *buf, int bufsize, value v) {
 
 void _exit(int code) {
   // TODO: implement this _exit function?
+  printf("_exit(%d): TODO: implement this _exit function?", code);
 }
 
 void _kill(int pid, int sig) {
   // TODO: implement this _kill function?
+  printf("_kill(%d, %d): TODO: implement this _kill function?", pid, sig);
 }
 
 int _getpid() {
   // TODO: implement this _getpid function?
+  printf("_gedpid(): TODO: implement this _getpid function?");
   return 0;
 }
 
