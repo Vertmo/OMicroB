@@ -39,16 +39,16 @@ let parse_from_string ?(filename="<string>") code =
 
 let default_filename = "ocaml.py"
 
-let default_program = "
-(* Example of an OCaml script to use
-   with the OMicroB-camlboot app *)
-let rec fibonacci n =
-  if n <= 1 then
-    n
-  else
-    fibonacci (n-1) + fibonacci (n-2)
-in
-\"default program\", fibonacci, fibonacci 15;;
+let default_program = "\
+(* Example of an OCaml script to use\
+   with the OMicroB-camlboot app *)\
+let rec fibonacci n =\
+  if n <= 1 then\
+    n\
+  else\
+    fibonacci (n-1) + fibonacci (n-2)\
+in\
+\"default program\", fibonacci, fibonacci 15;;\
 "
 
 let parse_from_numworks_localstorage filename =
@@ -436,7 +436,7 @@ let main () =
     | None -> run_ocamlc ()
   with InternalException e ->
     (* Printf.eprintf "Code raised exception: %a@." pp_print_value e *)
-    print_string "Code raised internal exception."
+    print_endline ("Code raised internal exception: " ^ (string_of_value e) )
 
 (* let () = main () *)
 
@@ -445,4 +445,4 @@ let () =
     run_files ()
   with InternalException e ->
     (* Printf.eprintf "Code raised exception: %a@." pp_print_value e *)
-    print_string "Code raised internal exception."
+    print_endline ("Code raised internal exception: " ^ (string_of_value e) )
