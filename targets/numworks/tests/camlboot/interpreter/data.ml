@@ -193,7 +193,7 @@ let is_true = onptr @@ function
   | _ -> assert false
 
 let rec pp_print_value ff =
-  failwith "TODO"
+  failwith "TODO pp_print_value"
  (* onptr @@ function *)
   (* | Int n -> Format.fprintf ff "%d" n *)
   (* | Int32 n -> Format.fprintf ff "%ldl" n *)
@@ -246,7 +246,7 @@ let rec string_of_value (arg : value) : string =
   | Fexpr _ -> "<fexpr>"
   | Fun _ | Function _ | Prim _ | Lz _ | Fun_with_extra_args _ ->
     "<function>"
-  | String s -> (Bytes.to_string (Bytes.escaped s)) (* %S formats with quotes and escapes *)
+  | String s -> "\"" ^ (Bytes.to_string (Bytes.escaped s)) ^ "\""
   | Float f -> string_of_float f
   | Tuple l ->
     "(" ^ (String.concat ", " (List.map string_of_value l)) ^ ")"
@@ -278,7 +278,7 @@ let print_value_to_stdout (v : value) : unit =
   print_newline ()
 
 let pp_print_unit_id ppf (Path s) =
-  failwith "TODO"
+  failwith "TODO pp_print_unit_id"
   (* Format.fprintf ppf "%S" s *)
 
 let read_caml_int s =
