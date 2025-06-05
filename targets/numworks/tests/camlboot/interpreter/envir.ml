@@ -59,7 +59,7 @@ let define_unit env unit_path mdl =
     | exception Not_found ->
        invalid_arg ("define_unit: The module unit "^module_name^" is not yet declared")
     | (_, (Module _ | Functor _)) ->
-       invalid_arg ("define_unit: The module"^module_name^"is not a unit")
+       invalid_arg ("define_unit: The module "^module_name^" is not a unit")
     | (_, Unit (unit_id, unit_state)) ->
        begin match !unit_state with
          | Initialized _ ->
@@ -112,10 +112,14 @@ let decompose get_module_data env { txt = lident; loc } =
     ("module", env_of_module_data md, str)
 
 let lookup object_name ~env_name object_env { txt = str; loc } =
+  print_string (Location.string_of_loc loc);
+  print_endline (" => lookup " ^ object_name ^ " " ^ env_name ^ " " ^ str ^ " (before SMap.find)");
   try snd (SMap.find str object_env)
   with Not_found ->
-    (* Format.eprintf *)
-    (*   "%a@.%s not found in %s: %s@." *)
+    (* print_endline "==> Failed SMap.find"; *)
+    print_endline ((Location.string_of_loc loc) ^ " " ^ (String.capitalize_ascii object_name) ^ " not found in " ^ env_name ^ ": " ^ str);
+    (* Uncomment the following lines to enable formatted error messages *)
+    (* Format.eprintf "%a@.%s not found in %s: %s@." *)
     (*   Location.print_loc *)
     (*   loc *)
     (*   (String.capitalize_ascii object_name) *)
