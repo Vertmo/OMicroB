@@ -5,10 +5,10 @@ EADK_APP_NAME = "camlboot"
 DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these?
-STACK_SIZE = 16192
-HEAP_SIZE = 2048
+HEAP_SIZE = 16192
+STACK_SIZE = 2048
 
-TARGETS := $(PROG).hex $(PROG).elf
+TARGETS := $(PROG).byte $(PROG).hex $(PROG).elf
 
 INCLUDES := -I stdlib/ -I parsing/ -I interpreter/
 CINCLUDES := $(shell echo $(INCLUDES) | sed -e 's/ /,/g')
@@ -36,7 +36,7 @@ CMIS = $(patsubst %.mli,%.cmi,$(MLIS))
 all: $(PROG).hex
 	cp -vf $(PROG).hex $(PROG).nwa
 
-$(TARGETS): $(CMOS) camlboot.cmo
+$(TARGETS): $(CMOS)
 	@echo "Compiling .cmo files to .byte"
 	$(BIN)/omicrob $(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
 
