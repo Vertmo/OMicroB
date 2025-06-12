@@ -415,8 +415,8 @@ let get_module_data loc = function
      end
 
 let module_name_of_unit_path path =
-  failwith "TODO module_name_of_unit_path"
-  (* path *)
-  (* |> Filename.basename *)
-  (* |> Filename.remove_extension *)
-  (* |> String.capitalize_ascii *)
+  print_endline "coucou";
+  path
+  |> Filename.basename
+  |> Filename.remove_extension
+  |> String.capitalize_ascii
