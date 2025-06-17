@@ -14,7 +14,3 @@
 (**************************************************************************)
 
 open Parsetree
-
-(** Documentation comments *)
-(* type docstring *)
-(* val docs_attr : docstring -> Parsetree.attribute *)

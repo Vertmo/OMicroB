@@ -38,7 +38,7 @@ all: $(PROG).hex
 
 $(TARGETS): $(CMOS)
 	@echo "Compiling .cmo files to .byte"
-	$(BIN)/omicrob $(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
+	$(BIN)/omicrob -trace 0 $(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
 
 %.cmi: %.mli
 	$(BIN)/omicrob $(OMICROB_PARAMS) -c $<

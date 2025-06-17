@@ -3,9 +3,6 @@
 (* open Eval *)
 (* open Envir *)
 
-let f () = print_endline "salut"
-let () = f ()
-
 let () = print_endline "coucou ?"
 
 (* let parse filename = *)
