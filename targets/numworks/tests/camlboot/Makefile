@@ -33,8 +33,11 @@ MLIS = $(filter %.mli,$(SSRCS))
 CMIS = $(patsubst %.mli,%.cmi,$(MLIS))
 
 .PHONY: all
-all: $(PROG).hex
-	cp -vf $(PROG).hex $(PROG).nwa
+
+all: $(PROG).nwa $(PROG).elf
+
+%.nwa: %.hex
+	cp -vf $^ $@
 
 $(TARGETS): $(CMOS)
 	@echo "Compiling .cmo files to .byte"
@@ -48,7 +51,7 @@ $(TARGETS): $(CMOS)
 
 .PHONY: clean
 clean:
-	rm -vf **/*.cm*
+	rm -vf **/*.cm* *.byte *.elf *.hex *.nwa
 
 NWLINK = npx --yes -- nwlink@0.0.17
 
