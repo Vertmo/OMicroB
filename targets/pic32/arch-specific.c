@@ -126,7 +126,7 @@ static inline value do_read_flash_data_1B(const value flash_global_data[], uint8
   return flash_global_data[glob_ind];
 }
 
-static inline value do_read_flash_data_2B(const value flash_global_data[], uint8_t glob_ind) {
+static inline value do_read_flash_data_2B(const value flash_global_data[], uint16_t glob_ind) {
   return flash_global_data[glob_ind];
 }
 

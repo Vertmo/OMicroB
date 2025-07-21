@@ -175,7 +175,7 @@ static inline value do_read_flash_data_1B(const value flash_global_data[], uint8
 #endif
 }
 
-static inline value do_read_flash_data_2B(const value flash_global_data[], uint8_t glob_ind) {
+static inline value do_read_flash_data_2B(const value flash_global_data[], uint16_t glob_ind) {
 #if OCAML_VIRTUAL_ARCH == 16
   return (value) pgm_read_word_near(flash_global_data + glob_ind);
 #elif OCAML_VIRTUAL_ARCH == 32
