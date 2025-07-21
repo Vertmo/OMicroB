@@ -15,9 +15,9 @@ STACK_SIZE = 16192
 # STACK_SIZE = 64768
 
 # HEAP_SIZE = 8192
-HEAP_SIZE = 16192
+# HEAP_SIZE = 16192
 # HEAP_SIZE = 32384
-# HEAP_SIZE = 64768
+HEAP_SIZE = 64768
 
 TARGETS := $(PROG).hex $(PROG).elf
 
@@ -61,9 +61,9 @@ hex: $(PROG).hex
 .PHONY: elf
 elf: $(PROG).elf
 
-$(TARGETS): $(CMOS) camlboot.cmo
+$(TARGETS): $(CMOS)
 	@echo "Compiling .cmo files to .byte"
-	$(BIN)/omicrob $(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
+	$(BIN)/omicrob -trace 0 $(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
 
 %.cmi: %.mli
 	$(BIN)/omicrob $(OMICROB_PARAMS) -c $<
@@ -73,7 +73,7 @@ $(TARGETS): $(CMOS) camlboot.cmo
 
 .PHONY: clean
 clean:
-	rm -vf **/*.cm*
+	rm -vf **/*.cm* *.byte *.c *.elf *.hex *nwa
 
 NWLINK = npx --yes -- nwlink@0.0.17
 

@@ -112,8 +112,8 @@ let decompose get_module_data env { txt = lident; loc } =
     ("module", env_of_module_data md, str)
 
 let lookup object_name ~env_name object_env { txt = str; loc } =
-  print_string (Location.string_of_loc loc);
-  print_endline (" => lookup " ^ object_name ^ " " ^ env_name ^ " " ^ str ^ " (before SMap.find)");
+  (* print_string (Location.string_of_loc loc); *)
+  (* print_endline (" => lookup " ^ object_name ^ " " ^ env_name ^ " " ^ str ^ " (before SMap.find)"); *)
   try snd (SMap.find str object_env)
   with Not_found ->
     (* print_endline "==> Failed SMap.find"; *)
