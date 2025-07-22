@@ -87,6 +87,10 @@ static void mark_block(value *p) {
 static void mark_root(value v) {
   if (Is_block_in_dynamic_heap(v)) {
     header_t h = Ram_hd_val(v);
+    if (Tag_hd(h) == Infix_tag) {
+      v = Val_dynamic_block(Ram_block_val(v) - Wosize_hd(h));
+      h = Ram_hd_val(v);
+    }
     if (Color_hd(h) == Color_white) {                   /* Is this block not already scanned?                        */
       if (Tag_hd(h) < No_scan_tag) {                    /* Is this block scannable?                                  */
         Ram_hd_val(v) = UNIQUE_MARK;                    /* Set root header to a unique unaligned value               */
@@ -249,13 +253,16 @@ static void update_pointers(void) {
   while (p < heap_ptr) {                                      /* Loop over the whole heap in block order                                         */
     value v = *p;
     /* printf("Checking %p\n",p); */
-    if (Color_hd(v) == Color_black) {                         /* Does the header contain a reversed pointer (equivalent to "is the block alive")? */
-      do {                                                    /* Loop over the reversed pointer list                                             */
-        v ^= Color_black;
+    // Warning: some recursive closures are alive due to a pointer to an infix sub-closure but no pointer to the main closure
+    // In that case, the header do not contain a reverse pointer but the block is alive
+    // This kind of recursive closure already have a white header
+    // Remark: Tag_hd(v) may be Closure_tag when v is a reverse pointer but this is not a problem
+    if (Color_hd(v) == Color_black || Tag_hd(v) == Closure_tag) { /* Is the block alive                                                          */
+      while (Color_hd(v) == Color_black) {                    /* Loop over the reversed pointer list                                             */         v ^= Color_black;
         value next = *Ram_block_val(v) & ~Color_red;
         *Ram_block_val(v) = Val_dynamic_block(alloc_pos + 1); /* Write the pointer to the destination of the block                               */
         v = next;
-      } while (Color_hd(v) == Color_black);
+      }
       *p = v;                                                 /* Restore the White original header                                               */
       mlsize_t size = Wosize_hd(v) + 1;
       if (Tag_hd(v) == Closure_tag) {                         /* Is this block a closure?                                                        */
