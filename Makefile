@@ -108,7 +108,7 @@ tests: all
 
 clean:
 	@rm -f *~ */*~ */*/*~ */*/*/*~
-	@rm -f bin/*
+	@rm -rf bin/* lib/targets/
 	$(call clean, src/bc2c)
 	$(call clean, src/h15ppx)
 	$(call clean, src/byterun)

@@ -32,8 +32,6 @@ value caml_delay_usec(value us) {
 /******************************* EADK library *********************************/
 /******************************************************************************/
 
-// TODO: write here some useful functions written as bindings for the eadh.k library
-
 /***********/
 /* Display */
 /***********/
@@ -178,6 +176,101 @@ value caml_read_any_file(value v) {
   #else
   return (value)copy_bytes(content);
   #endif
+}
+
+typedef struct {
+  char *curptr;
+  char *endptr;
+} storage_ptr;
+
+value numworks_ml_open_in(value v) {
+  // Read filename from v
+  #ifdef __OCAML__
+  const char * filename = String_val(v);
+  #else
+  int n = caml_string_length(v); int i;
+  char filename[n+1];
+  for(i = 0; i < n; i++) filename[i] = String_field(v, i);
+  filename[n] = '\0';
+  #endif
+
+  value ret;
+
+  #if defined(__OCAML__)
+  FILE *f = fopen(filename, "r");
+  if(!f) caml_raise_not_found();
+  ret = caml_alloc(1, Custom_tag);
+  Field(ret, 0) = (long)f;
+  #elif defined(__PC__)
+  FILE *f = fopen(filename, "r");
+  if(!f) caml_raise(OCAML_Not_found);
+  ret = value_of_int64((long)f);
+  #else
+  int len;
+  char *ofs = extapp_fileRead(filename, &len);
+  if(!ofs) caml_raise(OCAML_Not_found);
+
+  storage_ptr *ptr = malloc(sizeof(storage_ptr));
+  ptr->curptr = ofs;
+  ptr->endptr = ofs + len;
+  ret = value_of_int64((long)ptr); // TODO what size ?
+  #endif
+
+  return ret;
+}
+
+value numworks_ml_close_in(value fd) {
+  #if defined(__OCAML__)
+  FILE *f = (FILE*)Field(fd, 0);
+  fclose(f);
+  #elif defined(__PC__)
+  FILE *f = (FILE*)Int64_val(fd);
+  /* fclose(f); // TODO ? */
+  #else
+  storage_ptr *ptr = (storage_ptr*)Int64_val(fd);
+  free(ptr);
+  #endif
+}
+
+value numworks_ml_input(value fd, value dest, value vofs, value vlen) {
+  int len = Int_val(vlen);
+  int ofs = Int_val(vofs);
+  int nbread;
+  #if defined(__OCAML__)
+  FILE *f = (FILE*)Field(fd, 0);
+  nbread = fread(String_val(dest)+ofs, 1, len, f);
+  #elif defined(__PC__)
+  FILE *f = (FILE*)Int64_val(fd);
+  char buf[len];
+  nbread = fread(buf, 1, len, f);
+  for(int i = 0; i < nbread; i++) String_field(dest, ofs+i) = buf[i];
+  #else
+  storage_ptr *ptr = (storage_ptr*)Int64_val(fd);
+  nbread = len;
+  if(ptr->endptr - ptr->curptr < len) nbread = ptr->endptr - ptr->curptr;
+  for(int i = 0; i < nbread; i++) Ram_string_field(dest, ofs+i) = ptr->curptr[i];
+  ptr->curptr += nbread;
+  #endif
+  return Val_int(nbread);
+}
+
+value numworks_ml_input_char(value fd) {
+  char buf[1];
+  #if defined(__OCAML__)
+  FILE *f = (FILE*)Field(fd, 0);
+  int nb = fread(buf, 1, 1, f);
+  if(!nb) caml_raise_end_of_file();
+  #elif defined(__PC__)
+  FILE *f = (FILE*)Int64_val(fd);
+  int nb = fread(buf, 1, 1, f);
+  if(!nb) caml_raise(OCAML_End_of_file);
+  #else
+  storage_ptr *ptr = (storage_ptr*)Int64_val(fd);
+  if(ptr->curptr >= ptr->endptr) caml_raise(OCAML_End_of_file);
+  buf[0] = *(ptr->curptr);
+  ptr->curptr++;
+  #endif
+  return Val_int(buf[0]);
 }
 
 
