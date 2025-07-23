@@ -205,29 +205,29 @@ val open_in : string -> in_channel
 (** Open the named file for reading, and return a new input channel
    on that file, positioned at the beginning of the file. *)
 
-val open_in_bin : string -> in_channel
-(** Same as {!Pervasives.open_in}, but the file is opened in binary mode,
-   so that no translation takes place during reads. On operating
-   systems that do not distinguish between text mode and binary
-   mode, this function behaves like {!Pervasives.open_in}. *)
+(* val open_in_bin : string -> in_channel *)
+(* (\** Same as {!Pervasives.open_in}, but the file is opened in binary mode, *)
+(*    so that no translation takes place during reads. On operating *)
+(*    systems that do not distinguish between text mode and binary *)
+(*    mode, this function behaves like {!Pervasives.open_in}. *\) *)
 
-val open_in_gen : open_flag list -> int -> string -> in_channel
-(** [open_in_gen mode perm filename] opens the named file for reading,
-   as described above. The extra arguments
-   [mode] and [perm] specify the opening mode and file permissions.
-   {!Pervasives.open_in} and {!Pervasives.open_in_bin} are special
-   cases of this function. *)
+(* val open_in_gen : open_flag list -> int -> string -> in_channel *)
+(* (\** [open_in_gen mode perm filename] opens the named file for reading, *)
+(*    as described above. The extra arguments *)
+(*    [mode] and [perm] specify the opening mode and file permissions. *)
+(*    {!Pervasives.open_in} and {!Pervasives.open_in_bin} are special *)
+(*    cases of this function. *\) *)
 
 val input_char : in_channel -> char
 (** Read one character from the given input channel.
    Raise [End_of_file] if there are no more characters to read. *)
 
-val input_line : in_channel -> string
-(** Read characters from the given input channel, until a
-   newline character is encountered. Return the string of
-   all characters read, without the newline character at the end.
-   Raise [End_of_file] if the end of the file is reached
-   at the beginning of line. *)
+(* val input_line : in_channel -> string *)
+(* (\** Read characters from the given input channel, until a *)
+(*    newline character is encountered. Return the string of *)
+(*    all characters read, without the newline character at the end. *)
+(*    Raise [End_of_file] if the end of the file is reached *)
+(*    at the beginning of line. *\) *)
 
 val input : in_channel -> bytes -> int -> int -> int
 (** [input ic buf pos len] reads up to [len] characters from
@@ -245,13 +245,6 @@ val input : in_channel -> bytes -> int -> int -> int
    exactly [len] characters.)
    Exception [Invalid_argument "input"] is raised if [pos] and [len]
    do not designate a valid range of [buf]. *)
-
-val input_value : in_channel -> 'a
-(** Read the representation of a structured value, as produced
-   by {!Pervasives.output_value}, and return the corresponding value.
-   This function is identical to {!Marshal.from_channel};
-   see the description of module {!Marshal} for more information,
-   in particular concerning the lack of type safety. *)
 
 val really_input : in_channel -> bytes -> int -> int -> unit
 (** [really_input ic buf pos len] reads [len] characters from channel [ic],
@@ -274,12 +267,12 @@ val close_in : in_channel -> unit
   except [close_in], which does nothing when applied to an already
   closed channel. *)
 
-val input_value : in_channel -> 'a
-(** Read the representation of a structured value, as produced
-   by {!Pervasives.output_value}, and return the corresponding value.
-   This function is identical to {!Marshal.from_channel};
-   see the description of module {!Marshal} for more information,
-   in particular concerning the lack of type safety. *)
+(* val input_value : in_channel -> 'a *)
+(* (\** Read the representation of a structured value, as produced *)
+(*    by {!Pervasives.output_value}, and return the corresponding value. *)
+(*    This function is identical to {!Marshal.from_channel}; *)
+(*    see the description of module {!Marshal} for more information, *)
+(*    in particular concerning the lack of type safety. *\) *)
 
 val seek_in : in_channel -> int -> unit
 (** [seek_in chan pos] sets the current reading position to [pos]

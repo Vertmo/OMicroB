@@ -136,7 +136,7 @@ let read_ocamlpy_file () =
 
 (* I/O operations *)
 
-type in_channel = bytes * int ref
+type in_channel
 type out_channel
 
 external open_descriptor_out : int -> out_channel = "numworks_caml_ml_open_descriptor_out" [@@noalloc]
@@ -199,64 +199,48 @@ let prerr_bytes s = (* TODO with the correct color *)
 
 (* General input functions *)
 
-let open_in_gen _ _ name =
-  let content = read_any_file name in (* TODO read_any_file should raise exceptions *)
-  (Bytes.of_string content, ref 0)
+(* external open_in_gen : _ list -> _ -> string -> in_channel = "caml_ml_open_in_gen" *)
 
-let open_in name =
-  open_in_gen [Open_rdonly; Open_text] 0 name
+external open_in : string -> in_channel = "numworks_ml_open_in"
 
-let open_in_bin name =
-  open_in_gen [Open_rdonly; Open_binary] 0 name
+(* let open_in_bin name = *)
+(*   open_in_gen [Open_rdonly; Open_binary] 0 name *)
 
-let input_char ic =
-  let c = Bytes.get (fst ic) !(snd ic) in
-  (snd ic) := !(snd ic) + 1;
-  c
+external input_char : in_channel -> char = "numworks_ml_input_char"
+external unsafe_input : in_channel -> bytes -> int -> int -> int = "numworks_ml_input"
 
-let unsafe_input ic buf start len =
-  Bytes.unsafe_blit (fst ic) !(snd ic) buf start len;
-  (snd ic) := !(snd ic) + len;
-  len (* FIXME *)
+(* external input_scan_line : in_channel -> int = "caml_ml_input_scan_line" *)
 
-let input_scan_line ic =
-  let len = Bytes.length (fst ic) in
-  let rec search pos =
-    if pos >= len then -pos
-    else if Bytes.get (fst ic) pos = '\n' then pos
-    else search (pos + 1)
-  in (search !(snd ic)) - !(snd ic)
+(* let input_line chan = *)
+(*   let rec build_result buf pos = function *)
+(*     [] -> buf *)
+(*   | hd :: tl -> *)
+(*       let len = Bytes.length hd in *)
+(*       Bytes.unsafe_blit hd 0 buf (pos - len) len; *)
+(*       build_result buf (pos - len) tl in *)
+(*   let rec scan accu len = *)
+(*     let n = input_scan_line chan in *)
+(*     if n = 0 then begin                   (\* n = 0: we are at EOF *\) *)
+(*       match accu with *)
+(*         [] -> raise End_of_file *)
+(*       | _  -> build_result (Bytes.create len) len accu *)
+(*     end else if n > 0 then begin          (\* n > 0: newline found in buffer *\) *)
+(*       let res = Bytes.create (n - 1) in *)
+(*       ignore (unsafe_input chan res 0 (n - 1)); *)
+(*       ignore (input_char chan);           (\* skip the newline *\) *)
+(*       match accu with *)
+(*         [] -> res *)
+(*       |  _ -> let len = len + n - 1 in *)
+(*               build_result (Bytes.create len) len (res :: accu) *)
+(*     end else begin                        (\* n < 0: newline not found *\) *)
+(*       let beg = Bytes.create (-n) in *)
+(*       ignore(unsafe_input chan beg 0 (-n)); *)
+(*       scan (beg :: accu) (len - n) *)
+(*     end *)
+(*   in Bytes.unsafe_to_string (scan [] 0) *)
 
-let input_line chan =
-  let rec build_result buf pos = function
-    [] -> buf
-  | hd :: tl ->
-      let len = Bytes.length hd in
-      Bytes.unsafe_blit hd 0 buf (pos - len) len;
-      build_result buf (pos - len) tl in
-  let rec scan accu len =
-    let n = input_scan_line chan in
-    if n = 0 then begin                   (* n = 0: we are at EOF *)
-      match accu with
-        [] -> raise End_of_file
-      | _  -> build_result (Bytes.create len) len accu
-    end else if n > 0 then begin          (* n > 0: newline found in buffer *)
-      let res = Bytes.create (n - 1) in
-      ignore (unsafe_input chan res 0 (n - 1));
-      ignore (input_char chan);           (* skip the newline *)
-      match accu with
-        [] -> res
-      |  _ -> let len = len + n - 1 in
-              build_result (Bytes.create len) len (res :: accu)
-    end else begin                        (* n < 0: newline not found *)
-      let beg = Bytes.create (-n) in
-      ignore(unsafe_input chan beg 0 (-n));
-      scan (beg :: accu) (len - n)
-    end
-  in Bytes.unsafe_to_string (scan [] 0)
-
-external input_value : in_channel -> 'a = "caml_input_value"
-let close_in _ = ()
+(* external input_value : in_channel -> 'a = "caml_input_value" *)
+external close_in : in_channel -> unit = "numworks_ml_close_in"
 
 external seek_in : in_channel -> int -> unit = "caml_ml_seek_in"
 external pos_in : in_channel -> int = "caml_ml_pos_in"

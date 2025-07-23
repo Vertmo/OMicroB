@@ -13,10 +13,10 @@ static value value_of_int64(int64_t n) {
     value result;
     OCamlAlloc(result, 5, Custom_tag);
     Ram_field(result, 0) = INT64_CUSTOM_FLAG;
-    Ram_field(result, 1) = (value) ((n >> 48) & 0xFFFF);
-    Ram_field(result, 2) = (value) ((n >> 32) & 0xFFFF);
-    Ram_field(result, 3) = (value) ((n >> 16) & 0xFFFF);
-    Ram_field(result, 4) = (value) (n & 0xFFFF);
+    Ram_field(result, 4) = (value) ((n >> 48) & 0xFFFF);
+    Ram_field(result, 3) = (value) ((n >> 32) & 0xFFFF);
+    Ram_field(result, 2) = (value) ((n >> 16) & 0xFFFF);
+    Ram_field(result, 1) = (value) (n & 0xFFFF);
     return result;
   }
 #elif OCAML_VIRTUAL_ARCH == 32
@@ -26,8 +26,8 @@ static value value_of_int64(int64_t n) {
     value result;
     OCamlAlloc(result, 3, Custom_tag);
     Ram_field(result, 0) = INT64_CUSTOM_FLAG;
-    Ram_field(result, 1) = (value) ((n >> 32) & 0xFFFFFFFF);
-    Ram_field(result, 2) = (value) (n & 0xFFFFFFFFFF);
+    Ram_field(result, 2) = (value) ((n >> 32) & 0xFFFFFFFF);
+    Ram_field(result, 1) = (value) (n & 0xFFFFFFFFFF);
     return result;
   }
 #elif OCAML_VIRTUAL_ARCH == 64

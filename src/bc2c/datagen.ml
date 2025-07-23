@@ -8,7 +8,9 @@ let exception_list = [
   ("Out_of_memory", -1);
   ("Failure", -3);
   ("Invalid_argument", -4);
+  ("End_of_file", -5);
   ("Division_by_zero", -6);
+  ("Not_found", -7);
   ("Stack_overflow", -9);
 ]
 
