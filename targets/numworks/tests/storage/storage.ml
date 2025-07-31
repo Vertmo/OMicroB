@@ -10,24 +10,38 @@ let () =
   print_newline ();
   close_in ic
 
-let () =
-  let ic = open_in "test.py" in
-  let bytes = Bytes.make 20 'a' in
-  let n = input ic bytes 0 10 in
-  print_endline (Bytes.to_string bytes);
-  let n = input ic bytes 10 10 in
-  print_endline (Bytes.to_string bytes);
-  let n = input ic bytes 0 20 in
-  print_endline (Bytes.to_string bytes);
-  let n = input ic bytes 0 20 in
-  print_int n; print_newline ();
-  print_endline (Bytes.to_string bytes);
-  close_in ic
+(* let () = *)
+(*   let ic = open_in "test.py" in *)
+(*   let bytes = Bytes.make 20 'a' in *)
+(*   let n = input ic bytes 0 10 in *)
+(*   print_endline (Bytes.to_string bytes); *)
+(*   let n = input ic bytes 10 10 in *)
+(*   print_endline (Bytes.to_string bytes); *)
+(*   let n = input ic bytes 0 20 in *)
+(*   print_endline (Bytes.to_string bytes); *)
+(*   let n = input ic bytes 0 20 in *)
+(*   print_int n; print_newline (); *)
+(*   print_endline (Bytes.to_string bytes); *)
+(*   close_in ic *)
 
 let () =
   try
     ignore (open_in "doesnotexist.py")
   with Not_found -> print_endline "Got an exception as expected"
 
+let input_some_bytes ic len =
+  let bytes = Bytes.make len 'X' in
+  let n = input ic bytes 0 len in
+  let s = Bytes.to_string bytes in
+  (n, if n < len then String.sub s 0 n else s)
+
+let nb = 120
+
 let () =
-  while true do () done
+  let ic = open_in "test.py" in
+  while true do
+    let (n, s) = input_some_bytes ic nb in
+    if (0 < n) then print_string s;
+    if (0 < n && n < nb) then (print_int n; print_newline ())
+  done;
+  close_in ic

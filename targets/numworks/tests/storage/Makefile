@@ -32,6 +32,6 @@ clean:
 NWLINK = npx --yes -- nwlink@0.0.17
 
 .PHONY: run
-run: $(TARGETS)
+run: $(PROG).nwa
 	@echo "INSTALL $<"
 	$(Q) $(NWLINK) install-nwa $<
