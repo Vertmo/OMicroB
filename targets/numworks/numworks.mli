@@ -246,47 +246,8 @@ val input : in_channel -> bytes -> int -> int -> int
    Exception [Invalid_argument "input"] is raised if [pos] and [len]
    do not designate a valid range of [buf]. *)
 
-val really_input : in_channel -> bytes -> int -> int -> unit
-(** [really_input ic buf pos len] reads [len] characters from channel [ic],
-   storing them in byte sequence [buf], starting at character number [pos].
-   Raise [End_of_file] if the end of file is reached before [len]
-   characters have been read.
-   Raise [Invalid_argument "really_input"] if
-   [pos] and [len] do not designate a valid range of [buf]. *)
-
-val really_input_string : in_channel -> int -> string
-(** [really_input_string ic len] reads [len] characters from channel [ic]
-   and returns them in a new string.
-   Raise [End_of_file] if the end of file is reached before [len]
-   characters have been read.
-   @since 4.02.0 *)
-
 val close_in : in_channel -> unit
 (** Close the given channel.  Input functions raise a [Sys_error]
   exception when they are applied to a closed input channel,
   except [close_in], which does nothing when applied to an already
   closed channel. *)
-
-(* val input_value : in_channel -> 'a *)
-(* (\** Read the representation of a structured value, as produced *)
-(*    by {!Pervasives.output_value}, and return the corresponding value. *)
-(*    This function is identical to {!Marshal.from_channel}; *)
-(*    see the description of module {!Marshal} for more information, *)
-(*    in particular concerning the lack of type safety. *\) *)
-
-val seek_in : in_channel -> int -> unit
-(** [seek_in chan pos] sets the current reading position to [pos]
-   for channel [chan]. This works only for regular files. On
-   files of other kinds, the behavior is unspecified. *)
-
-val pos_in : in_channel -> int
-(** Return the current reading position for the given channel. *)
-
-val in_channel_length : in_channel -> int
-(** Return the size (number of characters) of the regular file
-    on which the given channel is opened.  If the channel is opened
-    on a file that is not a regular file, the result is meaningless.
-    The returned size does not take into account the end-of-line
-    translations that can be performed when reading from a channel
-    opened in text mode. *)
-

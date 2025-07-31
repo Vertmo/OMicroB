@@ -208,6 +208,7 @@ value numworks_ml_open_in(value v) {
   #else
   int len;
   char *ofs = extapp_fileRead(filename, &len);
+  len = len - strlen(filename) - 5; // size + filename + \0 + autoimport status
   if(!ofs) caml_raise(OCAML_Not_found);
 
   storage_ptr *ptr = malloc(sizeof(storage_ptr));
@@ -246,10 +247,11 @@ value numworks_ml_input(value fd, value dest, value vofs, value vlen) {
   for(int i = 0; i < nbread; i++) String_field(dest, ofs+i) = buf[i];
   #else
   storage_ptr *ptr = (storage_ptr*)Int64_val(fd);
-  nbread = len;
-  if(ptr->endptr - ptr->curptr < len) nbread = ptr->endptr - ptr->curptr;
-  for(int i = 0; i < nbread; i++) Ram_string_field(dest, ofs+i) = ptr->curptr[i];
-  ptr->curptr += nbread;
+  for(nbread = 0; nbread < len; nbread++) {
+    if(ptr->curptr >= ptr->endptr) break;
+    Ram_string_field(dest, ofs+nbread) = *ptr->curptr;
+    ptr->curptr++;
+  }
   #endif
   return Val_int(nbread);
 }

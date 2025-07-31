@@ -57,16 +57,26 @@ let clear_black_screen () =
   cursorY := 0;
   display_push_allscreen_uniform color_black
 
-let print_string s =
-  display_draw_string s !cursorX !cursorY;
-  cursorX := !cursorX + 10 * (String.length s)
-
 let print_newline () =
-  print_string "\n"; (* If in simu *)
+  display_draw_string "\n" !cursorX !cursorY;
   cursorX := 0;
   cursorY := !cursorY + 16
 
-let print_endline s = print_string s; print_newline ()
+let print_string s =
+  let rec aux ss =
+    match ss with
+    | [] -> ()
+    | [s] ->
+       display_draw_string s !cursorX !cursorY;
+       cursorX := !cursorX + 10 * (String.length s)
+    | s::tl ->
+       display_draw_string s !cursorX !cursorY;
+       print_newline ();
+       aux tl
+  in aux (String.split_on_char '\n' s)
+
+let print_endline s =
+  print_string s; print_newline ()
 
 let print_int i = print_string (string_of_int i)
 
@@ -242,30 +252,7 @@ external unsafe_input : in_channel -> bytes -> int -> int -> int = "numworks_ml_
 (* external input_value : in_channel -> 'a = "caml_input_value" *)
 external close_in : in_channel -> unit = "numworks_ml_close_in"
 
-external seek_in : in_channel -> int -> unit = "caml_ml_seek_in"
-external pos_in : in_channel -> int = "caml_ml_pos_in"
-
-external in_channel_length : in_channel -> int = "caml_ml_channel_size"
-
 let input ic s ofs len =
   if ofs < 0 || len < 0 || ofs > Bytes.length s - len
   then invalid_arg "input"
   else unsafe_input ic s ofs len
-
-let rec unsafe_really_input ic s ofs len =
-  if len <= 0 then () else begin
-    let r = unsafe_input ic s ofs len in
-    if r = 0
-    then raise End_of_file
-    else unsafe_really_input ic s (ofs + r) (len - r)
-  end
-
-let really_input ic s ofs len =
-  if ofs < 0 || len < 0 || ofs > Bytes.length s - len
-  then invalid_arg "really_input"
-  else unsafe_really_input ic s ofs len
-
-let really_input_string ic len =
-  let s = Bytes.create len in
-  really_input ic s 0 len;
-  Bytes.unsafe_to_string s

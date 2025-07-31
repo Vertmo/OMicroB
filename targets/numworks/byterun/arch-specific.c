@@ -29,15 +29,13 @@ void device_finish() {
 /******************************************************************************/
 
 void debug_blink_error(void) {
-  while(1) {
-    printf("Error!");
-  }
+  printf("Error!");
+  while(1) { }
 }
 
 void debug_blink_uncatched_exception(void) {
-  while(1) {
-    printf("Uncatched exception!");
-  }
+  printf("Uncatched exception!");
+  while(1) { }
 }
 
 void debug_blink_message(int n) {
