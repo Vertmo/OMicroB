@@ -118,13 +118,21 @@ let with_comment_buffer comment lexbuf =
   let loc = { start_loc with Location.loc_end = end_loc.Location.loc_end } in
   s, loc
 
-let error lexbuf e =
-  print_endline "\nError: raising Lexer.Error from error ...";
-  raise (Error(e, Location.curr lexbuf))
+let print_position pos =
+  let open Lexing in
+  print_int pos.pos_lnum;
+  print_string ":";
+  print_int (pos.pos_cnum - pos.pos_bol)
 
 let error_loc loc e =
-  print_endline "\nError: raising Lexer.Error from error_loc ...";
+  let open Location in
+  print_string "\nLexer.Error at ";
+  print_position loc.loc_start;
+  print_newline ();
   raise (Error(e, loc))
+
+let error lexbuf e =
+  error_loc (Location.curr lexbuf) e
 
 (* to translate escape sequences *)
 

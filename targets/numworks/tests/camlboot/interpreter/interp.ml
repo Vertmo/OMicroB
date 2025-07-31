@@ -3,132 +3,163 @@ open Conf
 open Eval
 open Envir
 
+let stdlib = {|external raise : exn -> 'a = "%raise"
+
+(* Composition operators *)
+
+external ( |> ) : 'a -> ('a -> 'b) -> 'b = "%revapply"
+external ( @@ ) : ('a -> 'b) -> 'a -> 'b = "%apply"
+
+(* Comparisons *)
+
+external ( = ) : 'a -> 'a -> bool = "%equal"
+external ( <> ) : 'a -> 'a -> bool = "%notequal"
+external ( < ) : 'a -> 'a -> bool = "%lessthan"
+external ( > ) : 'a -> 'a -> bool = "%greaterthan"
+external ( <= ) : 'a -> 'a -> bool = "%lessequal"
+external ( >= ) : 'a -> 'a -> bool = "%greaterequal"
+external compare : 'a -> 'a -> int = "%compare"
+
+let min x y = if x <= y then x else y
+let max x y = if x >= y then x else y
+
+external ( == ) : 'a -> 'a -> bool = "%eq"
+external ( != ) : 'a -> 'a -> bool = "%noteq"
+
+(* Boolean operations *)
+
+external not : bool -> bool = "%boolnot"
+external ( & ) : bool -> bool -> bool = "%sequand"
+external ( && ) : bool -> bool -> bool = "%sequand"
+external ( or ) : bool -> bool -> bool = "%sequor"
+external ( || ) : bool -> bool -> bool = "%sequor"
+
+(* Integer operations *)
+
+external ( ~- ) : int -> int = "%negint"
+external ( ~+ ) : int -> int = "%identity"
+external succ : int -> int = "%succint"
+external pred : int -> int = "%predint"
+external ( + ) : int -> int -> int = "%addint"
+external ( - ) : int -> int -> int = "%subint"
+external ( * ) : int -> int -> int = "%mulint"
+external ( / ) : int -> int -> int = "%divint"
+external ( mod ) : int -> int -> int = "%modint"
+
+let abs x = if x >= 0 then x else -x
+
+external ( land ) : int -> int -> int = "%andint"
+external ( lor ) : int -> int -> int = "%orint"
+external ( lxor ) : int -> int -> int = "%xorint"
+
+let lnot x = x lxor (-1)
+
+external ( lsl ) : int -> int -> int = "%lslint"
+external ( lsr ) : int -> int -> int = "%lsrint"
+external ( asr ) : int -> int -> int = "%asrint"
+
+let max_int = (-1) lsr 1
+let min_int = max_int + 1
+
+(* Floating-point operations *)
+
+external ( ~-. ) : float -> float = "%negfloat"
+external ( ~+. ) : float -> float = "%identity"
+external ( +. ) : float -> float -> float = "%addfloat"
+external ( -. ) : float -> float -> float = "%subfloat"
+external ( *. ) : float -> float -> float = "%mulfloat"
+external ( /. ) : float -> float -> float = "%divfloat"
+external ( ** ) : float -> float -> float = "caml_power_float" "pow"
+  [@@unboxed] [@@noalloc]
+external exp : float -> float = "caml_exp_float" "exp" [@@unboxed] [@@noalloc]
+external expm1 : float -> float = "caml_expm1_float" "caml_expm1"
+  [@@unboxed] [@@noalloc]
+external acos : float -> float = "caml_acos_float" "acos"
+  [@@unboxed] [@@noalloc]
+external asin : float -> float = "caml_asin_float" "asin"
+  [@@unboxed] [@@noalloc]
+external atan : float -> float = "caml_atan_float" "atan"
+  [@@unboxed] [@@noalloc]
+external atan2 : float -> float -> float = "caml_atan2_float" "atan2"
+  [@@unboxed] [@@noalloc]
+external hypot : float -> float -> float
+               = "caml_hypot_float" "caml_hypot" [@@unboxed] [@@noalloc]
+external cos : float -> float = "caml_cos_float" "cos" [@@unboxed] [@@noalloc]
+external cosh : float -> float = "caml_cosh_float" "cosh"
+  [@@unboxed] [@@noalloc]
+external log : float -> float = "caml_log_float" "log" [@@unboxed] [@@noalloc]
+external log10 : float -> float = "caml_log10_float" "log10"
+  [@@unboxed] [@@noalloc]
+external log1p : float -> float = "caml_log1p_float" "caml_log1p"
+  [@@unboxed] [@@noalloc]
+external sin : float -> float = "caml_sin_float" "sin" [@@unboxed] [@@noalloc]
+external sinh : float -> float = "caml_sinh_float" "sinh"
+  [@@unboxed] [@@noalloc]
+external sqrt : float -> float = "caml_sqrt_float" "sqrt"
+  [@@unboxed] [@@noalloc]
+external tan : float -> float = "caml_tan_float" "tan" [@@unboxed] [@@noalloc]
+external tanh : float -> float = "caml_tanh_float" "tanh"
+  [@@unboxed] [@@noalloc]
+external ceil : float -> float = "caml_ceil_float" "ceil"
+  [@@unboxed] [@@noalloc]
+external floor : float -> float = "caml_floor_float" "floor"
+  [@@unboxed] [@@noalloc]
+external abs_float : float -> float = "%absfloat"
+external copysign : float -> float -> float
+                  = "caml_copysign_float" "caml_copysign"
+                  [@@unboxed] [@@noalloc]
+external mod_float : float -> float -> float = "caml_fmod_float" "fmod"
+  [@@unboxed] [@@noalloc]
+external frexp : float -> float * int = "caml_frexp_float"
+external ldexp : (float [@unboxed]) -> (int [@untagged]) -> (float [@unboxed]) =
+  "caml_ldexp_float" "caml_ldexp_float_unboxed" [@@noalloc]
+external modf : float -> float * float = "caml_modf_float"
+external float : int -> float = "%floatofint"
+external float_of_int : int -> float = "%floatofint"
+external truncate : float -> int = "%intoffloat"
+external int_of_float : float -> int = "%intoffloat"
+
+let max_float = 1.79769313486231571e+308
+
+let min_float = 2.22507385850720138e-308
+
+let epsilon_float = 2.22044604925031308e-16
+|}
+
 let parse filename =
-  let inc = try open_in filename with e ->
-    begin
-      (* Printf.eprintf "Error opening file: %s@." filename; *)
-      print_string "Error opening file: ";
-      print_string filename;
-      raise e
-    end
-  in
-  let lexbuf = Lexing.from_channel inc in
-  Location.init lexbuf filename;
-(*  let parsed = Parser.implementation Lexer.real_token lexbuf in *)
-  let parsed = Parse.implementation lexbuf in
-  close_in inc;
-  parsed
-
-let parse_ml_or_mlpy filename =
-  try
-    parse filename
-  with e1 ->
-    parse (filename ^ ".py")
-
-let parse_from_string ?(filename="<string>") code =
-  (* FIXME: this was simply to debug and check that both standardlib.ml and ocaml.py file were read *)
-  (* print_endline "filename ="; *)
-  (* print_endline filename; *)
-  (* print_endline "code ="; *)
-  (* print_endline code; *)
-  (* now we do the lexing and parsing *)
-  let lexbuf = Lexing.from_string code in
-  Location.init lexbuf filename;
-  let parsed = Parse.implementation lexbuf in
-  parsed
-
-let default_filename = "ocaml.py"
-
-let default_program = "\
-(* Example of an OCaml script to use\
-   with the OMicroB-camlboot app *)\
-let rec fibonacci n =\
-  if n <= 1 then\
-    n\
-  else\
-    fibonacci (n-1) + fibonacci (n-2)\
-in\
-\"default program\", fibonacci, fibonacci 15;;\
-"
-
-let parse_from_numworks_localstorage filename =
-  let file_content =
-    try
-      read_any_file filename
-    with e1 ->
-      ""
-  in
-  let file_content = if file_content = "" then default_program else file_content in
-  parse_from_string ~filename:filename file_content
+  if filename = "stdlib.py" then
+    let lexbuf = Lexing.from_string stdlib in
+    Location.init lexbuf filename;
+    let parsed = Parse.implementation lexbuf in
+    parsed
+  else
+    let inc =
+      try
+        open_in filename
+      with e ->
+        begin
+        (* Printf.eprintf "Error opening file: %s@." filename; *)
+        print_string "Error opening file: ";
+        print_string filename;
+        raise e
+        end
+    in
+    let lexbuf = Lexing.from_channel inc in
+    Location.init lexbuf filename;
+    (*  let parsed = Parser.implementation Lexer.real_token lexbuf in *)
+    let parsed = Parse.implementation lexbuf in
+    close_in inc;
+    parsed
 
 (** Previous content of the interp.ml file *)
 type env_flag = Open of Longident.t
 
-let stdlib_flag = [Open (Longident.Lident "Standardlib")]
+let stdlib_flag = [Open (Longident.Lident "Stdlib")]
 let no_stdlib_flag = []
 
 let stdlib_units =
-  let stdlib_path = stdlib_path () in
-  let fullpath file = Filename.concat stdlib_path file in
-  (no_stdlib_flag, fullpath "standardlib.ml")
-  (* (no_stdlib_flag, "stdlib") *)  (* FIXME: the real name should be "stdlib", not "standardlib" *)
-  ::
-  List.map (fun file -> stdlib_flag, fullpath file) [
-  (*
-    "sys.ml";
-    (* "callback.ml"; *)
-    (* "complex.ml"; *)
-    (* "float.ml"; *)
-    (* "char.ml"; *)
-    "bytes.ml";
-    "string.ml";
-    (* "bytesLabels.ml"; *)
-    (* "stringLabels.ml"; *)
-    (* "seq.ml"; *)
-    "list.ml";
-    (* "listLabels.ml"; *)
-    (* "set.ml"; *)
-    (* "map.ml"; *)
-    (* "uchar.ml"; *)
-    (* "buffer.ml"; *)
-    (* "stream.ml"; *)
-    (* "genlex.ml"; *)
-    (* "camlinternalFormatBasics.ml"; *)
-    (* "camlinternalFormat.ml"; *)
-    (* "printf.ml"; *)
-    (* "scanf.ml"; *)
-    (* "format.ml"; *)
-    (* "obj.ml"; *)
-    (* "gc.ml"; *)
-    (* "camlinternalOO.ml"; *)
-    (* "oo.ml"; *)
-    (* "camlinternalLazy.ml"; *)
-    (* "lazy.ml"; *)
-    (* "printexc.ml"; *)
-    "array.ml";
-    (* "arrayLabels.ml"; *)
-    (* "sort.ml"; *)
-    "queue.ml";
-    (* "int64.ml"; *)
-    (* "int32.ml"; *)
-    "nativeint.ml";
-    (* "digest.ml"; *)
-    "random.ml";
-    "hashtbl.ml";
-    (* "lexing.ml"; *)
-    (* "parsing.ml"; *)
-    (* "weak.ml"; *)
-    (* "ephemeron.ml"; *)
-    (* "spacetime.ml"; *)
-    "stack.ml";
-    (* "arg.ml"; *)
-    (* "filename.ml"; *)
-    (* "marshal.ml"; *)
-    (* "bigarray.ml"; *)
-    (* "moreLabels.ml"; *)
-    (* "stdLabels.ml"; *)
-  *)
-  ]
+  (* let stdlib_path = stdlib_path () in *)
+  [(no_stdlib_flag, "stdlib.py")]
 
 let eval_env_flag ~loc env flag =
   match flag with
@@ -147,26 +178,25 @@ let load_rec_units env flags_and_units =
       let module_name = module_name_of_unit_path unit_path in
       if debug then begin
         (* Printf.eprintf "Loading %s from %s (or %s.py) @." module_name unit_path unit_path; *)
-        print_endline ("Loading " ^ module_name ^ " from " ^ unit_path ^ " (or " ^ unit_path ^ ".py)");
+        print_endline ("Loading " ^ module_name ^ " from " ^ unit_path);
       end;
       let module_contents =
         let loc = Location.in_file unit_path in
         let local_env = List.fold_left (eval_env_flag ~loc) global_env flags in
-        (* eval_structure Primitives.prims local_env (parse unit_path) *)
-        try
-          eval_structure Primitives.prims local_env (parse_from_numworks_localstorage unit_path)
-        with e1 ->
-          print_endline "\nparse_from_numworks failed: trying parse_ml_or_mlpy";
-          eval_structure Primitives.prims local_env (parse_ml_or_mlpy unit_path)
+        eval_structure Primitives.prims local_env (parse unit_path)
       in
       define_unit global_env unit_path (make_module_data module_contents))
     env
     flags_and_units
 
+let () = clear_screen ()
+
 let stdlib_env =
   let env = Runtime_base.initial_env in
   let env = load_rec_units env stdlib_units in
   env
+
+let default_filename = "ocaml.py"
 
 let run_files () =
   let rev_files = ref [default_filename] in
@@ -181,6 +211,10 @@ let run_files () =
 let () =
   try
     run_files ()
-  with InternalException e ->
-    (* Printf.eprintf "Code raised exception: %a@." pp_print_value e *)
-    print_endline ("Code raised internal exception: " ^ (string_of_value e) )
+  with
+  | InternalException e ->
+     print_endline ("Code raised internal exception: " ^ (string_of_value e) )
+  | _ -> print_endline "Error"
+
+let () =
+  while true do () done

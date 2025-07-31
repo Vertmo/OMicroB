@@ -576,13 +576,7 @@ let get_module_data loc = function
      end
 
 let module_name_of_unit_path path =
-  if path = "ocaml.py" then
-    "Ocaml"
-  else begin
-
-    (* print_string "path = ";
-    print_endline path; *)
-
+  begin
     (* This function is used to convert a unit path (e.g. "foo/bar/baz.ml") *)
     (* into a module name (e.g. "Foo_bar_baz"). It is used to create the *)
     (* module name for the unit when it is loaded into the environment. *)
@@ -595,14 +589,14 @@ let module_name_of_unit_path path =
     let n = String.length path in
     let guessed_ml_extension = String.sub path (n - 3) 3 in
     let path_without_extension =
-      if guessed_ml_extension = ".ml" then
-        String.sub path 3 (n - 6)
+      if guessed_ml_extension = ".ml" || guessed_ml_extension = ".py" then
+        String.sub path 0 (n - 3)
       else
-        String.sub path 3 (n - 3)
+        String.sub path 0 n
     in
 
     (* print_string "=> path_without_extension = ";
-    print_endline path_without_extension; *)
+       print_endline path_without_extension; *)
 
     (* We remove the ".ml" extension from the path, as it is not needed for the module name. *)
     (* The module name is derived from the path by capitalizing each part and joining them with underscores. *)
@@ -610,15 +604,15 @@ let module_name_of_unit_path path =
     (* The function currently raises an exception, as it is not yet implemented. *)
     (* failwith "TODO module_name_of_unit_path" *)
     let module_name = String.split_on_char '/' path_without_extension
-      |> List.map String.capitalize_ascii
-      |> String.concat "_"
-      |> String.capitalize_ascii
-      |> String.map (function ' ' -> '_' | c -> c)
-      |> String.trim
+                      |> List.map String.capitalize_ascii
+                      |> String.concat "_"
+                      |> String.capitalize_ascii
+                      |> String.map (function ' ' -> '_' | c -> c)
+                      |> String.trim
     in
 
     (* print_string "==> module_name = ";
-    print_endline module_name; *)
+       print_endline module_name; *)
 
     module_name
   end
