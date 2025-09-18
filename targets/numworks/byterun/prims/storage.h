@@ -9,9 +9,12 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 
-int extapp_fileList(const char ** filename, int maxrecord, const char * extension);
-const char * extapp_fileRead(const char * filename, size_t * len);
+char * extapp_fileRead(const char * filename, size_t * len);
 /* bool extapp_fileWrite(const char * filename, const char * content, size_t len); */
+
+#ifdef __NUMWORKS__
+
+int extapp_fileList(const char ** filename, int maxrecord, const char * extension);
 bool extapp_fileErase(const char * filename);
 uint32_t extapp_size();
 uint32_t * extapp_address();
@@ -22,6 +25,7 @@ bool extapp_isValid(const uint32_t * address);
 uint8_t extapp_calculatorModel();
 const uint32_t * extapp_userlandAddress();
 
+#endif
 
 #ifdef __cplusplus
 }

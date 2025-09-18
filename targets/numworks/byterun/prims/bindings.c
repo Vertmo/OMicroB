@@ -206,7 +206,7 @@ value numworks_ml_open_in(value v) {
   if(!f) caml_raise(OCAML_Not_found);
   ret = value_of_int64((long)f);
   #else
-  int len;
+  unsigned int len;
   char *ofs = extapp_fileRead(filename, &len);
   len = len - strlen(filename) - 5; // size + filename + \0 + autoimport status
   if(!ofs) caml_raise(OCAML_Not_found);
@@ -225,12 +225,13 @@ value numworks_ml_close_in(value fd) {
   FILE *f = (FILE*)Field(fd, 0);
   fclose(f);
   #elif defined(__PC__)
-  FILE *f = (FILE*)Int64_val(fd);
-  /* fclose(f); // TODO ? */
+  /* FILE *f = (FILE*)Int64_val(fd); */
+  /* fclose(f); */ // TODO ?
   #else
   storage_ptr *ptr = (storage_ptr*)Int64_val(fd);
   free(ptr);
   #endif
+  return Val_unit;
 }
 
 value numworks_ml_input(value fd, value dest, value vofs, value vlen) {
@@ -280,101 +281,101 @@ value numworks_ml_input_char(value fd) {
 
 // TODO: include the io.c library?
 
-#include <unistd.h>
+/* #include <unistd.h> */
 
-#ifndef IO_BUFFER_SIZE
-#define IO_BUFFER_SIZE 65536
-#endif
+/* #ifndef IO_BUFFER_SIZE */
+/* #define IO_BUFFER_SIZE 65536 */
+/* #endif */
 
-#if defined(_WIN32)
-typedef __int64 file_offset;
-#elif defined(HAS_OFF_T)
-#include <sys/types.h>
-typedef off_t file_offset;
-#else
-typedef long file_offset;
-#endif
+/* #if defined(_WIN32) */
+/* typedef __int64 file_offset; */
+/* #elif defined(HAS_OFF_T) */
+/* #include <sys/types.h> */
+/* typedef off_t file_offset; */
+/* #else */
+/* typedef long file_offset; */
+/* #endif */
 
-struct channel {
-  int fd;                       /* Unix file descriptor */
-  file_offset offset;           /* Absolute position of fd in the file */
-  char * end;                   /* Physical end of the buffer */
-  char * curr;                  /* Current position in the buffer */
-  char * max;                   /* Logical end of the buffer (for input) */
-  void * mutex;                 /* Placeholder for mutex (for systhreads) */
-  struct channel * next, * prev;/* Double chaining of channels (flush_all) */
-  int revealed;                 /* For Cash only */
-  int old_revealed;             /* For Cash only */
-  int refcount;                 /* For flush_all and for Cash */
-  int flags;                    /* Bitfield */
-  char buff[IO_BUFFER_SIZE];    /* The buffer itself */
-  char * name;                  /* Optional name (to report fd leaks) */
-};
+/* struct channel { */
+/*   int fd;                       /\* Unix file descriptor *\/ */
+/*   file_offset offset;           /\* Absolute position of fd in the file *\/ */
+/*   char * end;                   /\* Physical end of the buffer *\/ */
+/*   char * curr;                  /\* Current position in the buffer *\/ */
+/*   char * max;                   /\* Logical end of the buffer (for input) *\/ */
+/*   void * mutex;                 /\* Placeholder for mutex (for systhreads) *\/ */
+/*   struct channel * next, * prev;/\* Double chaining of channels (flush_all) *\/ */
+/*   int revealed;                 /\* For Cash only *\/ */
+/*   int old_revealed;             /\* For Cash only *\/ */
+/*   int refcount;                 /\* For flush_all and for Cash *\/ */
+/*   int flags;                    /\* Bitfield *\/ */
+/*   char buff[IO_BUFFER_SIZE];    /\* The buffer itself *\/ */
+/*   char * name;                  /\* Optional name (to report fd leaks) *\/ */
+/* }; */
 
-#ifndef SEEK_SET
-#define SEEK_SET 0
-#define SEEK_CUR 1
-#define SEEK_END 2
-#endif
+/* #ifndef SEEK_SET */
+/* #define SEEK_SET 0 */
+/* #define SEEK_CUR 1 */
+/* #define SEEK_END 2 */
+/* #endif */
 
 /* List of opened channels */
-struct channel * numworks_caml_all_opened_channels = NULL;
+/* struct channel * numworks_caml_all_opened_channels = NULL; */
 
 /* Basic functions over type struct channel *.
    These functions can be called directly from C.
    No locking is performed. */
 
 /* Functions shared between input and output */
-value caml_alloc_dummy(value ml_size);
+/* value caml_alloc_dummy(value ml_size); */
 
-struct channel * numworks_caml_open_descriptor_in(int fd)
-{
-  struct channel * channel;
+/* struct channel * numworks_caml_open_descriptor_in(int fd) */
+/* { */
+/*   struct channel * channel; */
 
-  // channel = (struct channel *) caml_stat_alloc(sizeof(struct channel)); // FIXME: commenting this will fail when ran...
-  channel = (struct channel *) caml_alloc_dummy(sizeof(struct channel));
-  channel->fd = fd;
-  // caml_enter_blocking_section(); // XXX durty hack?
-  channel->offset = lseek(fd, 0, SEEK_CUR);
-  // caml_leave_blocking_section(); // XXX durty hack?
-  channel->curr = channel->max = channel->buff;
-  channel->end = channel->buff + IO_BUFFER_SIZE;
-  channel->mutex = NULL;
-  channel->revealed = 0;
-  channel->old_revealed = 0;
-  channel->refcount = 0;
-  channel->flags = 0;
-  channel->next = numworks_caml_all_opened_channels;
-  channel->prev = NULL;
-  channel->name = NULL;
-  if (numworks_caml_all_opened_channels != NULL)
-    numworks_caml_all_opened_channels->prev = channel;
-  numworks_caml_all_opened_channels = channel;
-  return channel;
-};
+/*   // channel = (struct channel *) caml_stat_alloc(sizeof(struct channel)); // FIXME: commenting this will fail when ran... */
+/*   channel = (struct channel *) caml_alloc_dummy(sizeof(struct channel)); */
+/*   channel->fd = fd; */
+/*   // caml_enter_blocking_section(); // XXX durty hack? */
+/*   channel->offset = lseek(fd, 0, SEEK_CUR); */
+/*   // caml_leave_blocking_section(); // XXX durty hack? */
+/*   channel->curr = channel->max = channel->buff; */
+/*   channel->end = channel->buff + IO_BUFFER_SIZE; */
+/*   channel->mutex = NULL; */
+/*   channel->revealed = 0; */
+/*   channel->old_revealed = 0; */
+/*   channel->refcount = 0; */
+/*   channel->flags = 0; */
+/*   channel->next = numworks_caml_all_opened_channels; */
+/*   channel->prev = NULL; */
+/*   channel->name = NULL; */
+/*   if (numworks_caml_all_opened_channels != NULL) */
+/*     numworks_caml_all_opened_channels->prev = channel; */
+/*   numworks_caml_all_opened_channels = channel; */
+/*   return channel; */
+/* }; */
 
-enum {
-  CHANNEL_FLAG_FROM_SOCKET = 1,  /* For Windows */
-#if defined(NATIVE_CODE) && defined(WITH_SPACETIME)
-  CHANNEL_FLAG_BLOCKING_WRITE = 2, /* Don't release master lock when writing */
-#endif
-  CHANNEL_FLAG_MANAGED_BY_GC = 4,  /* Free and close using GC finalization */
-};
+/* enum { */
+/*   CHANNEL_FLAG_FROM_SOCKET = 1,  /\* For Windows *\/ */
+/* #if defined(NATIVE_CODE) && defined(WITH_SPACETIME) */
+/*   CHANNEL_FLAG_BLOCKING_WRITE = 2, /\* Don't release master lock when writing *\/ */
+/* #endif */
+/*   CHANNEL_FLAG_MANAGED_BY_GC = 4,  /\* Free and close using GC finalization *\/ */
+/* }; */
 
-struct channel * numworks_caml_open_descriptor_out(int fd)
-{
-  struct channel * channel;
+/* struct channel * numworks_caml_open_descriptor_out(int fd) */
+/* { */
+/*   struct channel * channel; */
 
-  channel = numworks_caml_open_descriptor_in(fd);
-  channel->max = NULL;
-  return channel;
-}
+/*   channel = numworks_caml_open_descriptor_in(fd); */
+/*   channel->max = NULL; */
+/*   return channel; */
+/* } */
 
 /* Extract a struct channel * from the heap object representing it */
 
-#define Field(x, i) (((value *)(x)) [i])           /* Also an l-value. */
-#define Data_custom_val(v) ((void *) &Field((v), 1))
-#define Channel(v) (*((struct channel **) (Data_custom_val(v))))
+/* #define LField(x, i) (((value *)(x)) [i])           /\* Also an l-value. *\/ */
+/* #define Data_custom_val(v) ((void *) &LField((v), 1)) */
+/* #define Channel(v) (*((struct channel **) (Data_custom_val(v)))) */
 
 // static struct custom_operations channel_operations = {
 //   "_chan",
@@ -387,15 +388,15 @@ struct channel * numworks_caml_open_descriptor_out(int fd)
 // };
 
 
-value numworks_caml_alloc_channel(struct channel *chan)
-{
-  value res;
-  chan->refcount++;             /* prevent finalization during next alloc */
-  // res = caml_alloc_custom(&channel_operations, sizeof(struct channel *), 1, 1000);  // FIXME:
-  res = caml_alloc_dummy(sizeof(struct channel *));  // FIXME:
-  Channel(res) = chan;
-  return res;
-}
+/* value numworks_caml_alloc_channel(struct channel *chan) */
+/* { */
+/*   value res; */
+/*   chan->refcount++;             /\* prevent finalization during next alloc *\/ */
+/*   // res = caml_alloc_custom(&channel_operations, sizeof(struct channel *), 1, 1000);  // FIXME: */
+/*   res = caml_alloc_dummy(sizeof(struct channel *));  // FIXME: */
+/*   Channel(res) = chan; */
+/*   return res; */
+/* } */
 
 value numworks_caml_ml_open_descriptor_in(value fd) {
   /* struct channel * chan = numworks_caml_open_descriptor_in(Int_val(fd)); */

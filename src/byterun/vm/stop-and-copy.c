@@ -103,31 +103,28 @@ void gc_one_val(value* ptr, int update) {
     }
     else {                 /* ici il faut le copier*/
       tag = Tag_hd(hd);
-      sz = Wosize_hd(hd);
-      /* printf("must copy %d blocs \n", sz); */
+      int infix_ofs;
       if (tag == Infix_tag) {
-        value start = val - Infix_offset_hd(hd);
-        if (!(Is_black_val(start))) { /* déjà déplacé*/
-          gc_one_val(&start,1);
+        infix_ofs = Infix_offset_hd(hd);
+        val -= infix_ofs;
+        hd = Hd_val(val);
+        if (Is_black_hd(hd)) {
+          *ptr = Field(val, 0) + infix_ofs;
+          goto next;
         }
-        *ptr = Field(start, 0) + Infix_offset_hd(hd);
+        tag = Tag_hd(hd);
+      } else {
+        infix_ofs = 0;
       }
-      else { /* tag < No_scan_tag : tous les autres */
-        *heap_ptr = hd;
-	heap_ptr ++;
-        value new_val = Val_dynamic_block(heap_ptr);
-	/* int n = sz ; */
-	/* value* po = heap_ptr; */
-	/* value* pi = (Block_val(val)); */
-	/* while (n--){ */
-	/*   *po++ = *pi++; */
-	/* } */
-	memcpy(heap_ptr, Ram_block_val(val), sz * sizeof (value));
-        Ram_field(val, 0) = new_val;
-        heap_ptr += sz;
-        Ram_hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
-	*ptr = new_val ; /* on le copie systematiquement (à voir pour les glob)*/
-      }
+      sz = Wosize_hd(hd);
+      *heap_ptr = hd;
+      heap_ptr ++;
+      value new_val = Val_dynamic_block(heap_ptr);
+      memcpy(heap_ptr, Ram_block_val(val), sz * sizeof (value));
+      Ram_field(val, 0) = new_val;
+      heap_ptr += sz;
+      Ram_hd_val(val) = Set_black_hd(hd); /* bloc  copié, mise à jour de l'entête */
+      *ptr = new_val + infix_ofs; /* on le copie systematiquement (à voir pour les glob)*/
     }
   }
   /* else{ */

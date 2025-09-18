@@ -173,8 +173,8 @@ value caml_bytes_of_string(value v){
 #define INT_ERRMSG "int_of_string"
 
 static int parse_sign_and_base(/*in*/  value v,
-                               /*out*/ int * base,
-                               /*out*/ int * signedness,
+                               /*out*/ unsigned int * base,
+                               /*out*/ unsigned int * signedness,
                                /*out*/ int * sign) {
   int pos = 0;
   *sign = 1;
@@ -200,17 +200,17 @@ static int parse_sign_and_base(/*in*/  value v,
   return pos;
 }
 
-static int parse_digit(char c) {
+static unsigned int parse_digit(char c) {
   if (c >= '0' && c <= '9') return c - '0';
   else if (c >= 'A' && c <= 'F') return c - 'A' + 10;
   else if (c >= 'a' && c <= 'f') return c - 'a' + 10;
   else return -1;
 }
 
-static int parse_intnat(value s, int nbits, const char *errmsg) {
-  int pos;
-  int res, threshold;
-  int sign, base, signedness, d;
+static int parse_intnat(value s, unsigned int nbits, const char *errmsg) {
+  unsigned int pos;
+  unsigned int res, threshold;
+  int sign; unsigned int base, signedness, d;
 
   pos = parse_sign_and_base(s, &base, &signedness, &sign);
   threshold = ((unsigned int) -1) / base;

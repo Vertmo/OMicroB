@@ -40,9 +40,9 @@ let compile_c_to_hex ~local ~trace:_ ~verbose ~cxxopts input output =
   let cmd = cmd @ [ "-D__NUMWORKS__" ] in
   let cmd = cmd @ [ "-I"; Filename.concat includedir "numworks" ] in
   let cmd = cmd @ [ "-o"; arm_o_file ] @ [ "-c"; input ] in
-  Printf.printf "################## Compile  a .c into a .arm_o\n";
+  (* Printf.printf "################## Compile  a .c into a .arm_o\n"; *)
   run ~verbose cmd;
-  Printf.printf "################## Compiled a .c into a .arm_o\n";
+  (* Printf.printf "################## Compiled a .c into a .arm_o\n"; *)
 
   (* Compile a .arm_o into a .arm_elf *)
   let cmd = [ Config.arm_cxx ] @ default_arm_cxx_options in
@@ -61,16 +61,16 @@ let compile_c_to_hex ~local ~trace:_ ~verbose ~cxxopts input output =
                     conc_numworks "icon.o" ] in
   let cmd = cmd @ [ "-lm" ] in
   let cmd = cmd @ [ "-o" ; arm_elf_file ] in
-  List.iter (Printf.printf "%s ") cmd;
-  Printf.printf "################## Compile  a .arm_o into a .arm_elf\n";
+  (* List.iter (Printf.printf "%s ") cmd; *)
+  (* Printf.printf "################## Compile  a .arm_o into a .arm_elf\n"; *)
   run ~verbose cmd;
-  Printf.printf "################## Compiled a .arm_o into a .arm_elf\n";
+  (* Printf.printf "################## Compiled a .arm_o into a .arm_elf\n"; *)
 
   (* Compile a .arm_elf into a .hex *)
-  Printf.printf "################## Compile  a .arm_elf into a .hex\n";
+  (* Printf.printf "################## Compile  a .arm_elf into a .hex\n"; *)
   let cmd = [ "cp"; arm_elf_file; output ] in
-  run ~verbose cmd;
-  Printf.printf "################## Compiled a .arm_elf into a .hex\n"
+  run ~verbose cmd
+  (* Printf.printf "################## Compiled a .arm_elf into a .hex\n" *)
 
   let simul_flag = "__SIMUL_NUMWORKS__"
 

@@ -4,7 +4,6 @@
 // See https://framagit.org/Yaya.Cout/numworks-extapp-storage/-/blob/master/src/storage.c?ref_type=heads#L46
 //
 
-#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -21,36 +20,7 @@ inline uint32_t reverse32(uint32_t value) {
 }
 
 
-int extapp_fileList(const char ** filename, int maxrecord, const char * extension) {
-  // TODO simul version
-  char * offset = (char*) extapp_address();
-  const char * endAddress = offset + extapp_size();
-
-  if (!extapp_isValid((const uint32_t *)offset)) {
-    // Storage is invalid
-    return -1;
-  }
-
-  offset += 4;
-  int currentRecord = 0;
-
-
-  while ((currentRecord < maxrecord) && offset < endAddress) {
-    uint16_t size = *(uint16_t *)offset;
-    if (size == 0) {
-      break;
-    }
-    char * name = (char *)offset + 2;
-    filename[currentRecord] = name;
-
-    offset += size;
-    currentRecord++;
-  }
-
-  return currentRecord;
-}
-
-const char * extapp_fileRead(const char * filename, size_t * len) {
+char * extapp_fileRead(const char * filename, size_t * len) {
   #ifdef __NUMWORKS__
   char * offset = (char *)extapp_address();
   const char * endAddress = offset + extapp_size();
@@ -90,7 +60,7 @@ const char * extapp_fileRead(const char * filename, size_t * len) {
       // Go back to start
       fseek(fd, 0L, SEEK_SET);
       // Now read
-      fread(buf, sizeof(char), *len, fd);
+      size_t _ = fread(buf, sizeof(char), *len, fd);
       buf[*len] = '\0';
       fclose(fd);
       return buf;
@@ -130,6 +100,37 @@ const char * extapp_fileRead(const char * filename, size_t * len) {
 /*   // The record is now written, so we can return */
 /*   return true; */
 /* } */
+
+#ifdef __NUMWORKS__
+
+int extapp_fileList(const char ** filename, int maxrecord, const char * extension) {
+  // TODO simul version
+  char * offset = (char*) extapp_address();
+  const char * endAddress = offset + extapp_size();
+
+  if (!extapp_isValid((const uint32_t *)offset)) {
+    // Storage is invalid
+    return -1;
+  }
+
+  offset += 4;
+  int currentRecord = 0;
+
+
+  while ((currentRecord < maxrecord) && offset < endAddress) {
+    uint16_t size = *(uint16_t *)offset;
+    if (size == 0) {
+      break;
+    }
+    char * name = (char *)offset + 2;
+    filename[currentRecord] = name;
+
+    offset += size;
+    currentRecord++;
+  }
+
+  return currentRecord;
+}
 
 bool extapp_fileErase(const char * filename) {
   // TODO simul version
@@ -283,3 +284,5 @@ const uint32_t * extapp_userlandAddress() {
   // than N0110/N0115
   return (uint32_t *)0x24000008;
 }
+
+#endif
