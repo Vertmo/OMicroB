@@ -7,31 +7,6 @@ $ make
 Then flash the hello.nwa app to your Numworks calculator, using <https://my.numworks.com/apps> !
 *)
 
-let test_cat_read_files () =
-  (* WOOW reading and displaying the content of a file (from C) worked! *)
-  print_endline "cat_ocamlpy_file...";
-  let _ = cat_ocamlpy_file () in
-  print_endline "cat_ocamlpy_file done";
-  delay 3000;
-  clear_screen();
-
-  (* DONE: read from C and return a OCaml string *)
-  print_endline "read_ocamlpy_file...\r\n";
-  let content_of_ocamlpy_file : string = read_ocamlpy_file () in
-  print_endline "read_ocamlpy_file done\r\n";
-  delay 5000;
-
-  display_push_allscreen_uniform color_blue;
-  print_endline content_of_ocamlpy_file;
-  delay 10000;
-
-  (* display_push_allscreen_uniform color_blue; *)
-  (* display_draw_string_small (String.make 50 'X') 0 0; *)
-  (* delay 10000; *)
-;;
-
-(* test_cat_read_files ();; *)
-
 (* Examples of OCaml basic recursive code, to test the limit of the stack-size and heap-size *)
 let rec fact n =
   if n <= 1 then 1

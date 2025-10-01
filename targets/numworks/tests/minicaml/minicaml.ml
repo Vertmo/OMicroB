@@ -27,8 +27,13 @@ let () =
   clear_screen ();
   print_endline ("Loading code from " ^ filename ^ " ...");
 
-  let file_content = read_any_file filename in
-  let file_content = if file_content = "" then default_program else file_content in
+  let file_content =
+    try
+      read_any_file filename
+    with Not_found -> default_program
+  in
+
+  print_endline file_content;
 
   let lb = Mylexing.from_string file_content in
   try
