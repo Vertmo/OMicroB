@@ -141,43 +141,6 @@ static const uint16_t color_red   = 0xF800;
 static const uint16_t color_green = 0x07E0;
 static const uint16_t color_blue  = 0x001F;
 
-// Read the content of the 'ocaml.py' file from the Calculator local storage, and returns it as a OCaml string, to be used from OCaml code.
-value caml_read_any_file(value v) {
-  // We read filename from the OCaml value v, for example 'ocaml.py'
-  #ifdef __OCAML__
-  const char * filename = String_val(v);
-  #else
-  int n = caml_string_length(v); int i;
-  char filename[n+1];
-  for(i = 0; i < n; i++) filename[i] = String_field(v, i);
-  filename[n] = '\0';
-  #endif
-
-  size_t file_len = 0;
-  const char * content = extapp_fileRead(filename, &file_len);
-
-  if (content == NULL) {
-    display_push_allscreen_uniform(color_red);
-    display_draw_string_full("Local file not found:", 0, 0, true, color_black, color_red);
-    display_draw_string_full(filename, 0, 18, true, color_black, color_red);
-    delay(5000);
-
-    #ifdef __OCAML__
-    return (value)caml_copy_string("");
-    #else
-    const char * fake_content = "";
-    return (value)copy_bytes(fake_content);
-    #endif
-  }
-
-  // The file is found, so we return his content
-  #ifdef __OCAML__
-  return (value)caml_copy_string(content);
-  #else
-  return (value)copy_bytes(content);
-  #endif
-}
-
 typedef struct {
   char *curptr;
   char *endptr;

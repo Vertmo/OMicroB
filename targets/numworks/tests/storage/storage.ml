@@ -1,6 +1,9 @@
 let () = clear_screen()
 
 let () =
+  print_endline (read_any_file "test.py")
+
+let () =
   let ic = open_in "test.py" in
   (try
      while true do

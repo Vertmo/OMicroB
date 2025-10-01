@@ -84,14 +84,10 @@ val exit : int -> unit
 (* Storage library *)
 (*******************)
 
-val cat_any_file : string -> unit
-val cat_ocamlpy_file : unit -> unit
 val read_any_file : string -> string
-val read_ocamlpy_file : unit -> string
-
 
 (****************************************)
-(* Copied content of the stdlib.ml file *)
+(* Implementation of IO from stdlib     *)
 (****************************************)
 
 (** {1 Input/output}

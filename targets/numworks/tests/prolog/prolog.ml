@@ -319,7 +319,7 @@ let rec string_join_on c strings =
 
 
 (* DONE: this is now read from a "prolog_theory.py" file, from the local storage *)
-let prolog_theory_content = read_any_file "prolog_theory.py"
+let prolog_theory_content = try read_any_file "prolog_theory.py" with Not_found -> ""
 let default_programs = ref [];;
 if prolog_theory_content <> "" then
   default_programs := [ prolog_theory_content ]
@@ -339,7 +339,7 @@ ishuntedby(X, Y) <-- mouse(X), cat(Y)." ]
 let default_programs = !default_programs
 
 (* DONE: this is now read from a "prolog_questions.py" file, from the local storage *)
-let prolog_questions_content = read_any_file "prolog_questions.py"
+let prolog_questions_content = try read_any_file "prolog_questions.py" with Not_found -> ""
 let default_questions = ref "";;
 if prolog_questions_content <> "" then
   default_questions := prolog_questions_content

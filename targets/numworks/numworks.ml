@@ -122,26 +122,8 @@ external random : unit -> int = "caml_random" [@@noalloc]
 
 let exit (_:int) = ()
 
-(*******************)
-(* Storage library *)
-(*******************)
-
-external read_any_file : string -> string = "caml_read_any_file"
-
-let cat_any_file s =
-  print_endline ("Reading from "^s);
-  print_string (read_any_file  s)
-
-let cat_ocamlpy_file () =
-  cat_any_file "ocaml.py"
-;;
-
-let read_ocamlpy_file () =
-  read_any_file "ocaml.py"
-;;
-
 (****************************************)
-(* Copied content of the stdlib.ml file *)
+(* Implementation of IO from stdlib     *)
 (****************************************)
 
 (* I/O operations *)
@@ -197,7 +179,6 @@ let output_substring oc s ofs len =
 let close_out oc = flush oc
 let close_out_noerr oc = try flush oc with _ -> ()
 
-
 (* Output functions on standard output *)
 
 let print_bytes s = print_string (Bytes.unsafe_to_string s)
@@ -209,50 +190,35 @@ let prerr_bytes s = (* TODO with the correct color *)
 
 (* General input functions *)
 
-(* external open_in_gen : _ list -> _ -> string -> in_channel = "caml_ml_open_in_gen" *)
-
 external open_in : string -> in_channel = "numworks_ml_open_in"
-
-(* let open_in_bin name = *)
-(*   open_in_gen [Open_rdonly; Open_binary] 0 name *)
 
 external input_char : in_channel -> char = "numworks_ml_input_char"
 external unsafe_input : in_channel -> bytes -> int -> int -> int = "numworks_ml_input"
 
-(* external input_scan_line : in_channel -> int = "caml_ml_input_scan_line" *)
-
-(* let input_line chan = *)
-(*   let rec build_result buf pos = function *)
-(*     [] -> buf *)
-(*   | hd :: tl -> *)
-(*       let len = Bytes.length hd in *)
-(*       Bytes.unsafe_blit hd 0 buf (pos - len) len; *)
-(*       build_result buf (pos - len) tl in *)
-(*   let rec scan accu len = *)
-(*     let n = input_scan_line chan in *)
-(*     if n = 0 then begin                   (\* n = 0: we are at EOF *\) *)
-(*       match accu with *)
-(*         [] -> raise End_of_file *)
-(*       | _  -> build_result (Bytes.create len) len accu *)
-(*     end else if n > 0 then begin          (\* n > 0: newline found in buffer *\) *)
-(*       let res = Bytes.create (n - 1) in *)
-(*       ignore (unsafe_input chan res 0 (n - 1)); *)
-(*       ignore (input_char chan);           (\* skip the newline *\) *)
-(*       match accu with *)
-(*         [] -> res *)
-(*       |  _ -> let len = len + n - 1 in *)
-(*               build_result (Bytes.create len) len (res :: accu) *)
-(*     end else begin                        (\* n < 0: newline not found *\) *)
-(*       let beg = Bytes.create (-n) in *)
-(*       ignore(unsafe_input chan beg 0 (-n)); *)
-(*       scan (beg :: accu) (len - n) *)
-(*     end *)
-(*   in Bytes.unsafe_to_string (scan [] 0) *)
-
-(* external input_value : in_channel -> 'a = "caml_input_value" *)
 external close_in : in_channel -> unit = "numworks_ml_close_in"
 
 let input ic s ofs len =
   if ofs < 0 || len < 0 || ofs > Bytes.length s - len
   then invalid_arg "input"
   else unsafe_input ic s ofs len
+
+(******************************)
+(* High-level storage library *)
+(******************************)
+
+let read_any_file filename =
+  let ic = open_in filename in
+  let bufsize = 100 in
+  let rec aux l =
+    let buf = Bytes.create bufsize in
+    let i = unsafe_input ic buf 0 bufsize in
+    let buf = if i < bufsize then
+        let nbuf = Bytes.create i in
+        Bytes.blit buf 0 nbuf 0 i;
+        nbuf
+      else buf in
+    let l = buf::l in
+    if i < bufsize then List.rev l else aux l
+  in
+  let s = Bytes.to_string (Bytes.concat Bytes.empty (aux [])) in
+  close_in ic; s
