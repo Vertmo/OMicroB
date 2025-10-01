@@ -3,9 +3,10 @@
 #
 include ../../../../etc/Makefile.conf
 
-VERSION = 0.0.1
-EADK_APP_NAME = OMicroB-camlboot
-PROG = $(EADK_APP_NAME)-$(VERSION)
+APP_NAME = OMicroB-Camlboot
+VERSION = 1.0
+EADK_APP_NAME = \"$(APP_NAME)\"
+PROG = $(APP_NAME)-$(VERSION)
 DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these? Apparently above 16192 it doesn't get flashed on the NumWorks flashing website
@@ -24,7 +25,7 @@ TARGETS := $(PROG).byte $(PROG).hex $(PROG).elf
 
 INCLUDES := -I stdlib/ -I parsing/ -I interpreter/
 CINCLUDES := $(shell echo $(INCLUDES) | sed -e 's/ /,/g')
-OMICROB_PARAMS := -v -mlopts $(CINCLUDES) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE)
+OMICROB_PARAMS := -v -mlopts $(CINCLUDES) -device=$(DEVICE)
 
 OCAMLOPT = ocamlopt.opt
 
@@ -55,7 +56,7 @@ elf: $(PROG).elf
 
 $(TARGETS): $(CMOS)
 	@echo "Compiling .cmo files to .byte"
-	$(BIN)/omicrob -trace 0 $(OMICROB_PARAMS) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
+	$(BIN)/omicrob -trace 0 $(OMICROB_PARAMS) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) $^ -o $@
 
 %.cmi: %.mli
 	$(BIN)/omicrob $(OMICROB_PARAMS) -c $<
