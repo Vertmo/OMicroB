@@ -130,6 +130,76 @@ value caml_random(value unit) {
 //   return Val_bool(usb_is_plugged ());
 // }
 
+/********/
+/* Keys */
+/********/
+
+value caml_numworks_keyboard_scan(value unit) {
+  #ifdef __NUMWORKS__
+  return value_of_int64(eadk_keyboard_scan());
+  #endif
+  return Val_unit;
+}
+
+// Conversion from OCaml enum to eadk key numbers
+int keys[] = {
+  0,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  8,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  31,
+  32,
+  33,
+  34,
+  36,
+  37,
+  38,
+  39,
+  40,
+  42,
+  43,
+  44,
+  45,
+  46,
+  48,
+  49,
+  50,
+  51,
+  52
+};
+
+value caml_numworks_keyboard_key_down(value state, value key) {
+  #ifdef __NUMWORKS__
+  eadk_keyboard_state_t st = Int64_val(state);
+  return Val_int(eadk_keyboard_key_down(st, keys[Int_val(key)]));
+  #else
+  return Val_int(0); // TODO
+  #endif
+}
+
 /******************************************************************************/
 /***************************** Storage.c library ******************************/
 /******************************************************************************/

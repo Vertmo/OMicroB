@@ -86,6 +86,67 @@ val exit : int -> unit
 
 val read_any_file : string -> string
 
+(********)
+(* Keys *)
+(********)
+
+type key =
+  | Key_left
+  | Key_up
+  | Key_down
+  | Key_right
+  | Key_ok
+  | Key_back
+  | Key_home
+  | Key_on_off
+  | Key_shift
+  | Key_alpha
+  | Key_xnt
+  | Key_var
+  | Key_toolbox
+  | Key_backspace
+  | Key_exp
+  | Key_ln
+  | Key_log
+  | Key_imaginary
+  | Key_comma
+  | Key_power
+  | Key_sine
+  | Key_cosine
+  | Key_tangent
+  | Key_pi
+  | Key_sqrt
+  | Key_square
+  | Key_seven
+  | Key_eight
+  | Key_nine
+  | Key_left_parenthesis
+  | Key_right_parenthesis
+  | Key_four
+  | Key_five
+  | Key_six
+  | Key_multiplication
+  | Key_division
+  | Key_one
+  | Key_two
+  | Key_three
+  | Key_plus
+  | Key_minus
+  | Key_zero
+  | Key_dot
+  | Key_ee
+  | Key_ans
+  | Key_exe
+
+val key_of_char : char -> key
+val char_of_key : key -> char
+
+module Keyboard : sig
+  val scan : unit -> unit
+  val key_down : key -> bool
+  val wait_key_press : unit -> key
+end
+
 (****************************************)
 (* Implementation of IO from stdlib     *)
 (****************************************)
