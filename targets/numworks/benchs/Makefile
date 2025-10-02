@@ -4,10 +4,10 @@ DEVICE ?= numworks
 EADK_APP_NAME = \"OMicroB-benchs\"
 
 # FIXME: my examples of recursive functions broke quite quickly, do they perform better with an increased STACK_SIZE and HEAP_SIZE ?
-STACK_SIZE = 8192  # 2^13 = 8192
-HEAP_SIZE = 8192  # 2^13 = 8192
+STACK_SIZE = 8192
+HEAP_SIZE = 16000
 
-BENCHS = jdlv
+BENCHS = jdlv aQueens oDivE oNucleic
 NWAS = $(foreach var,$(BENCHS),$(var).nwa)
 ELFS = $(foreach var,$(BENCHS),$(var).elf)
 
