@@ -158,7 +158,20 @@ value caml_string_of_int(value v) {
 
 value caml_string_of_float(value v) {
   char buf[13];
-  snprintf(buf, sizeof(buf), "%.3lg", (double) Float_val(v));
+  double f = Float_val(v);
+  // float snprintf does not work on numworks, so we redefine it
+  #ifdef __NUMWORKS__
+  int l = snprintf(buf, sizeof(buf), "%ld.", (long)f);
+  if (l < sizeof(buf)) {
+    // round to the nearest 10e-3
+    int dec_part = ((int)(f*10000))%10000;
+    if (dec_part % 10 < 5) dec_part = dec_part%1000;
+    else dec_part = dec_part%1000 + 1;
+    snprintf(buf+l, sizeof(buf)-l, "%d", dec_part);
+  }
+  #else
+  snprintf(buf, sizeof(buf), "%.3lg", f);
+  #endif
   return copy_bytes(buf);
 }
 
