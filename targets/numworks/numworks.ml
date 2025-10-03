@@ -96,6 +96,13 @@ let prerr_bool f = print_bool f;;
 let prerr_endline s = print_endline s;;
 let prerr_newline () = print_newline ();;
 
+let erase_char () =
+  if (!cursorX = 0) then failwith "TODO"
+  else cursorX := !cursorX - 10;
+  display_draw_string " " !cursorX !cursorY
+
+(* TODO should be able to scroll screen *)
+
 (*************)
 (* Backlight *)
 (*************)
@@ -287,9 +294,110 @@ let key_of_char c =
   | '!' -> Key_dot
   | _ -> invalid_arg "key_of_char"
 
-
 let char_of_key k =
   match k with
+  | Key_one -> '1'
+  | Key_two -> '2'
+  | Key_three -> '3'
+  | Key_four -> '4'
+  | Key_five -> '5'
+  | Key_six -> '6'
+  | Key_seven -> '7'
+  | Key_eight -> '8'
+  | Key_nine -> '9'
+  | Key_zero -> '0'
+  | Key_left_parenthesis -> '('
+  | Key_right_parenthesis -> ')'
+  | Key_multiplication -> '*'
+  | Key_division -> '/'
+  | Key_plus -> '+'
+  | Key_minus -> '-'
+  | Key_dot -> '.'
+  | Key_xnt
+  | Key_var
+  | Key_toolbox
+  | Key_backspace
+  | Key_exp
+  | Key_ln
+  | Key_log
+  | Key_imaginary
+  | Key_comma
+  | Key_power
+  | Key_sine
+  | Key_cosine
+  | Key_tangent
+  | Key_pi
+  | Key_sqrt
+  | Key_square
+  | Key_left
+  | Key_up
+  | Key_down
+  | Key_right
+  | Key_ok
+  | Key_back
+  | Key_home
+  | Key_on_off
+  | Key_shift
+  | Key_alpha
+  | Key_ee
+  | Key_ans
+  | Key_exe ->  invalid_arg "char_of_key"
+
+let shift_char_of_key k =
+  match k with
+  | Key_exp -> "["
+  | Key_ln -> "]"
+  | Key_log -> "{"
+  | Key_imaginary -> "}"
+  | Key_comma -> "_"
+  | Key_power -> "->"
+  | Key_pi -> "="
+  | Key_sqrt -> "<"
+  | Key_square -> ">"
+  | Key_seven
+  | Key_eight
+  | Key_nine
+  | Key_left_parenthesis
+  | Key_right_parenthesis
+  | Key_four
+  | Key_five
+  | Key_six
+  | Key_multiplication
+  | Key_division
+  | Key_one
+  | Key_two
+  | Key_three
+  | Key_plus
+  | Key_minus
+  | Key_zero
+  | Key_dot
+  | Key_left
+  | Key_up
+  | Key_down
+  | Key_right
+  | Key_ok
+  | Key_back
+  | Key_home
+  | Key_on_off
+  | Key_shift
+  | Key_alpha
+  | Key_ee
+  | Key_ans
+  | Key_exe
+  | Key_xnt
+  | Key_var
+  | Key_toolbox
+  | Key_backspace
+  | Key_sine
+  | Key_cosine
+  | Key_tangent -> invalid_arg "alpha_char_of_key"
+
+let alpha_char_of_key k =
+  match k with
+  | Key_xnt -> ':'
+  | Key_var -> ';'
+  | Key_toolbox -> '"'
+  | Key_backspace -> '%'
   | Key_exp -> 'a'
   | Key_ln -> 'b'
   | Key_log -> 'c'
@@ -329,13 +437,9 @@ let char_of_key k =
   | Key_on_off
   | Key_shift
   | Key_alpha
-  | Key_xnt
-  | Key_var
-  | Key_toolbox
-  | Key_backspace
   | Key_ee
   | Key_ans
-  | Key_exe -> invalid_arg "char_of_key"
+  | Key_exe -> invalid_arg "alpha_char_of_key"
 
 module Keyboard = struct
 
