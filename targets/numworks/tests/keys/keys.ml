@@ -4,7 +4,7 @@ let rec loop1 () =
 
 let rec loop2 () =
   let key = Keyboard.wait_key_press () in
-  (try print_char (char_of_key key) with _ -> ());
+  (try print_char (alpha_char_of_key key) with _ -> ());
   if key = Key_home || key = Key_back then () else loop2 ()
 
 let () =

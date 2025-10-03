@@ -31,6 +31,7 @@ val prerr_bool : bool -> unit
 val prerr_char : char -> unit
 val prerr_float : float -> unit
 
+val erase_char : unit -> unit
 
 (***********************************)
 (* Functions from the EADK library *)
@@ -140,6 +141,8 @@ type key =
 
 val key_of_char : char -> key
 val char_of_key : key -> char
+val shift_char_of_key : key -> string
+val alpha_char_of_key : key -> char
 
 module Keyboard : sig
   val scan : unit -> unit
