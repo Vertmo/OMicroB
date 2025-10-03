@@ -817,8 +817,6 @@ and eval_structitem prims env it =
   match it.pstr_desc with
   | Pstr_eval (e, _) ->
     let v = eval_expr prims env e in
-    (* FIXED: I need to bring back the printing of this value! *)
-    (* Format.printf "%a@." pp_print_value v; *)
     print_value_to_stdout v;
     env
   | Pstr_value (recflag, defs) -> eval_bindings prims env recflag defs

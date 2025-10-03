@@ -126,23 +126,22 @@ let min_float = 2.22507385850720138e-308
 let epsilon_float = 2.22044604925031308e-16
 |}
 
-let parse filename =
-  if filename = "stdlib.py" then
-    let lexbuf = Lexing.from_string stdlib in
-    Location.init lexbuf filename;
-    let parsed = Parse.implementation lexbuf in
-    parsed
+let parse_string str =
+  let lexbuf = Lexing.from_string str in
+  Location.init lexbuf "";
+  Parse.implementation lexbuf
+
+let parse_file filename =
+  if filename = "stdlib.py" then parse_string stdlib
   else
     let inc =
       try
         open_in filename
-      with e ->
-        begin
-        (* Printf.eprintf "Error opening file: %s@." filename; *)
-        print_string "Error opening file: ";
-        print_string filename;
-        raise e
-        end
+      with e -> (
+          print_string "Error opening file: ";
+          print_string filename;
+          raise e
+        )
     in
     let lexbuf = Lexing.from_channel inc in
     Location.init lexbuf filename;
@@ -154,7 +153,7 @@ let parse filename =
 (** Previous content of the interp.ml file *)
 type env_flag = Open of Longident.t
 
-let stdlib_flag = [Open (Longident.Lident "Stdlib")]
+let stdlib_flag = Open (Longident.Lident "Stdlib")
 let no_stdlib_flag = []
 
 let stdlib_units =
@@ -167,8 +166,8 @@ let eval_env_flag ~loc env flag =
      let module_ident = Location.mkloc module_ident loc in
      env_extend false env (env_get_module_data env module_ident)
 
-let debug = true
-(* let debug = false *)
+(* let debug = true *)
+let debug = false
 
 let load_rec_units env flags_and_units =
   let unit_paths = List.map snd flags_and_units in
@@ -177,44 +176,85 @@ let load_rec_units env flags_and_units =
     (fun global_env (flags, unit_path) ->
       let module_name = module_name_of_unit_path unit_path in
       if debug then begin
-        (* Printf.eprintf "Loading %s from %s (or %s.py) @." module_name unit_path unit_path; *)
         print_endline ("Loading " ^ module_name ^ " from " ^ unit_path);
       end;
       let module_contents =
         let loc = Location.in_file unit_path in
         let local_env = List.fold_left (eval_env_flag ~loc) global_env flags in
-        eval_structure Primitives.prims local_env (parse unit_path)
+        eval_structure Primitives.prims local_env (parse_file unit_path)
       in
       define_unit global_env unit_path (make_module_data module_contents))
     env
     flags_and_units
 
-let () = clear_screen ()
-
 let stdlib_env =
   let env = Runtime_base.initial_env in
   let env = load_rec_units env stdlib_units in
-  env
+  eval_env_flag env ~loc:Location.none stdlib_flag
 
-let default_filename = "ocaml.py"
+(* Read in [R]EPL *)
+let read () =
+  let add_char c l =
+    print_string c; c::l
+  in
+  let remove_char l =
+    match l with
+    | [] -> []
+    | _::tl ->
+      erase_char ();
+      tl
+  in
+  let rec aux shift alpha l =
+    let k = Keyboard.wait_key_press () in
+    match k with
+    | Key_home -> raise Exit
+    | Key_back -> clear_screen (); print_string "> "; aux shift alpha []
+    | Key_alpha -> aux shift (not alpha) l
+    | Key_shift -> aux (not shift) alpha l
+    | Key_exe ->
+      (match l with
+       | ";"::";"::tl -> List.rev tl
+       | _ -> aux shift alpha (add_char "\n" l)
+      )
+    | Key_backspace when not alpha -> aux shift alpha (remove_char l)
+    | _ ->
+      try
+        if alpha then
+          let s = String.make 1 (alpha_char_of_key k) in
+          let s = if shift then String.capitalize_ascii s else s
+          in aux shift alpha (add_char s l)
+        else if shift then aux shift alpha (add_char (shift_char_of_key k) l)
+        else aux shift alpha (add_char (String.make 1 (char_of_key k)) l)
+      with _ -> aux shift alpha l
+  in String.concat "" (aux false false [])
 
-let run_files () =
-  let rev_files = ref [default_filename] in
-  let anon_fun file = rev_files := file :: !rev_files in
-  (* Arg.parse [] anon_fun ""; *)
-  let files = List.rev !rev_files in
-  files
-  |> List.map (fun file -> stdlib_flag, file)
-  |> load_rec_units stdlib_env
-  |> ignore
+(* Eval in R[E]PL *)
+let eval env cmd =
+    try
+      if String.length cmd > 4 && String.sub cmd 0 4 = "%use" then
+        let ss = String.split_on_char ' ' (String.sub cmd 4 (String.length cmd - 4)) in
+        let filename = List.find (fun s -> s <> "") ss in
+        let exp = parse_file filename in
+        eval_structure Primitives.prims env exp
+      else
+        let exp = parse_string cmd in
+        eval_structure Primitives.prims env exp
+    with
+    | InternalException e ->
+      print_endline ("Internal Exn: " ^ (string_of_value e));
+      env
+    | Not_found -> env
 
 let () =
-  try
-    run_files ()
-  with
-  | InternalException e ->
-     print_endline ("Code raised internal exception: " ^ (string_of_value e) )
-  | _ -> print_endline "Error"
-
-let () =
-  while true do () done
+  clear_screen ();
+  print_endline "Camlboot for Numworks 1.0.0";
+  print_endline "%use file.py;; to load a file";
+  (* Loop in REP[L] *)
+  let rec loop env =
+    print_newline ();
+    print_string "> ";
+    let cmd = read () in
+    print_newline ();
+    let env = eval env cmd in
+    loop env
+  in loop stdlib_env
