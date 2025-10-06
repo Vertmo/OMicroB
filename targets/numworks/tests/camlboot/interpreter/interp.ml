@@ -192,6 +192,19 @@ let stdlib_env =
   let env = load_rec_units env stdlib_units in
   eval_env_flag env ~loc:Location.none stdlib_flag
 
+let shift = ref false and alpha = ref false
+
+let state_bg_color = color_green
+
+let draw_state () =
+  display_push_rect_uniform state_bg_color 290 0 30 15;
+  if !shift then display_draw_string_small "white/green s" 295 1;
+  if !alpha then display_draw_string_small "a" 310 1
+
+let draw_bg () =
+  clear_screen ();
+  draw_state ()
+
 (* Read in [R]EPL *)
 let read () =
   let add_char c l =
@@ -204,29 +217,29 @@ let read () =
       erase_char ();
       tl
   in
-  let rec aux shift alpha l =
+  let rec aux l =
     let k = Keyboard.wait_key_press () in
     match k with
     | Key_home -> raise Exit
-    | Key_back -> clear_screen (); print_string "> "; aux shift alpha []
-    | Key_alpha -> aux shift (not alpha) l
-    | Key_shift -> aux (not shift) alpha l
+    | Key_back -> draw_bg (); print_newline (); print_string "> "; aux []
+    | Key_alpha -> alpha := not !alpha; draw_state (); aux l
+    | Key_shift -> shift := not !shift; draw_state (); aux l
     | Key_exe ->
       (match l with
        | ";"::";"::tl -> List.rev tl
-       | _ -> aux shift alpha (add_char "\n" l)
+       | _ -> aux (add_char "\n" l)
       )
-    | Key_backspace when not alpha -> aux shift alpha (remove_char l)
+    | Key_backspace when not !alpha -> aux (remove_char l)
     | _ ->
       try
-        if alpha then
+        if !alpha then
           let s = String.make 1 (alpha_char_of_key k) in
-          let s = if shift then String.capitalize_ascii s else s
-          in aux shift alpha (add_char s l)
-        else if shift then aux shift alpha (add_char (shift_char_of_key k) l)
-        else aux shift alpha (add_char (String.make 1 (char_of_key k)) l)
-      with _ -> aux shift alpha l
-  in String.concat "" (aux false false [])
+          let s = if !shift then String.capitalize_ascii s else s
+          in aux (add_char s l)
+        else if !shift then aux (add_char (shift_char_of_key k) l)
+        else aux (add_char (String.make 1 (char_of_key k)) l)
+      with _ -> aux l
+  in String.concat "" (aux [])
 
 (* Eval in R[E]PL *)
 let eval env cmd =
@@ -246,8 +259,8 @@ let eval env cmd =
     | Not_found -> env
 
 let () =
-  clear_screen ();
-  print_endline "Camlboot for Numworks 1.0.0";
+  draw_bg ();
+  print_endline "Camlboot for Numworks 1.0";
   print_endline "%use file.py;; to load a file";
   (* Loop in REP[L] *)
   let rec loop env =
