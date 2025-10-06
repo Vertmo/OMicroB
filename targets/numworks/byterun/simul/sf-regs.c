@@ -12,14 +12,6 @@ void delay_usec(uint64_t us) {
 
 /******************************************************************************/
 
-void display_draw_string(const char *text, uint16_t x, uint16_t y) {
-  printf("%s", text);
-}
-
-void display_draw_string_small(const char *text, uint16_t x, uint16_t y) {
-  printf("%s", text);
-}
-
 void display_draw_string_full(const char *text, uint16_t x, uint16_t y, bool large_font, uint16_t text_color, uint16_t bg_color) {
   printf("%s", text);
 }

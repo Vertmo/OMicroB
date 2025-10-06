@@ -21,25 +21,33 @@ external millis : unit -> int = "caml_millis" [@@noalloc]
 (* Functions from the EADK library *)
 (***********************************)
 
-let color_black : int = 0x0
-let color_white : int = 0xFFFF
-let color_red : int = 0xF800
-let color_green : int = 0x07E0
-let color_blue : int = 0x001F
+(* 15-bit colors *)
+type color = int
+
+(* Values should be between 0 and 1F *)
+let mk_color r g b =
+  (r lsl 11) + ((2 * g) lsl 5) + b
+
+let color_black : int = mk_color 0 0 0
+let color_white : int = mk_color 31 31 31
+let color_red : int = mk_color 31 0 0
+let color_green : int = mk_color 0 31 0
+let color_blue : int = mk_color 0 0 31
 
 let screen_width = 320
 let screen_height = 240
 
-external display_draw_string : string -> int -> int -> unit = "caml_display_draw_string" [@@noalloc]
-external display_draw_string_small : string -> int -> int -> unit = "caml_display_draw_string_small" [@@noalloc]
-(* let display_draw_string_large = display_draw_string  (\* an alias only *\) *)
+external display_draw_string_full : string -> int -> int -> bool -> (color * color) -> unit = "caml_display_draw_string_full" [@@noalloc]
 
-(* FIXME: it RESETs the calculator! *)
-(* external display_draw_string_full : string -> int -> int -> bool -> int -> int -> unit = "caml_display_draw_string_full" [@@noalloc] *)
+let display_draw_string s x y =
+  display_draw_string_full s x y true (color_black, color_white)
 
-external display_push_rect_uniform : int -> int -> int -> int -> int -> unit = "caml_display_push_rect_uniform" [@@noalloc]
+let display_draw_string_small s x y =
+  display_draw_string_full s x y false (color_black, color_white)
 
-external display_push_allscreen_uniform : int -> unit = "caml_display_push_allscreen_uniform" [@@noalloc]
+external display_draw_rect : color -> int -> int -> int -> int -> unit = "caml_display_push_rect_uniform" [@@noalloc]
+
+external display_fill_screen : color -> unit = "caml_display_push_allscreen_uniform" [@@noalloc]
 
 (***********************)
 (* High-Level Printing *)
@@ -50,12 +58,12 @@ let cursorX = ref 0 and cursorY = ref 0
 let clear_screen () =
   cursorX := 0;
   cursorY := 0;
-  display_push_allscreen_uniform color_white
+  display_fill_screen color_white
 
 let clear_black_screen () =
   cursorX := 0;
   cursorY := 0;
-  display_push_allscreen_uniform color_black
+  display_fill_screen color_black
 
 let print_newline () =
   display_draw_string "\n" !cursorX !cursorY;

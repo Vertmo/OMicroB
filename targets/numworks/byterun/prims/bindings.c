@@ -36,44 +36,20 @@ value caml_delay_usec(value us) {
 /* Display */
 /***********/
 
-value caml_display_draw_string(value text, value x, value y) {
+value caml_display_draw_string_full(value text, value x, value y, value large_font, value colors) {
+  value text_color = Field(colors, 0);
+  value background_color = Field(colors, 1);
   #ifdef __OCAML__
-  display_draw_string(String_val(text), Int_val(x), Int_val(y));
+  display_draw_string_full(String_val(text), Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color));
   #else
   int n = caml_string_length(text); int i;
   char buf[n+1];
   for(i = 0; i < n; i++) buf[i] = String_field(text, i);
   buf[n] = '\0';
-  display_draw_string(buf, Int_val(x), Int_val(y));
+  display_draw_string_full(buf, Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color));
   #endif
   return Val_unit;
 }
-
-value caml_display_draw_string_small(value text, value x, value y) {
-  #ifdef __OCAML__
-  display_draw_string_small(String_val(text), Int_val(x), Int_val(y));
-  #else
-  int n = caml_string_length(text); int i;
-  char buf[n+1];
-  for(i = 0; i < n; i++) buf[i] = String_field(text, i);
-  buf[n] = '\0';
-  display_draw_string_small(buf, Int_val(x), Int_val(y));
-  #endif
-  return Val_unit;
-}
-
-/* value caml_display_draw_string_full(value text, value x, value y, value large_font, value text_color, value background_color) { */
-/*   #ifdef __OCAML__ */
-/*   display_draw_string_full(String_val(text), Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color)); */
-/*   #else */
-/*   int n = caml_string_length(text); int i; */
-/*   char buf[n+1]; */
-/*   for(i = 0; i < n; i++) buf[i] = String_field(text, i); */
-/*   buf[n] = '\0'; */
-/*   display_draw_string_full(buf, Int_val(x), Int_val(y), Bool_val(large_font), Int_val(text_color), Int_val(background_color)); */
-/*   #endif */
-/*   return Val_unit; */
-/* } */
 
 value caml_display_push_rect_uniform(value background_color, value x, value y, value width, value height) {
   display_push_rect_uniform(Int_val(background_color), Int_val(x), Int_val(y), Int_val(width), Int_val(height));
