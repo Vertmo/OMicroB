@@ -208,15 +208,6 @@ int millis() {
 
 // TODO: write here some useful functions written as bindings for the eadk.h library
 
-void display_draw_string(const char * text, uint16_t x, uint16_t y) {
-  return eadk_display_draw_string(text, (eadk_point_t){(uint16_t)x, (uint16_t)y}, true, eadk_color_black, eadk_color_white);
-}
-
-void display_draw_string_small(const char * text, uint16_t x, uint16_t y) {
-  return eadk_display_draw_string(text, (eadk_point_t){(uint16_t)x, (uint16_t)y}, false, eadk_color_black, eadk_color_white);
-}
-
-// FIXME: this RESET the calculator?
 void display_draw_string_full(const char * text, uint16_t x, uint16_t y, bool large_font, uint16_t text_color, uint16_t background_color) {
   return eadk_display_draw_string(text, (eadk_point_t){(uint16_t)x, (uint16_t)y}, large_font, (eadk_color_t) text_color, (eadk_color_t) background_color);
 }

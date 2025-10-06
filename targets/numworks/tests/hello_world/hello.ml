@@ -160,26 +160,22 @@ let main () =
   delay 250;
   print_endline "End loop #5.";
 
-  (* FIXME: this test breaks my calculator, it makes it RESET completely! *)
-  (* let array_colors = [| color_black; color_white; color_red; color_green; color_blue |] in *)
-  (* let array_name_colors = [| "black"; "white"; "red"; "green"; "blue" |] in *)
-  (* let nb_colors = Array.length array_colors in *)
+  let array_colors = [| color_black; color_white; color_red; color_green; color_blue |] in
+  let array_name_colors = [| "black"; "white"; "red"; "green"; "blue" |] in
+  let nb_colors = Array.length array_colors in
 
-  (* for color1 = 0 to nb_colors-1 do *)
-  (*   for color2 = 0 to nb_colors-1 do *)
-  (*     for i = 1 to 12 do *)
-  (*       let x = 0 and y = delta_y * i in *)
-  (*       let text = "draw " ^ (array_name_colors.(color1)) ^"/" ^ (array_name_colors.(color2)) ^ " at {" ^ (string_of_int x) ^ "," ^ (string_of_int y) ^ "}" in *)
-  (*       print_endline text; *)
-  (*       delay 1000; *)
-  (*       (\* FIXME: this test breaks my calculator, it makes it RESET completely! *\) *)
-  (*       (\* display_draw_string text x y true array_colors.(color1) array_colors.(color2) ; *\) *)
-  (*       delay 1000; *)
-  (*     done; *)
-  (*     delay 2000; *)
-  (*   done; *)
-  (*   delay 200; *)
-  (* done; *)
+  for color1 = 0 to nb_colors-1 do
+    for color2 = 0 to nb_colors-1 do
+      for i = 1 to 12 do
+        let x = 0 and y = delta_y * i in
+        let text = "draw " ^ (array_name_colors.(color1)) ^"/" ^ (array_name_colors.(color2)) ^ " at {" ^ (string_of_int x) ^ "," ^ (string_of_int y) ^ "}" in
+        display_draw_string_full text x y true (array_colors.(color1), array_colors.(color2));
+        delay 1000;
+      done;
+      delay 2000;
+    done;
+    delay 200;
+  done;
 
   delay 1000; clear_screen ();
   print_endline "Done for all the tests.";

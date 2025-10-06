@@ -194,12 +194,12 @@ let stdlib_env =
 
 let shift = ref false and alpha = ref false
 
-let state_bg_color = color_green
+let state_bg_color = mk_color 29 15 1
 
 let draw_state () =
-  display_push_rect_uniform state_bg_color 290 0 30 15;
-  if !shift then display_draw_string_small "white/green s" 295 1;
-  if !alpha then display_draw_string_small "a" 310 1
+  display_draw_rect state_bg_color 290 0 30 15;
+  if !shift then display_draw_string_full "s" 295 1 false (color_white, state_bg_color);
+  if !alpha then display_draw_string_full "a" 310 1 false (color_white, state_bg_color)
 
 let draw_bg () =
   clear_screen ();

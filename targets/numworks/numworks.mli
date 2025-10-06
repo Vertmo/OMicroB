@@ -37,22 +37,26 @@ val erase_char : unit -> unit
 (* Functions from the EADK library *)
 (***********************************)
 
-val color_black : int
-val color_white : int
-val color_red : int
-val color_green : int
-val color_blue : int
+type color
+
+(* Values should be between 0 and 1F *)
+val mk_color : int -> int -> int -> color
+
+val color_black : color
+val color_white : color
+val color_red : color
+val color_green : color
+val color_blue : color
 
 val screen_width : int
 val screen_height : int
 
+val display_draw_string_full : string -> int -> int -> bool -> (color * color) -> unit
 val display_draw_string : string -> int -> int -> unit
 val display_draw_string_small : string -> int -> int -> unit
-(* val display_draw_string_large : string -> int -> int -> unit *)
-(* val display_draw_string_full : string -> int -> int -> bool -> int -> int -> unit (\* FIXME: it can RESET the calculator! I don't know why. Wrong conversion from an OCaml int to a uint16_t? *\) *)
 
-val display_push_rect_uniform : int -> int -> int -> int -> int -> unit
-val display_push_allscreen_uniform : int -> unit
+val display_draw_rect : color -> int -> int -> int -> int -> unit
+val display_fill_screen : color -> unit
 val clear_screen : unit -> unit
 val clear_black_screen : unit -> unit
 
