@@ -407,19 +407,19 @@ value numworks_ml_input_char(value fd) {
 /*   return res; */
 /* } */
 
-value numworks_caml_ml_open_descriptor_in(value fd) {
-  /* struct channel * chan = numworks_caml_open_descriptor_in(Int_val(fd)); */
-  /* chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC; */
-  /* return numworks_caml_alloc_channel(chan); */
-  return Val_unit; // FIXME
-}
+/* value numworks_caml_ml_open_descriptor_in(value fd) { */
+/*   /\* struct channel * chan = numworks_caml_open_descriptor_in(Int_val(fd)); *\/ */
+/*   /\* chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC; *\/ */
+/*   /\* return numworks_caml_alloc_channel(chan); *\/ */
+/*   return Val_unit; // FIXME */
+/* } */
 
-value numworks_caml_ml_open_descriptor_out(value fd) {
-  /* struct channel * chan = numworks_caml_open_descriptor_out(Int_val(fd)); */
-  /* chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC; */
-  /* return numworks_caml_alloc_channel(chan); */
-  return Val_unit; // FIXME
-}
+/* value numworks_caml_ml_open_descriptor_out(value fd) { */
+/*   /\* struct channel * chan = numworks_caml_open_descriptor_out(Int_val(fd)); *\/ */
+/*   /\* chan->flags |= CHANNEL_FLAG_MANAGED_BY_GC; *\/ */
+/*   /\* return numworks_caml_alloc_channel(chan); *\/ */
+/*   return Val_unit; // FIXME */
+/* } */
 
 /*****************************************************************/
 

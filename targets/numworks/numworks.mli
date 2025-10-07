@@ -158,25 +158,6 @@ end
 (* Implementation of IO from stdlib     *)
 (****************************************)
 
-(** {1 Input/output}
-    Note: all input/output functions can raise [Sys_error] when the system
-    calls they invoke fail. *)
-
-type in_channel
-(** The type of input channel. *)
-
-type out_channel
-(** The type of output channel. *)
-
-val stdin : in_channel
-(** The standard input for the process. *)
-
-val stdout : out_channel
-(** The standard output for the process. *)
-
-val stderr : out_channel
-(** The standard error output for the process. *)
-
 val print_bytes : bytes -> unit
 (** Print a byte sequence on standard output.
    @since 4.02.0 *)
@@ -188,8 +169,10 @@ val prerr_bytes : bytes -> unit
 
 (** {2 General output functions} *)
 
+type out_channel
+
 type open_flag =
-Open_rdonly      (** open for reading. *)
+  Open_rdonly      (** open for reading. *)
 | Open_wronly      (** open for writing. *)
 | Open_append      (** open for appending: always write at end of file. *)
 | Open_creat       (** create the file if it does not exist. *)
@@ -198,100 +181,82 @@ Open_rdonly      (** open for reading. *)
 | Open_binary      (** open in binary mode (no conversion). *)
 | Open_text        (** open in text mode (may perform conversions). *)
 | Open_nonblock    (** open in non-blocking mode. *)
-(** Opening modes for {!Pervasives.open_out_gen} and
-{!Pervasives.open_in_gen}. *)
+(** Opening modes for {!Pervasives.open_out_gen} and {!Pervasives.open_in_gen}. *)
 
-val open_out : string -> out_channel
-(** Open the named file for writing, and return a new output channel
-on that file, positioned at the beginning of the file. The
-file is truncated to zero length if it already exists. It
-is created if it does not already exists. *)
+(* TODO *)
 
-val open_out_bin : string -> out_channel
-(** Same as {!Pervasives.open_out}, but the file is opened in binary mode,
-so that no translation takes place during writes. On operating
-systems that do not distinguish between text mode and binary
-mode, this function behaves like {!Pervasives.open_out}. *)
+(* val open_out : string -> out_channel *)
+(* (\** Open the named file for writing, and return a new output channel *)
+(* on that file, positioned at the beginning of the file. The *)
+(* file is truncated to zero length if it already exists. It *)
+(* is created if it does not already exists. *\) *)
 
-val open_out_gen : open_flag list -> int -> string -> out_channel
-(** [open_out_gen mode perm filename] opens the named file for writing,
-as described above. The extra argument [mode]
-specifies the opening mode. The extra argument [perm] specifies
-the file permissions, in case the file must be created.
-{!Pervasives.open_out} and {!Pervasives.open_out_bin} are special
-cases of this function. *)
+(* val open_out_bin : string -> out_channel *)
+(* (\** Same as {!Pervasives.open_out}, but the file is opened in binary mode, *)
+(* so that no translation takes place during writes. On operating *)
+(* systems that do not distinguish between text mode and binary *)
+(* mode, this function behaves like {!Pervasives.open_out}. *\) *)
 
-val flush : out_channel -> unit
-(** Flush the buffer associated with the given output channel,
-performing all pending writes on that channel.
-Interactive programs must be careful about flushing standard
-output and standard error at the right time. *)
+(* val open_out_gen : open_flag list -> int -> string -> out_channel *)
+(* (\** [open_out_gen mode perm filename] opens the named file for writing, *)
+(* as described above. The extra argument [mode] *)
+(* specifies the opening mode. The extra argument [perm] specifies *)
+(* the file permissions, in case the file must be created. *)
+(* {!Pervasives.open_out} and {!Pervasives.open_out_bin} are special *)
+(* cases of this function. *\) *)
 
-val flush_all : unit -> unit
-(** Flush all open output channels; ignore errors. *)
+(* val flush : out_channel -> unit *)
+(* (\** Flush the buffer associated with the given output channel, *)
+(* performing all pending writes on that channel. *)
+(* Interactive programs must be careful about flushing standard *)
+(* output and standard error at the right time. *\) *)
 
-val output_char : out_channel -> char -> unit
-(** Write the character on the given output channel. *)
+(* val flush_all : unit -> unit *)
+(* (\** Flush all open output channels; ignore errors. *\) *)
 
-val output_string : out_channel -> string -> unit
-(** Write the string on the given output channel. *)
+(* val output_char : out_channel -> char -> unit *)
+(* (\** Write the character on the given output channel. *\) *)
 
-val output_bytes : out_channel -> bytes -> unit
-(** Write the byte sequence on the given output channel.
-@since 4.02.0 *)
+(* val output_string : out_channel -> string -> unit *)
+(* (\** Write the string on the given output channel. *\) *)
 
-val output : out_channel -> bytes -> int -> int -> unit
-(** [output oc buf pos len] writes [len] characters from byte sequence [buf],
-starting at offset [pos], to the given output channel [oc].
-Raise [Invalid_argument "output"] if [pos] and [len] do not
-designate a valid range of [buf]. *)
+(* val output_bytes : out_channel -> bytes -> unit *)
+(* (\** Write the byte sequence on the given output channel. *)
+(* @since 4.02.0 *\) *)
 
-val output_substring : out_channel -> string -> int -> int -> unit
-(** Same as [output] but take a string as argument instead of
-a byte sequence.
-@since 4.02.0 *)
+(* val output : out_channel -> bytes -> int -> int -> unit *)
+(* (\** [output oc buf pos len] writes [len] characters from byte sequence [buf], *)
+(* starting at offset [pos], to the given output channel [oc]. *)
+(* Raise [Invalid_argument "output"] if [pos] and [len] do not *)
+(* designate a valid range of [buf]. *\) *)
 
-val close_out : out_channel -> unit
-(** Close the given channel, flushing all buffered write operations.
-Output functions raise a [Sys_error] exception when they are
-applied to a closed output channel, except [close_out] and [flush],
-which do nothing when applied to an already closed channel.
-Note that [close_out] may raise [Sys_error] if the operating
-system signals an error when flushing or closing. *)
+(* val output_substring : out_channel -> string -> int -> int -> unit *)
+(* (\** Same as [output] but take a string as argument instead of *)
+(* a byte sequence. *)
+(* @since 4.02.0 *\) *)
 
-val close_out_noerr : out_channel -> unit
-(** Same as [close_out], but ignore all errors. *)
+(* val close_out : out_channel -> unit *)
+(* (\** Close the given channel, flushing all buffered write operations. *)
+(* Output functions raise a [Sys_error] exception when they are *)
+(* applied to a closed output channel, except [close_out] and [flush], *)
+(* which do nothing when applied to an already closed channel. *)
+(* Note that [close_out] may raise [Sys_error] if the operating *)
+(* system signals an error when flushing or closing. *\) *)
 
+(* val close_out_noerr : out_channel -> unit *)
+(* (\** Same as [close_out], but ignore all errors. *\) *)
 
 (** {2 General input functions} *)
+
+type in_channel
 
 val open_in : string -> in_channel
 (** Open the named file for reading, and return a new input channel
    on that file, positioned at the beginning of the file. *)
 
-(* val open_in_bin : string -> in_channel *)
-(* (\** Same as {!Pervasives.open_in}, but the file is opened in binary mode, *)
-(*    so that no translation takes place during reads. On operating *)
-(*    systems that do not distinguish between text mode and binary *)
-(*    mode, this function behaves like {!Pervasives.open_in}. *\) *)
-
-(* val open_in_gen : open_flag list -> int -> string -> in_channel *)
-(* (\** [open_in_gen mode perm filename] opens the named file for reading, *)
-(*    as described above. The extra arguments *)
-(*    [mode] and [perm] specify the opening mode and file permissions. *)
-(*    {!Pervasives.open_in} and {!Pervasives.open_in_bin} are special *)
-(*    cases of this function. *\) *)
-
 val input_char : in_channel -> char
 (** Read one character from the given input channel.
    Raise [End_of_file] if there are no more characters to read. *)
-
-(* val input_line : in_channel -> string *)
-(* (\** Read characters from the given input channel, until a *)
-(*    newline character is encountered. Return the string of *)
-(*    all characters read, without the newline character at the end. *)
-(*    Raise [End_of_file] if the end of the file is reached *)
-(*    at the beginning of line. *\) *)
 
 val input : in_channel -> bytes -> int -> int -> int
 (** [input ic buf pos len] reads up to [len] characters from

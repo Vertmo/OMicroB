@@ -144,58 +144,47 @@ let exit (_:int) = ()
 (* Implementation of IO from stdlib     *)
 (****************************************)
 
-(* I/O operations *)
+(** {2 General output functions} *)
+(* TODO *)
 
-type in_channel
 type out_channel
-
-external open_descriptor_out : int -> out_channel = "numworks_caml_ml_open_descriptor_out" [@@noalloc]
-external open_descriptor_in : int -> in_channel = "numworks_caml_ml_open_descriptor_in" [@@noalloc]
-
-let stdin = open_descriptor_in 0
-let stdout = open_descriptor_out 1
-let stderr = open_descriptor_out 2
-
-(* General output functions *)
 
 type open_flag =
   Open_rdonly | Open_wronly | Open_append
 | Open_creat | Open_trunc | Open_excl
 | Open_binary | Open_text | Open_nonblock
 
-let open_out_gen _mode _perm _name =
-  failwith "TODO open_out_gen"
-(* open_descriptor_out (open_desc name mode perm) *)
+(* let open_out_gen _mode _perm _name = *)
+(*   failwith "TODO open_out_gen" *)
+(* (\* open_descriptor_out (open_desc name mode perm) *\) *)
 
-let open_out name =
-  open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_text] 0o666 name
+(* let open_out name = *)
+(*   open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_text] 0o666 name *)
 
-let open_out_bin name =
-  open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_binary] 0o666 name
+(* let open_out_bin name = *)
+(*   open_out_gen [Open_wronly; Open_creat; Open_trunc; Open_binary] 0o666 name *)
 
-let flush _ = () (* Every operation flushes anyway *)
-let flush_all () = ()
+(* let flush _ = () (\* Every operation flushes anyway *\) *)
+(* let flush_all () = () *)
 
-let output_string oc s =
-  if oc = stdout || oc = stderr then print_string s
-  else print_endline "FIXME output_string"
+(* let output_string oc s = print_string s *)
 
-let output_bytes oc b = output_string oc (Bytes.unsafe_to_string b)
+(* let output_bytes oc b = output_string oc (Bytes.unsafe_to_string b) *)
 
-let output_char oc c = output_string oc (String.make 1 c)
+(* let output_char oc c = output_string oc (String.make 1 c) *)
 
-let output oc s ofs len =
-  if ofs < 0 || len < 0 || ofs > Bytes.length s - len
-  then invalid_arg "output"
-  else output_bytes oc (Bytes.sub s ofs len)
+(* let output oc s ofs len = *)
+(*   if ofs < 0 || len < 0 || ofs > Bytes.length s - len *)
+(*   then invalid_arg "output" *)
+(*   else output_bytes oc (Bytes.sub s ofs len) *)
 
-let output_substring oc s ofs len =
-  if ofs < 0 || len < 0 || ofs > String.length s - len
-  then invalid_arg "output_substring"
-  else output_string oc (String.sub s ofs len)
+(* let output_substring oc s ofs len = *)
+(*   if ofs < 0 || len < 0 || ofs > String.length s - len *)
+(*   then invalid_arg "output_substring" *)
+(*   else output_string oc (String.sub s ofs len) *)
 
-let close_out oc = flush oc
-let close_out_noerr oc = try flush oc with _ -> ()
+(* let close_out oc = flush oc *)
+(* let close_out_noerr oc = try flush oc with _ -> () *)
 
 (* Output functions on standard output *)
 
@@ -206,7 +195,9 @@ let print_bytes s = print_string (Bytes.unsafe_to_string s)
 let prerr_bytes s = (* TODO with the correct color *)
   print_bytes s
 
-(* General input functions *)
+(** {2 General input functions} *)
+
+type in_channel
 
 external open_in : string -> in_channel = "numworks_ml_open_in"
 
