@@ -124,6 +124,12 @@ let max_float = 1.79769313486231571e+308
 let min_float = 2.22507385850720138e-308
 
 let epsilon_float = 2.22044604925031308e-16
+
+(* Printing *)
+
+external print_string : string -> unit = "%print_string"
+external print_int : int -> unit = "%print_int"
+external print_float : float -> unit = "%print_float"
 |}
 
 let parse_string str =
@@ -262,6 +268,7 @@ let () =
   draw_bg ();
   print_endline "Camlboot for Numworks 1.0";
   print_endline "%use file.py;; to load a file";
+
   (* Loop in REP[L] *)
   let rec loop env =
     print_newline ();

@@ -178,6 +178,9 @@ let prims =
     (* ( "caml_ml_output_char", *)
     (*   prim2 output_char unwrap_out_channel unwrap_char wrap_unit ); *)
     (* ("caml_ml_flush", prim1 flush unwrap_out_channel wrap_unit); *)
+    ("%print_string", prim1 print_string unwrap_string wrap_unit);
+    ("%print_int", prim1 print_int unwrap_int wrap_unit);
+    ("%print_float", prim1 print_float unwrap_float wrap_unit);
     (* ("caml_ml_input_char", prim1 input_char unwrap_in_channel wrap_char); *)
     (* ("caml_ml_input_int", prim1 input_binary_int unwrap_in_channel wrap_int); *)
     (* ( "caml_ml_input_scan_line", *)
