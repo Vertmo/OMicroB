@@ -169,7 +169,7 @@ let main () =
       for i = 1 to 12 do
         let x = 0 and y = delta_y * i in
         let text = "draw " ^ (array_name_colors.(color1)) ^"/" ^ (array_name_colors.(color2)) ^ " at {" ^ (string_of_int x) ^ "," ^ (string_of_int y) ^ "}" in
-        display_draw_string_full text x y true (array_colors.(color1), array_colors.(color2));
+        display_draw_string_full text x y true array_colors.(color1) array_colors.(color2);
         delay 1000;
       done;
       delay 2000;
