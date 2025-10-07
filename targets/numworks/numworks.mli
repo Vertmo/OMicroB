@@ -51,7 +51,7 @@ val color_blue : color
 val screen_width : int
 val screen_height : int
 
-val display_draw_string_full : string -> int -> int -> bool -> (color * color) -> unit
+val display_draw_string_full : string -> int -> int -> bool -> color -> color -> unit
 val display_draw_string : string -> int -> int -> unit
 val display_draw_string_small : string -> int -> int -> unit
 

@@ -37,13 +37,16 @@ let color_blue : int = mk_color 0 0 31
 let screen_width = 320
 let screen_height = 240
 
-external display_draw_string_full : string -> int -> int -> bool -> (color * color) -> unit = "caml_display_draw_string_full" [@@noalloc]
+external display_draw_string_full' : string -> int -> int -> bool -> (color * color) -> unit = "caml_display_draw_string_full" [@@noalloc]
+
+let display_draw_string_full text x y size tcolor bgcolor =
+  display_draw_string_full' text x y size (tcolor, bgcolor)
 
 let display_draw_string s x y =
-  display_draw_string_full s x y true (color_black, color_white)
+  display_draw_string_full' s x y true (color_black, color_white)
 
 let display_draw_string_small s x y =
-  display_draw_string_full s x y false (color_black, color_white)
+  display_draw_string_full' s x y false (color_black, color_white)
 
 external display_draw_rect : color -> int -> int -> int -> int -> unit = "caml_display_push_rect_uniform" [@@noalloc]
 
