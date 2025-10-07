@@ -3,7 +3,37 @@ open Conf
 open Eval
 open Envir
 
-let stdlib = {|
+let parse_string str =
+  let lexbuf = Lexing.from_string str in
+  Location.init lexbuf "";
+  Parse.implementation lexbuf
+
+let parse_file filename =
+  let inc =
+    try
+      open_in filename
+    with e -> (
+        print_string "Error opening file: ";
+        print_string filename;
+        raise e
+      )
+  in
+  let lexbuf = Lexing.from_channel inc in
+  Location.init lexbuf filename;
+  (*  let parsed = Parser.implementation Lexer.real_token lexbuf in *)
+  let parsed = Parse.implementation lexbuf in
+  close_in inc;
+  parsed
+
+(** Previous content of the interp.ml file *)
+type env_flag = Open of Longident.t
+
+let stdlib_flag = Open (Longident.Lident "Stdlib")
+let no_stdlib_flag = []
+
+let stdlib_units =
+
+  let stdlib = {|
 
 external raise : exn -> 'a = "%raise"
 
@@ -134,7 +164,7 @@ external print_int : int -> unit = "%print_int"
 external print_float : float -> unit = "%print_float"
 |}
 
-let list = {|
+  and list = {|
 (* An alias for the type of lists. *)
 type 'a t = 'a list = [] | (::) of 'a * 'a list
 
@@ -258,41 +288,9 @@ let rec fold_right f l accu =
   | a::l -> f a (fold_right f l accu)
 |}
 
-let parse_string str =
-  let lexbuf = Lexing.from_string str in
-  Location.init lexbuf "";
-  Parse.implementation lexbuf
-
-let parse_file filename =
-  if filename = "stdlib.ml" then parse_string stdlib
-  else if filename = "list.ml" then parse_string list
-  else
-    let inc =
-      try
-        open_in filename
-      with e -> (
-          print_string "Error opening file: ";
-          print_string filename;
-          raise e
-        )
-    in
-    let lexbuf = Lexing.from_channel inc in
-    Location.init lexbuf filename;
-    (*  let parsed = Parser.implementation Lexer.real_token lexbuf in *)
-    let parsed = Parse.implementation lexbuf in
-    close_in inc;
-    parsed
-
-(** Previous content of the interp.ml file *)
-type env_flag = Open of Longident.t
-
-let stdlib_flag = Open (Longident.Lident "Stdlib")
-let no_stdlib_flag = []
-
-let stdlib_units =
-  (* let stdlib_path = stdlib_path () in *)
-  [(no_stdlib_flag, "stdlib.ml");
-   ([stdlib_flag], "list.ml")]
+in
+[(no_stdlib_flag, "stdlib.ml", stdlib);
+ ([stdlib_flag], "list.ml", list)]
 
 let eval_env_flag ~loc env flag =
   match flag with
@@ -304,10 +302,10 @@ let eval_env_flag ~loc env flag =
 let debug = false
 
 let load_rec_units env flags_and_units =
-  let unit_paths = List.map snd flags_and_units in
+  let unit_paths = List.map (fun (_, path, _) -> path) flags_and_units in
   let env = List.fold_left declare_unit env unit_paths in
   List.fold_left
-    (fun global_env (flags, unit_path) ->
+    (fun global_env (flags, unit_path, unit_content) ->
       let module_name = module_name_of_unit_path unit_path in
       if debug then begin
         print_endline ("Loading " ^ module_name ^ " from " ^ unit_path);
@@ -315,7 +313,7 @@ let load_rec_units env flags_and_units =
       let module_contents =
         let loc = Location.in_file unit_path in
         let local_env = List.fold_left (eval_env_flag ~loc) global_env flags in
-        eval_structure Primitives.prims local_env (parse_file unit_path)
+        eval_structure Primitives.prims local_env (parse_string unit_content)
       in
       define_unit global_env unit_path (make_module_data module_contents))
     env

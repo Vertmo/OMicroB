@@ -609,7 +609,6 @@ let ccall arch ooid prim args =
         print_args args;
         Printf.eprintf ").\n%!"
     end;
-    print_string "###"; print_endline prim;
     raise Exit
 
 (******************************************************************************)

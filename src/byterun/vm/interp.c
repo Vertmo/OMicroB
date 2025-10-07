@@ -144,8 +144,8 @@ static inline void pop_n(int n) {
 /******************************************************************************/
 /* Initialization */
 
-static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, uint16_t size) {
-  uint16_t ind = 0;
+static inline void copy_flash_to_ram(void *ram_ptr, const void *flash_ptr, long unsigned int size) {
+  long unsigned int ind = 0;
   for (ind = 0; ind < size; ind ++) {
     uint8_t byte = do_read_byte_from_flash(flash_ptr, ind);
     ((uint8_t *) ram_ptr)[ind] = byte;
