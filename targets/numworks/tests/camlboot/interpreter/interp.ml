@@ -204,8 +204,8 @@ let state_bg_color = mk_color 29 15 1
 
 let draw_state () =
   display_draw_rect state_bg_color 290 0 30 15;
-  if !shift then display_draw_string_full "s" 295 1 false (color_white, state_bg_color);
-  if !alpha then display_draw_string_full "a" 310 1 false (color_white, state_bg_color)
+  if !shift then display_draw_string_full "s" 295 1 false color_white state_bg_color;
+  if !alpha then display_draw_string_full "a" 310 1 false color_white state_bg_color
 
 let draw_bg () =
   clear_screen ();
