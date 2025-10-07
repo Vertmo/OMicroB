@@ -450,11 +450,14 @@ module Keyboard = struct
   external numworks_scan : unit -> keyboard_state = "caml_numworks_keyboard_scan"
   external numworks_key_down : keyboard_state -> key -> bool = "caml_numworks_keyboard_key_down"
 
-  let state = ref (numworks_scan ())
+  let state = ref None
 
-  let scan () = state := numworks_scan ()
+  let scan () = state := Some (numworks_scan ())
 
-  let key_down key = numworks_key_down !state key
+  let key_down key =
+    match !state with
+    | None -> false
+    | Some state -> numworks_key_down state key
 
   let all_keys : key list = List.init 46 (fun i -> Obj.magic i)
 

@@ -431,8 +431,9 @@ let ccall arch ooid prim args =
   | "caml_cosh_float", [ Float x ] -> Float (cosh x)
   | "caml_create_bytes", [ Int size ] -> Bytes (Mutable, Bytes.make size '\x00')
   | "caml_create_string", [ Int size ] -> Bytes (Immutable, Bytes.make size '\x00')
-  | "caml_ml_string_length", [ Bytes (_mut, b) ] -> Int (Bytes.length b)
-  | "caml_string_get", [ Bytes (_mut, b); Int n ] -> Int (int_of_char (Bytes.get b n))
+  | ("caml_ml_string_length"|"caml_ml_bytes_length"), [ Bytes (_mut, b) ] -> Int (Bytes.length b)
+  | ("caml_string_get"|"caml_bytes_get"), [ Bytes (_mut, b); Int n ] -> Int (int_of_char (Bytes.get b n))
+  | "caml_string_of_bytes", [ Bytes (_, b) ] -> Bytes (Immutable, b)
   | "caml_exp_float", [ Float x ] -> Float (exp x)
   | "caml_expm1_float", [ Float x ] -> Float (expm1 x)
   | ("caml_fill_bytes" | "caml_fill_string"), [ Bytes (mut, b); Int ofs; Int len; Int c ] -> assert (mut = Mutable); Bytes.fill b ofs len (char_of_int c); Int 0
@@ -466,12 +467,17 @@ let ccall arch ooid prim args =
   | "caml_int32_of_float", [ Float x ] -> Int32 (Int32.of_float x)
   | "caml_int32_of_string", [ Bytes (_mut, b) ] -> Int32 (Int32.of_string (Bytes.unsafe_to_string b))
   | "caml_int32_to_float", [ Int32 i ] -> Float (Int32.to_float i)
+  | "caml_int64_of_int", [ Int i ] -> Int64 (Int64.of_int i)
+  | "caml_int64_to_int", [ Int64 i ] -> Int (Int64.to_int i)
   | "caml_int64_bits_of_float", [ Float x ] -> Int64 (Int64.bits_of_float x)
   | "caml_int64_float_of_bits", [ Int64 i ] -> Float (Int64.float_of_bits i)
   | "caml_string_of_int64", [ Int64 i ] -> Bytes (Immutable, Bytes.unsafe_of_string (Int64.to_string i))
   | "caml_int64_of_float", [ Float x ] -> Int64 (Int64.of_float x)
   | "caml_int64_of_string", [ Bytes (_mut, b) ] -> Int64 (Int64.of_string (Bytes.unsafe_to_string b))
   | "caml_int64_to_float", [ Int64 i ] -> Float (Int64.to_float i)
+  | "caml_int64_add", [ Int64 i1; Int64 i2 ] -> Int64 (Int64.add i1 i2)
+  | "caml_int64_mul", [ Int64 i1; Int64 i2 ] -> Int64 (Int64.mul i1 i2)
+  | "caml_int64_div", [ Int64 i1; Int64 i2 ] -> Int64 (Int64.div i1 i2)
   | "caml_int_of_string", [ Bytes (_mut, b) ] -> Int (int_of_string (Bytes.unsafe_to_string b))
   | "caml_ldexp_float", [ Float x; Int i ] -> Float (ldexp x i)
   | "caml_log10_float", [ Float x ] -> Float (log10 x)
@@ -513,7 +519,60 @@ let ccall arch ooid prim args =
   | "caml_update_dummy", [ Block (_mut1, tag1, tbl1); Block (_mut2, tag2, tbl2) ] -> assert (Array.length tbl1 = Array.length tbl2); tag1 := !tag2; Array.blit tbl2 0 tbl1 0 (Array.length tbl1); Int 0
   | "caml_update_dummy", [ Closure dummy; Closure newval ] -> dummy.ofs <- newval.ofs; dummy.ptrs <- Array.copy newval.ptrs; dummy.env <- Array.copy newval.env; Int 0
   | "caml_gc_run", [ Int 0 ] -> Int 0
+  | "caml_ensure_stack_capacity", [ Int _ ] -> Int 0
   | "caml_equal", [ v1; v2 ] -> if value_equal v1 v2 then Int 1 else Int 0
+  (* The following primitives are used for camlboot initialization *)
+  | "caml_lex_engine", [ Block (_, _, tbl); Int state; Block (Mutable, _, lexbuf_arr) ] ->
+    let open Lexing in
+    let tbl =
+      let tbl = Array.map (function Bytes (_, b) -> String.of_bytes b | _ -> invalid_arg "caml_lex_engine") tbl in
+      match tbl with
+      | [|lex_base; lex_backtrk; lex_default; lex_trans; lex_check;
+         lex_base_code; lex_backtrk_code; lex_default_code; lex_trans_code; lex_check_code; lex_code|] ->
+        { lex_base; lex_backtrk; lex_default; lex_trans; lex_check;
+          lex_base_code; lex_backtrk_code; lex_default_code; lex_trans_code; lex_check_code; lex_code }
+      | _ -> invalid_arg "caml_lex_engine (tbl)"
+    and lexbuf =
+      let position_of_value v =
+        match v with
+        | Block (_, _, [| Bytes (Immutable, pos_fname); Int pos_lnum; Int pos_bol; Int pos_cnum |]) ->
+          { pos_fname = String.of_bytes pos_fname; pos_lnum; pos_bol; pos_cnum }
+        | _ -> invalid_arg "caml_lex_engine (position)"
+      in
+      match lexbuf_arr with
+      | [| Closure _refill_buff; Bytes (Mutable, lex_buffer); Int lex_buffer_len;
+           Int lex_abs_pos; Int lex_start_pos; Int lex_curr_pos;
+           Int lex_last_pos; Int lex_last_action;
+           Int lex_eof_reached; Block (_, _, lex_mem);
+           lex_start_p; lex_curr_p |] ->
+        let lex_mem = Array.map (function Int i -> i | _ -> invalid_arg "caml_lex_engine") lex_mem in
+        { refill_buff = (fun _ -> Printf.eprintf "caml_lex_engine failed (refill lexbuf)"; raise Exit) (* TODO *);
+          lex_buffer; lex_buffer_len;
+          lex_abs_pos; lex_start_pos; lex_curr_pos;
+          lex_last_pos; lex_last_action;
+          lex_eof_reached = (lex_eof_reached <> 0);
+          lex_mem;
+          lex_start_p = position_of_value lex_start_p;
+          lex_curr_p = position_of_value lex_curr_p }
+      | _ -> invalid_arg "caml_lex_engine (lexbuf)"
+    in
+    let result = engine tbl state lexbuf in
+    Array.set lexbuf_arr 1 (Bytes (Mutable, lexbuf.lex_buffer));
+    Array.set lexbuf_arr 2 (Int lexbuf.lex_buffer_len);
+    Array.set lexbuf_arr 3 (Int lexbuf.lex_abs_pos);
+    Array.set lexbuf_arr 4 (Int lexbuf.lex_start_pos);
+    Array.set lexbuf_arr 5 (Int lexbuf.lex_curr_pos);
+    Array.set lexbuf_arr 6 (Int lexbuf.lex_last_pos);
+    Array.set lexbuf_arr 7 (Int lexbuf.lex_last_action);
+    Array.set lexbuf_arr 8 (Int (if lexbuf.lex_eof_reached then 1 else 0));
+    Array.set lexbuf_arr 9 (Block (Mutable, ref (Array.length lexbuf.lex_mem), Array.map (fun i -> Int i) lexbuf.lex_mem));
+    let value_of_position { pos_fname; pos_lnum; pos_bol; pos_cnum } =
+      Block (Mutable, ref 0, [| Bytes (Immutable, Bytes.of_string pos_fname);
+                                Int pos_lnum; Int pos_bol; Int pos_cnum |])
+    in
+    Array.set lexbuf_arr 10 (value_of_position lexbuf.lex_start_p);
+    Array.set lexbuf_arr 11 (value_of_position lexbuf.lex_curr_p);
+    Int result
   | _ ->
     begin
       match prim with
@@ -550,6 +609,7 @@ let ccall arch ooid prim args =
         print_args args;
         Printf.eprintf ").\n%!"
     end;
+    print_string "###"; print_endline prim;
     raise Exit
 
 (******************************************************************************)
