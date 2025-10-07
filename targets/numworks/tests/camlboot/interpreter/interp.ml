@@ -3,7 +3,9 @@ open Conf
 open Eval
 open Envir
 
-let stdlib = {|external raise : exn -> 'a = "%raise"
+let stdlib = {|
+
+external raise : exn -> 'a = "%raise"
 
 (* Composition operators *)
 
@@ -132,13 +134,138 @@ external print_int : int -> unit = "%print_int"
 external print_float : float -> unit = "%print_float"
 |}
 
+let list = {|
+(* An alias for the type of lists. *)
+type 'a t = 'a list = [] | (::) of 'a * 'a list
+
+(* List operations *)
+
+let rec length_aux len = function
+    [] -> len
+  | _::l -> length_aux (len + 1) l
+
+let length l = length_aux 0 l
+
+let cons a l = a::l
+
+let singleton a = [a]
+
+let hd = function
+    [] -> failwith "hd"
+  | a::_ -> a
+
+let tl = function
+    [] -> failwith "tl"
+  | _::l -> l
+
+let nth l n =
+  if n < 0 then invalid_arg "List.nth" else
+  let rec nth_aux l n =
+    match l with
+    | [] -> failwith "nth"
+    | a::l -> if n = 0 then a else nth_aux l (n-1)
+  in nth_aux l n
+
+let nth_opt l n =
+  if n < 0 then invalid_arg "List.nth" else
+  let rec nth_aux l n =
+    match l with
+    | [] -> None
+    | a::l -> if n = 0 then Some a else nth_aux l (n-1)
+  in nth_aux l n
+
+let rec (@) l1 l2 =
+  match l1 with
+  | [] -> l2
+  | h1 :: [] -> h1 :: l2
+  | h1 :: h2 :: [] -> h1 :: h2 :: l2
+  | h1 :: h2 :: h3 :: tl -> h1 :: h2 :: h3 :: (tl @ l2)
+
+let append = (@)
+
+let rec rev_append l1 l2 =
+  match l1 with
+    [] -> l2
+  | a :: l -> rev_append l (a :: l2)
+
+let rev l = rev_append l []
+
+let[@tail_mod_cons] rec init i last f =
+  if i > last then []
+  else if i = last then [f i]
+  else
+    let r1 = f i in
+    let r2 = f (i+1) in
+    r1 :: r2 :: init (i+2) last f
+
+let init len f =
+  if len < 0 then invalid_arg "List.init" else
+  init 0 (len - 1) f
+
+let rec flatten = function
+    [] -> []
+  | l::r -> l @ flatten r
+
+let concat = flatten
+
+let[@tail_mod_cons] rec map f = function
+    [] -> []
+  | [a1] ->
+      let r1 = f a1 in
+      [r1]
+  | a1::a2::l ->
+      let r1 = f a1 in
+      let r2 = f a2 in
+      r1::r2::map f l
+
+let[@tail_mod_cons] rec mapi i f = function
+    [] -> []
+  | [a1] ->
+      let r1 = f i a1 in
+      [r1]
+  | a1::a2::l ->
+      let r1 = f i a1 in
+      let r2 = f (i+1) a2 in
+      r1::r2::mapi (i+2) f l
+
+let mapi f l = mapi 0 f l
+
+let rev_map f l =
+  let rec rmap_f accu = function
+    | [] -> accu
+    | a::l -> rmap_f (f a :: accu) l
+  in
+  rmap_f [] l
+
+let rec iter f = function
+    [] -> ()
+  | a::l -> f a; iter f l
+
+let rec iteri i f = function
+    [] -> ()
+  | a::l -> f i a; iteri (i + 1) f l
+
+let iteri f l = iteri 0 f l
+
+let rec fold_left f accu l =
+  match l with
+    [] -> accu
+  | a::l -> fold_left f (f accu a) l
+
+let rec fold_right f l accu =
+  match l with
+    [] -> accu
+  | a::l -> f a (fold_right f l accu)
+|}
+
 let parse_string str =
   let lexbuf = Lexing.from_string str in
   Location.init lexbuf "";
   Parse.implementation lexbuf
 
 let parse_file filename =
-  if filename = "stdlib.py" then parse_string stdlib
+  if filename = "stdlib.ml" then parse_string stdlib
+  else if filename = "list.ml" then parse_string list
   else
     let inc =
       try
@@ -164,7 +291,8 @@ let no_stdlib_flag = []
 
 let stdlib_units =
   (* let stdlib_path = stdlib_path () in *)
-  [(no_stdlib_flag, "stdlib.py")]
+  [(no_stdlib_flag, "stdlib.ml");
+   ([stdlib_flag], "list.ml")]
 
 let eval_env_flag ~loc env flag =
   match flag with
@@ -268,6 +396,8 @@ let () =
   draw_bg ();
   print_endline "Camlboot for Numworks 1.0";
   print_endline "%use file.py;; to load a file";
+
+  let _env = eval stdlib_env "%use ocaml.py" in
 
   (* Loop in REP[L] *)
   let rec loop env =
