@@ -1,4 +1,4 @@
-all: startup.o icon.o
+all: icon.o
 
 CC = arm-none-eabi-gcc
 NWLINK = npx --yes -- nwlink@0.0.17
