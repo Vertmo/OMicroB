@@ -5,6 +5,8 @@ let default_arm_cxx_options = [ "-std=c99" ]
                               @ [ "-fno-exceptions"; "-fno-unwind-tables" ]
                               @ [ "-Os"; "-Wall"; "-ggdb"]
 
+let nwlink_cmd = [ "npx"; "--yes"; "--"; "nwlink@0.0.19"; "install-nwa" ]
+
 module NumworksConfig : DEVICECONFIG = struct
   let compile_ml ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
         inputs output =
@@ -29,8 +31,6 @@ let compile_c_to_hex ~local ~trace:_ ~verbose ~cxxopts input output =
     else Filename.concat Config.includedir "numworks" in
 
   let arm_o_file = (Filename.remove_extension input)^".arm_o" in
-  let arm_elf_file = (Filename.remove_extension input)^".arm_elf" in
-  (* let arm_map_file = (Filename.remove_extension input)^".map" in *)
 
   (* Compile a .c into a .arm_o *)
 
@@ -49,33 +49,20 @@ let compile_c_to_hex ~local ~trace:_ ~verbose ~cxxopts input output =
   let cmd = cmd @ cxxopts in
   let cmd = cmd @ [ "-Wl,--relocatable" ] in
   let cmd = cmd @ [ "-nostartfiles" ] in
-  (* FIXED: find which -specs=... file should be used *)
   let cmd = cmd @ [ "-specs=nano.specs" ] in
-  (* let cmd = cmd @ [ "-specs=nosys.specs" ] in *) (* this one broke everything...*)
   let cmd = cmd @ [ "-fdata-sections"; "-ffunction-sections" ] in
-  let cmd = cmd @ [ "-Wl,-e,__start"; "-Wl,-u,eadk_app_name"; "-Wl,-u,eadk_app_icon"; "-Wl,-u,eadk_api_level" ] in
+  let cmd = cmd @ [ "-Wl,-e,main"; "-Wl,-u,eadk_app_name"; "-Wl,-u,eadk_app_icon"; "-Wl,-u,eadk_api_level" ] in
   let cmd = cmd @ [ "-Wl,--gc-sections" ] in
   let cmd = cmd @ [ "-D__NUMWORKS__" ] in
-  let cmd = cmd @ [ arm_o_file;
-                    conc_numworks "startup.o";
-                    conc_numworks "icon.o" ] in
+  let cmd = cmd @ [ arm_o_file; conc_numworks "icon.o" ] in
   let cmd = cmd @ [ "-lm" ] in
-  let cmd = cmd @ [ "-o" ; arm_elf_file ] in
-  (* List.iter (Printf.printf "%s ") cmd; *)
-  (* Printf.printf "################## Compile  a .arm_o into a .arm_elf\n"; *)
-  run ~verbose cmd;
-  (* Printf.printf "################## Compiled a .arm_o into a .arm_elf\n"; *)
-
-  (* Compile a .arm_elf into a .hex *)
-  (* Printf.printf "################## Compile  a .arm_elf into a .hex\n"; *)
-  let cmd = [ "cp"; arm_elf_file; output ] in
+  let cmd = cmd @ [ "-o" ; output ] in
   run ~verbose cmd
-  (* Printf.printf "################## Compiled a .arm_elf into a .hex\n" *)
 
   let simul_flag = "__SIMUL_NUMWORKS__"
 
-  let flash ~sudo:_ ~verbose:_ _hexfile =
-    failwith "Error: flashing is not supported, use <https://my.numworks.com/apps> instead to flash the resulting NWA app to your Numworks calculator."
+  let flash ~sudo:_ ~verbose hexfile =
+    run ~verbose (nwlink_cmd @ [ hexfile ])
 end
 
 (******************************************************************************)

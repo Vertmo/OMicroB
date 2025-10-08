@@ -25,6 +25,9 @@ tests:
 	@echo "Testing the omicrob version:"
 	./$(PROG).elf
 
+flash: $(PROG).hex
+	$(BIN)/omicrob -device $(DEVICE) -flash $^
+
 .PHONY: clean
 clean:
 	rm -f *.cmi *.cmo *.byte *.c *.arm_o *.elf *.arm_elf *.hex *.nwa

@@ -28,10 +28,5 @@ tests:
 clean:
 	rm -f *.cmi *.cmo *.byte *.c *.arm_o *.elf *.arm_elf *.hex *.nwa
 
-
-NWLINK = npx --yes -- nwlink@0.0.17
-
-.PHONY: run
-run: $(PROG).nwa
-	@echo "INSTALL $<"
-	$(Q) $(NWLINK) install-nwa $<
+flash: $(PROG).hex
+	$(BIN)/omicrob -device $(DEVICE) -flash $^
