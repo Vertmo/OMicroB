@@ -388,6 +388,9 @@ let eval env cmd =
     | InternalException e ->
       print_endline ("Internal Exn: " ^ (string_of_value e));
       env
+    | Match_fail ->
+      print_endline "Match Fail";
+      env
     | Not_found -> env
 
 let () =

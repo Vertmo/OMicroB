@@ -192,8 +192,7 @@ let is_true = onptr @@ function
   | Constructor ("false", _, None) -> false
   | _ -> assert false
 
-let rec pp_print_value ff =
-  failwith "TODO pp_print_value"
+(* let rec pp_print_value ff = *)
  (* onptr @@ function *)
   (* | Int n -> Format.fprintf ff "%d" n *)
   (* | Int32 n -> Format.fprintf ff "%ldl" n *)
@@ -233,9 +232,9 @@ let rec pp_print_value ff =
   (*     (Array.to_list a) *)
   (* | Object _ -> Format.fprintf ff "<object>" *)
 
-and pp_print_arg ff = function
-  | None -> ()
-  | Some v -> print_string " "; pp_print_value ff v
+(* and pp_print_arg ff = function *)
+(*   | None -> () *)
+(*   | Some v -> print_string " "; pp_print_value ff v *)
 
 let rec string_of_value (arg : value) : string =
   match (Ptr.get arg) with
