@@ -30,13 +30,17 @@ TARGETS := $(OCAMLRUN_BYTE) \
 	$(OMICROB_ELF) $(OMICROB_ARM_HEX) $(OMICROB_AVR_HEX) \
 	$(C_EXE) $(C_ARM_ELF) $(C_ARM_HEX)
 
+DEVICE = numworks
+
+OMICROB_OPTS = -no-shortcut-initialization -stack-size 400 -heap-size 1000
+
 all: $(TARGETS)
 
 %.omicrob.byte: %.ml
-	$(BIN)/omicrob -device microbit $^ -o $@
+	$(BIN)/omicrob -device $(DEVICE) $^ -o $@
 
 %.elf: %.ml
-	$(BIN)/omicrob -no-shortcut-initialization -device microbit $^ -o $@
+	$(BIN)/omicrob $(OMICROB_OPTS) -device $(DEVICE) $^ -o $@
 
 %.cmo: %.ml
 	ocamlc -c -o $@ unix.cma $^
@@ -45,7 +49,7 @@ all: $(TARGETS)
 	ocamlc -o $@ unix.cma ocamlrunHarness.cmo -open OcamlrunHarness $<
 
 %.arm.hex: %.ml
-	$(BIN)/omicrob -device microbit $^ -o $@ -no-shortcut-initialization -stack-size 200 -heap-size 1000
+	$(BIN)/omicrob -device $(DEVICE) $^ -o $@ $(OMICROB_OPTS)
 
 %.avr.hex: %.ml
 	$(BIN)/omicrob -device arduino-uno $^ -o $@
@@ -88,6 +92,6 @@ simul: test.elf
 	./$<
 
 clean:
-	@rm -f **/*.cmo **/*.cmi **/*.byte **/*.exe **/*.arm_* **/*.hex
+	@rm -f **/*.cmo **/*.cmi **/*.byte **/*.elf **/*.arm_* **/*.hex
 
 .PHONY: all flash clean benchpc
