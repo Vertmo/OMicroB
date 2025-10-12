@@ -21,12 +21,12 @@ let rec fibonacci_rec n =
 
 (** TODO: document this main() test function. *)
 let main () =
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "Starting main() tests...";
   print_endline "In 1 secs";
 
   (* Dynamically generated strings works fine too *)
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline (String.make 100 'X');
 
   assert(true);
@@ -34,14 +34,14 @@ let main () =
   (* assert(120 < 100); *)
   (* FIXME: this prints "Error!" continuously... not very useful... *)
 
-  (* delay_usec 1_000_000; clear_screen (); *)
+  (* delay_usec 1_000_000; Screen.clear (); *)
   (* print_endline "After a delay_usec 1_000_000"; *)
 
-  (* delay 1000; clear_screen (); *)
+  (* delay 1000; Screen.clear (); *)
   (* print_endline "backlight_brightness():"; *)
   (* print_int (backlight_brightness()); *)
 
-  (* delay 1000; clear_screen (); *)
+  (* delay 1000; Screen.clear (); *)
   (* print_endline "backlight_set_brightness(0):"; *)
   (* delay 500; *)
   (* backlight_set_brightness(0); *)
@@ -50,57 +50,57 @@ let main () =
   (* backlight_set_brightness(100); *)
   (* delay 500; *)
 
-  (* delay 1000; clear_screen ();
+  (* delay 1000; Screen.clear ();
   print_endline "battery_is_charging():";
   print_bool (battery_is_charging()); *)
 
-  (* delay 1000; clear_screen ();
+  (* delay 1000; Screen.clear ();
   print_endline "battery_level():";
   print_int (battery_level()); *)
 
-  (* delay 1000; clear_screen ();
+  (* delay 1000; Screen.clear ();
   print_endline "battery_voltage():";
   print_float (battery_voltage()); *)
 
-  (* delay 1000; clear_screen ();
+  (* delay 1000; Screen.clear ();
   print_endline "usb_is_plugged():";
   print_bool (usb_is_plugged()); *)
 
   for _ = 1 to 5 do
-    delay 1000; clear_screen ();
+    delay 1000; Screen.clear ();
     print_string "random(): ";
     print_int (random());
     print_newline ()
   done;
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "print_endline():";
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_string "print_int 42: ";
   print_int 42;
   print_newline ();
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_string "print_float 3.1415: ";
   print_float 3.1415;
   print_newline ();
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_string "print_char '?': ";
   print_char '?';
   print_newline ();
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_string "millis():";
   print_int (millis ());
   print_newline ();
-  delay 3000; clear_screen ();
+  delay 3000; Screen.clear ();
   print_string "After delay(3000)";
   print_int (millis ());
   print_newline ();
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "Loop #1.";
   let nb_loop = 3 in
   for _ = 1 to nb_loop do
@@ -112,7 +112,7 @@ let main () =
   done;
   print_endline "End loop #1.";
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "Loop #2.";
   let max_n = 21 in
   for n = 0 to max_n do
@@ -123,7 +123,7 @@ let main () =
   print_endline "End loop #2.";
   delay 1000;
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "Loop #3.";
   (* FIXME: fibonacci_rec fails VERY quickly, I guess the stack size for recursive function is VERY LIMITED?
      The STACK_SIZE parameter in the Makefile allows now to change this parameter, to increase it.
@@ -136,31 +136,31 @@ let main () =
   done;
   print_endline "End loop #3.";
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "Loop #4.";
   let delta_y = 18 in
   for i = 1 to 12 do
     let x = i and y = delta_y * i in
     let text = "draw at {" ^ (string_of_int x) ^ ", " ^ (string_of_int y) ^ "}" in
-    display_draw_string text x y ;
+    Screen.draw_string text x y ;
     delay 250;
   done;
   delay 250;
   print_endline "End loop #4.";
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "Loop #5.";
   let small_delta_y = 10 in
   for i = 1 to 23 do
     let x = i and y = small_delta_y * i in
     let text = "draw small at {" ^ (string_of_int x) ^ ", " ^ (string_of_int y) ^ "}" in
-    display_draw_string_small text x y ;
+    Screen.draw_string_small text x y ;
     delay 250;
   done;
   delay 250;
   print_endline "End loop #5.";
 
-  let array_colors = [| color_black; color_white; color_red; color_green; color_blue |] in
+  let array_colors = [| Color.black; Color.white; Color.red; Color.green; Color.blue |] in
   let array_name_colors = [| "black"; "white"; "red"; "green"; "blue" |] in
   let nb_colors = Array.length array_colors in
 
@@ -169,7 +169,7 @@ let main () =
       for i = 1 to 12 do
         let x = 0 and y = delta_y * i in
         let text = "draw " ^ (array_name_colors.(color1)) ^"/" ^ (array_name_colors.(color2)) ^ " at {" ^ (string_of_int x) ^ "," ^ (string_of_int y) ^ "}" in
-        display_draw_string_full text x y true array_colors.(color1) array_colors.(color2);
+        Screen.draw_string_full text x y true array_colors.(color1) array_colors.(color2);
         delay 1000;
       done;
       delay 2000;
@@ -177,7 +177,7 @@ let main () =
     delay 200;
   done;
 
-  delay 1000; clear_screen ();
+  delay 1000; Screen.clear ();
   print_endline "Done for all the tests.";
   delay 1000;
 ;;

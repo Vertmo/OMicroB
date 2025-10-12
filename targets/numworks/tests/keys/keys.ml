@@ -8,8 +8,8 @@ let rec loop2 () =
   if key = Key_home || key = Key_back then () else loop2 ()
 
 let () =
-  clear_screen ();
+  Screen.clear ();
   print_endline "Press A to advance";
   loop1 ();
-  clear_screen ();
+  Screen.clear ();
   loop2 ()

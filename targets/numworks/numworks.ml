@@ -22,54 +22,54 @@ external millis : unit -> int = "caml_millis" [@@noalloc]
 (***********************************)
 
 (* 15-bit colors *)
-type color = int
+module Color = struct
 
-(* Values should be between 0 and 1F *)
-let mk_color r g b =
-  (r lsl 11) + ((2 * g) lsl 5) + b
+  type t = int
 
-let color_black : int = mk_color 0 0 0
-let color_white : int = mk_color 31 31 31
-let color_red : int = mk_color 31 0 0
-let color_green : int = mk_color 0 31 0
-let color_blue : int = mk_color 0 0 31
+  (* Values should be between 0 and 1F *)
+  let make r g b =
+    (r lsl 11) + ((2 * g) lsl 5) + b
 
-let screen_width = 320
-let screen_height = 240
+  let black : int = make 0 0 0
+  let white : int = make 31 31 31
+  let red : int = make 31 0 0
+  let green : int = make 0 31 0
+  let blue : int = make 0 0 31
+end
 
-external display_draw_string_full' : string -> int -> int -> bool -> (color * color) -> unit = "caml_display_draw_string_full" [@@noalloc]
+let cursorX = ref 0 and cursorY = ref 0
 
-let display_draw_string_full text x y size tcolor bgcolor =
-  display_draw_string_full' text x y size (tcolor, bgcolor)
+module Screen = struct
+  let width = 320
+  let height = 240
 
-let display_draw_string s x y =
-  display_draw_string_full' s x y true (color_black, color_white)
+  external draw_string_full' : string -> int -> int -> bool -> (Color.t * Color.t) -> unit = "caml_display_draw_string_full" [@@noalloc]
 
-let display_draw_string_small s x y =
-  display_draw_string_full' s x y false (color_black, color_white)
+  let draw_string_full text x y size tcolor bgcolor =
+    draw_string_full' text x y size (tcolor, bgcolor)
 
-external display_draw_rect : color -> int -> int -> int -> int -> unit = "caml_display_push_rect_uniform" [@@noalloc]
+  let draw_string s x y =
+    draw_string_full' s x y true (Color.black, Color.white)
 
-external display_fill_screen : color -> unit = "caml_display_push_allscreen_uniform" [@@noalloc]
+  let draw_string_small s x y =
+    draw_string_full' s x y false (Color.black, Color.white)
+
+  external fill_rect : Color.t -> int -> int -> int -> int -> unit = "caml_display_push_rect_uniform" [@@noalloc]
+
+  external fill_screen : Color.t -> unit = "caml_display_push_allscreen_uniform" [@@noalloc]
+
+  let clear () =
+    cursorX := 0;
+    cursorY := 0;
+    fill_screen Color.white
+end
 
 (***********************)
 (* High-Level Printing *)
 (***********************)
 
-let cursorX = ref 0 and cursorY = ref 0
-
-let clear_screen () =
-  cursorX := 0;
-  cursorY := 0;
-  display_fill_screen color_white
-
-let clear_black_screen () =
-  cursorX := 0;
-  cursorY := 0;
-  display_fill_screen color_black
-
 let print_newline () =
-  display_draw_string "\n" !cursorX !cursorY;
+  Screen.draw_string "\n" !cursorX !cursorY;
   cursorX := 0;
   cursorY := !cursorY + 16
 
@@ -78,10 +78,10 @@ let print_string s =
     match ss with
     | [] -> ()
     | [s] ->
-       display_draw_string s !cursorX !cursorY;
+       Screen.draw_string s !cursorX !cursorY;
        cursorX := !cursorX + 10 * (String.length s)
     | s::tl ->
-       display_draw_string s !cursorX !cursorY;
+       Screen.draw_string s !cursorX !cursorY;
        print_newline ();
        aux tl
   in aux (String.split_on_char '\n' s)
@@ -110,7 +110,7 @@ let prerr_newline () = print_newline ();;
 let erase_char () =
   if (!cursorX = 0) then failwith "TODO"
   else cursorX := !cursorX - 10;
-  display_draw_string " " !cursorX !cursorY
+  Screen.draw_string " " !cursorX !cursorY
 
 (* TODO should be able to scroll screen *)
 
@@ -118,8 +118,10 @@ let erase_char () =
 (* Backlight *)
 (*************)
 
-external backlight_set_brightness : int -> unit = "caml_backlight_set_brightness" [@@noalloc]
-external backlight_brightness : unit -> int = "caml_backlight_brightness" [@@noalloc]
+module Backlight = struct
+  external set_brightness : int -> unit = "caml_backlight_set_brightness" [@@noalloc]
+  external get_brightness : unit -> int = "caml_backlight_brightness" [@@noalloc]
+end
 
 
 (***********)

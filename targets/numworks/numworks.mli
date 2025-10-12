@@ -37,36 +37,41 @@ val erase_char : unit -> unit
 (* Functions from the EADK library *)
 (***********************************)
 
-type color
+module Color : sig
+    type t
 
-(* Values should be between 0 and 1F *)
-val mk_color : int -> int -> int -> color
+    (* Values should be between 0 and 1F *)
+    val make : int -> int -> int -> t
 
-val color_black : color
-val color_white : color
-val color_red : color
-val color_green : color
-val color_blue : color
+    val black : t
+    val white : t
+    val red : t
+    val green : t
+    val blue : t
+end
 
-val screen_width : int
-val screen_height : int
+module Screen : sig
+    val width : int
+    val height : int
 
-val display_draw_string_full : string -> int -> int -> bool -> color -> color -> unit
-val display_draw_string : string -> int -> int -> unit
-val display_draw_string_small : string -> int -> int -> unit
+    val draw_string_full : string -> int -> int -> bool -> Color.t -> Color.t -> unit
+    val draw_string : string -> int -> int -> unit
+    val draw_string_small : string -> int -> int -> unit
 
-val display_draw_rect : color -> int -> int -> int -> int -> unit
-val display_fill_screen : color -> unit
-val clear_screen : unit -> unit
-val clear_black_screen : unit -> unit
+    val fill_rect : Color.t -> int -> int -> int -> int -> unit
+    val fill_screen : Color.t -> unit
+    val clear : unit -> unit
+end
 
 
 (*************)
 (* Backlight *)
 (*************)
 
-val backlight_set_brightness : int -> unit
-val backlight_brightness : unit -> int
+module Backlight : sig
+    val set_brightness : int -> unit
+    val get_brightness : unit -> int
+end
 
 (***********)
 (* Battery *)

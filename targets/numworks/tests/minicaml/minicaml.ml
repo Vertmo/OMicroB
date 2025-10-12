@@ -24,7 +24,7 @@ let report (b,e) =
   print_endline ("File \"" ^ filename ^ "\", line " ^ (string_of_int lnum) ^ ", characters " ^ (string_of_int fc) ^ "-" ^ (string_of_int lc) ^ ":")
 
 let () =
-  clear_screen ();
+  Screen.clear ();
   print_endline ("Loading code from " ^ filename ^ " ...");
 
   let file_content =

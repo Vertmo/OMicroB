@@ -359,12 +359,12 @@ let numworks_main () =
   let long_delay = 1000 in
   let short_delay = 0 in
   delay short_delay;
-  clear_screen ();
+  Screen.clear ();
   delay short_delay;
   print_endline ("Loading " ^ (string_of_int (List.length default_programs)) ^ " theory content(s)...");
   delay long_delay;
   List.iter (fun program_content ->
-    clear_screen();
+    Screen.clear();
     delay short_delay;
     print_endline "1. Loading this theory:";
     print_endline program_content
@@ -372,14 +372,14 @@ let numworks_main () =
   delay long_delay;
   let default_programs = List.map (fun program_content -> string_join_on "\n" (filter_out_comments (String.split_on_char '\n' program_content))) default_programs in
   let prog = parse_strings default_programs in
-  clear_screen ();
+  Screen.clear ();
   delay short_delay;
   print_endline ("2. Loaded " ^ (string_of_int (List.length default_programs)) ^ " theory content(s) !");
   print_endline ("Giving "^ (string_of_int (List.length prog)) ^ " fact(s) !");
   delay long_delay;
 
   List.iter (fun question ->
-    clear_screen();
+    Screen.clear();
     delay short_delay;
     print_endline "3. Parsing this question...";
     print_endline ("?- " ^ question);
@@ -388,7 +388,7 @@ let numworks_main () =
     print_endline "5. Now answering it:";
     prove_goals ~interactive:false prog trm_list;
     delay long_delay;
-    clear_screen ()
+    Screen.clear ()
   ) default_questions
 
 (* let interactive_main () =

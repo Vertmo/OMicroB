@@ -56,7 +56,7 @@ let queens n =
    print_string "nb sols ";  print_int (list_length r); print_newline();;
 
 let () =
-   clear_screen ();
+   Screen.clear ();
    let start_time = millis () in
    queens 8;
    let end_time = millis () in
