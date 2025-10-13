@@ -290,7 +290,7 @@ let rec fold_right f l accu =
 
 in
 [(no_stdlib_flag, "stdlib.ml", stdlib);
- ([stdlib_flag], "list.ml", list)]
+ (* ([stdlib_flag], "list.ml", list) *)]
 
 let eval_env_flag ~loc env flag =
   match flag with
@@ -398,8 +398,6 @@ let () =
   draw_bg ();
   print_endline "Camlboot for Numworks 1.0";
   print_endline "%use file.py;; to load a file";
-
-  let _env = eval stdlib_env "%use ocaml.py" in
 
   (* Loop in REP[L] *)
   let rec loop env =

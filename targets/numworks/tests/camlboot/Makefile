@@ -68,9 +68,6 @@ $(TARGETS): $(CMOS)
 clean:
 	rm -vf **/*.cm* *.byte *.c *.elf *.hex *nwa
 
-NWLINK = npx --yes -- nwlink@0.0.17
-
-.PHONY: run
-run: $(PROG).nwa
-	@echo "INSTALL $<"
-	$(Q) $(NWLINK) install-nwa $<
+.PHONY: flash
+flash: $(PROG).hex
+	$(BIN)/omicrob -device numworks -flash $^
