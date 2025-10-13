@@ -37,36 +37,41 @@ val erase_char : unit -> unit
 (* Functions from the EADK library *)
 (***********************************)
 
-type color
+module Color : sig
+    type t
 
-(* Values should be between 0 and 1F *)
-val mk_color : int -> int -> int -> color
+    (* Values should be between 0 and 1F *)
+    val make : int -> int -> int -> t
 
-val color_black : color
-val color_white : color
-val color_red : color
-val color_green : color
-val color_blue : color
+    val black : t
+    val white : t
+    val red : t
+    val green : t
+    val blue : t
+end
 
-val screen_width : int
-val screen_height : int
+module Screen : sig
+    val width : int
+    val height : int
 
-val display_draw_string_full : string -> int -> int -> bool -> color -> color -> unit
-val display_draw_string : string -> int -> int -> unit
-val display_draw_string_small : string -> int -> int -> unit
+    val print_full : string -> int -> int -> bool -> Color.t -> Color.t -> unit
+    val print : string -> int -> int -> unit
+    val print_small : string -> int -> int -> unit
 
-val display_draw_rect : color -> int -> int -> int -> int -> unit
-val display_fill_screen : color -> unit
-val clear_screen : unit -> unit
-val clear_black_screen : unit -> unit
+    val fill_rect : Color.t -> int -> int -> int -> int -> unit
+    val fill_screen : Color.t -> unit
+    val clear : unit -> unit
+end
 
 
 (*************)
 (* Backlight *)
 (*************)
 
-val backlight_set_brightness : int -> unit
-val backlight_brightness : unit -> int
+module Backlight : sig
+    val set_brightness : int -> unit
+    val get_brightness : unit -> int
+end
 
 (***********)
 (* Battery *)
@@ -95,63 +100,66 @@ val read_any_file : string -> string
 (* Keys *)
 (********)
 
-type key =
-  | Key_left
-  | Key_up
-  | Key_down
-  | Key_right
-  | Key_ok
-  | Key_back
-  | Key_home
-  | Key_on_off
-  | Key_shift
-  | Key_alpha
-  | Key_xnt
-  | Key_var
-  | Key_toolbox
-  | Key_backspace
-  | Key_exp
-  | Key_ln
-  | Key_log
-  | Key_imaginary
-  | Key_comma
-  | Key_power
-  | Key_sine
-  | Key_cosine
-  | Key_tangent
-  | Key_pi
-  | Key_sqrt
-  | Key_square
-  | Key_seven
-  | Key_eight
-  | Key_nine
-  | Key_left_parenthesis
-  | Key_right_parenthesis
-  | Key_four
-  | Key_five
-  | Key_six
-  | Key_multiplication
-  | Key_division
-  | Key_one
-  | Key_two
-  | Key_three
-  | Key_plus
-  | Key_minus
-  | Key_zero
-  | Key_dot
-  | Key_ee
-  | Key_ans
-  | Key_exe
+module Key : sig
 
-val key_of_char : char -> key
-val char_of_key : key -> char
-val shift_char_of_key : key -> string
-val alpha_char_of_key : key -> char
+  type t =
+    | Key_left
+    | Key_up
+    | Key_down
+    | Key_right
+    | Key_ok
+    | Key_back
+    | Key_home
+    | Key_on_off
+    | Key_shift
+    | Key_alpha
+    | Key_xnt
+    | Key_var
+    | Key_toolbox
+    | Key_backspace
+    | Key_exp
+    | Key_ln
+    | Key_log
+    | Key_imaginary
+    | Key_comma
+    | Key_power
+    | Key_sine
+    | Key_cosine
+    | Key_tangent
+    | Key_pi
+    | Key_sqrt
+    | Key_square
+    | Key_seven
+    | Key_eight
+    | Key_nine
+    | Key_left_parenthesis
+    | Key_right_parenthesis
+    | Key_four
+    | Key_five
+    | Key_six
+    | Key_multiplication
+    | Key_division
+    | Key_one
+    | Key_two
+    | Key_three
+    | Key_plus
+    | Key_minus
+    | Key_zero
+    | Key_dot
+    | Key_ee
+    | Key_ans
+    | Key_exe
+
+  val of_char : char -> t
+  val to_char : t -> char
+  val to_shift_char : t -> string
+  val to_alpha_char : t -> char
+end
 
 module Keyboard : sig
   val scan : unit -> unit
-  val key_down : key -> bool
-  val wait_key_press : unit -> key
+  val key_down : Key.t -> bool
+  val wait_key_press : unit -> Key.t
 end
 
 (****************************************)

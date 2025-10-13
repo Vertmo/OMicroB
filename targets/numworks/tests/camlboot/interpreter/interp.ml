@@ -326,15 +326,15 @@ let stdlib_env =
 
 let shift = ref false and alpha = ref false
 
-let state_bg_color = mk_color 29 15 1
+let state_bg_color = Color.make 29 15 1
 
 let draw_state () =
-  display_draw_rect state_bg_color 290 0 30 15;
-  if !shift then display_draw_string_full "s" 295 1 false color_white state_bg_color;
-  if !alpha then display_draw_string_full "a" 310 1 false color_white state_bg_color
+  Screen.fill_rect state_bg_color 290 0 30 15;
+  if !shift then Screen.print_full "s" 295 1 false Color.white state_bg_color;
+  if !alpha then Screen.print_full "a" 310 1 false Color.white state_bg_color
 
 let draw_bg () =
-  clear_screen ();
+  Screen.clear ();
   draw_state ()
 
 (* Read in [R]EPL *)
@@ -351,6 +351,7 @@ let read () =
   in
   let rec aux l =
     let k = Keyboard.wait_key_press () in
+    let open Key in
     match k with
     | Key_home -> raise Exit
     | Key_back -> draw_bg (); print_newline (); print_string "> "; aux []
@@ -365,11 +366,11 @@ let read () =
     | _ ->
       try
         if !alpha then
-          let s = String.make 1 (alpha_char_of_key k) in
+          let s = String.make 1 (Key.to_alpha_char k) in
           let s = if !shift then String.capitalize_ascii s else s
           in aux (add_char s l)
-        else if !shift then aux (add_char (shift_char_of_key k) l)
-        else aux (add_char (String.make 1 (char_of_key k)) l)
+        else if !shift then aux (add_char (Key.to_shift_char k) l)
+        else aux (add_char (String.make 1 (Key.to_char k)) l)
       with _ -> aux l
   in String.concat "" (aux [])
 

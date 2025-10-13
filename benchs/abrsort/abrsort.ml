@@ -34,4 +34,5 @@ let _ =
     ignore (tree_sort l)
   done;
   let stop = millis () in
-  Serial.write_string (string_of_int (stop-start))
+  (* Serial.write_string (string_of_int (stop-start)) *)
+  ()

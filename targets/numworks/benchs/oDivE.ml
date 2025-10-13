@@ -74,7 +74,7 @@ let rec print_nat = function O_C -> print_int 0 | S_C n -> print_string "S_C ";p
 let print_resultat = function Xpair_C (a,b) -> print_nat a; print_string "-->";print_nat b;;
 
 let () =
-  clear_screen ();
+  Screen.clear ();
 
   let start_time = millis () in
 

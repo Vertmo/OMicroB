@@ -19,7 +19,7 @@ let compile_ml ~ppx_options ~mlopts ~cxxopts ~local ~trace ~verbose
   let cmd = cmd @ output @ inputs in
   run ~vars ~verbose cmd
 
-let compile_c_to_hex ~cpu ~linkscript ~startup ~microbian ~local ~trace:_ ~verbose input output =
+let compile_c_to_hex ~cpu ~linkscript ~startup ~microbian ~local ~trace:_ ~verbose ~cxxopts:_ input output =
   let includedir = includedir local in
   let microbitdir =
     if local then Filename.concat Config.builddir "src/byterun/microbit"

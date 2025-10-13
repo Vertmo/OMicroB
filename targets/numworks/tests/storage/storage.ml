@@ -1,4 +1,4 @@
-let () = clear_screen()
+let () = Screen.clear()
 
 let () =
   print_endline (read_any_file "test.py")

@@ -1,15 +1,15 @@
 let rec loop1 () =
   Keyboard.scan ();
-  if Keyboard.key_down (key_of_char 'a') then print_string "a" else loop1 ()
+  if Keyboard.key_down (Key.of_char 'a') then print_string "a" else loop1 ()
 
 let rec loop2 () =
   let key = Keyboard.wait_key_press () in
-  (try print_char (alpha_char_of_key key) with _ -> ());
+  (try print_char (Key.to_alpha_char key) with _ -> ());
   if key = Key_home || key = Key_back then () else loop2 ()
 
 let () =
-  clear_screen ();
+  Screen.clear ();
   print_endline "Press A to advance";
   loop1 ();
-  clear_screen ();
+  Screen.clear ();
   loop2 ()

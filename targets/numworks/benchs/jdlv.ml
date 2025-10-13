@@ -17,7 +17,7 @@ class virtual absWorld n m  =
      if c#isAlive then print_string "*"
      else print_string "."
     method display() =
-      clear_screen ();
+      Screen.clear ();
       for i = 0 to (maxx-1) do
         for j=0 to (maxy -1) do
           print_string " " ;

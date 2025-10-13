@@ -3325,7 +3325,7 @@ run () = most_distant_atom (pseudoknot ())
 ;;
 
 let main () =
-  clear_screen ();
+  Screen.clear ();
   let start_time = millis () in
   print_float (run ());
   print_newline();

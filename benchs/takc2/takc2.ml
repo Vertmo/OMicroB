@@ -12,10 +12,11 @@ let repeat n =
   done;
   !r
 
-let main () =
+let () =
+  clear_screen ();
   let start = millis () in
   ignore (repeat 200000);
-  let stop = millis () in ();;
+  let stop = millis () in
+  print_int (stop-start); print_newline ();
+  while true do () done
   (* Serial.write_string (string_of_int (stop-start));; *)
-
-main();;
