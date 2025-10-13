@@ -460,13 +460,8 @@ module Keyboard = struct
 
   let all_keys : key list = List.init 46 (fun i -> Obj.magic i)
 
-  let wait_key_press () =
-    let rec aux state =
-      let nstate = numworks_scan () in
-      match List.find_opt (fun key -> numworks_key_down nstate key && not (numworks_key_down state key)) all_keys with
-      | Some key -> key
-      | None -> aux nstate
-    in aux (numworks_scan ())
+  (* Through events *)
+  external wait_key_press : unit -> key = "caml_numworks_get_event"
 end
 
 

@@ -118,53 +118,53 @@ value caml_numworks_keyboard_scan(value unit) {
 }
 
 // Conversion from OCaml enum to eadk key numbers
-int keys[] = {
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  8,
-  12,
-  13,
-  14,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  23,
-  24,
-  25,
-  26,
-  27,
-  28,
-  29,
-  30,
-  31,
-  32,
-  33,
-  34,
-  36,
-  37,
-  38,
-  39,
-  40,
-  42,
-  43,
-  44,
-  45,
-  46,
-  48,
-  49,
-  50,
-  51,
-  52
+eadk_key_t keys[] = {
+  eadk_key_left,
+  eadk_key_up,
+  eadk_key_down,
+  eadk_key_right,
+  eadk_key_ok,
+  eadk_key_back,
+  eadk_key_home,
+  eadk_key_on_off,
+  eadk_key_shift,
+  eadk_key_alpha,
+  eadk_key_xnt,
+  eadk_key_var,
+  eadk_key_toolbox,
+  eadk_key_backspace,
+  eadk_key_exp,
+  eadk_key_ln,
+  eadk_key_log,
+  eadk_key_imaginary,
+  eadk_key_comma,
+  eadk_key_power,
+  eadk_key_sine,
+  eadk_key_cosine,
+  eadk_key_tangent,
+  eadk_key_pi,
+  eadk_key_sqrt,
+  eadk_key_square,
+  eadk_key_seven,
+  eadk_key_eight,
+  eadk_key_nine,
+  eadk_key_left_parenthesis,
+  eadk_key_right_parenthesis,
+  eadk_key_four,
+  eadk_key_five,
+  eadk_key_six,
+  eadk_key_multiplication,
+  eadk_key_division,
+  eadk_key_one,
+  eadk_key_two,
+  eadk_key_three,
+  eadk_key_plus,
+  eadk_key_minus,
+  eadk_key_zero,
+  eadk_key_dot,
+  eadk_key_ee,
+  eadk_key_ans,
+  eadk_key_exe
 };
 
 value caml_numworks_keyboard_key_down(value state, value key) {
@@ -283,6 +283,45 @@ value numworks_ml_input_char(value fd) {
   ptr->curptr++;
   #endif
   return Val_int(buf[0]);
+}
+
+/******************************************************************************/
+/******************************** Events **************************************/
+/******************************************************************************/
+
+// eadk event -> OCaml key
+int key_of_event(eadk_event_t ev) {
+  if(ev < 6) return (int)ev; // left-back
+  if(ev >= 12 && ev < 35) return (int)(ev-4); // shift-right par
+  if(ev >= 36 && ev < 41) return (int)(ev-5); // four-division
+  if(ev >= 42 && ev < 47) return (int)(ev-6); // one-minus
+  if(ev >= 48 && ev < 53) return (int)(ev-7); // zero-exe
+  if(ev >= 54 && ev < 58) return (int)(ev-54); // shift left-right
+  if(ev >= 67 && ev < 84) return (int)(ev-58); // shift alpha-greater
+  // lower-case chars
+  if(ev >= 122 && ev < 143) return (int)(ev-112);
+  if(ev >= 144 && ev < 149) return (int)(ev-113);
+  if(ev >= 150 && ev < 155) return (int)(ev-114);
+  if(ev >= 156 && ev < 158) return (int)(ev-115);
+  // upper-case chars
+  if(ev >= 180 && ev < 197) return (int)(ev-166);
+  if(ev >= 198 && ev < 203) return (int)(ev-167);
+  if(ev >= 204 && ev < 208) return (int)(ev-168);
+  return -1; // Undefined
+}
+
+value caml_numworks_get_event(value unit) {
+  #ifdef __NUMWORKS__
+  int32_t timeout = 1000;
+  int key;
+  do {
+    eadk_event_t ev = eadk_event_get(&timeout);
+    key = key_of_event(ev);
+  } while (key == -1);
+  return Val_int(key);
+  #endif
+  // TODO simul
+  return Val_int(0);
 }
 
 
