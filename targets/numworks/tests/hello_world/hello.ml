@@ -142,7 +142,7 @@ let main () =
   for i = 1 to 12 do
     let x = i and y = delta_y * i in
     let text = "draw at {" ^ (string_of_int x) ^ ", " ^ (string_of_int y) ^ "}" in
-    Screen.draw_string text x y ;
+    Screen.print text x y ;
     delay 250;
   done;
   delay 250;
@@ -154,7 +154,7 @@ let main () =
   for i = 1 to 23 do
     let x = i and y = small_delta_y * i in
     let text = "draw small at {" ^ (string_of_int x) ^ ", " ^ (string_of_int y) ^ "}" in
-    Screen.draw_string_small text x y ;
+    Screen.print_small text x y ;
     delay 250;
   done;
   delay 250;
@@ -169,7 +169,7 @@ let main () =
       for i = 1 to 12 do
         let x = 0 and y = delta_y * i in
         let text = "draw " ^ (array_name_colors.(color1)) ^"/" ^ (array_name_colors.(color2)) ^ " at {" ^ (string_of_int x) ^ "," ^ (string_of_int y) ^ "}" in
-        Screen.draw_string_full text x y true array_colors.(color1) array_colors.(color2);
+        Screen.print_full text x y true array_colors.(color1) array_colors.(color2);
         delay 1000;
       done;
       delay 2000;

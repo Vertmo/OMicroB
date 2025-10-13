@@ -54,9 +54,9 @@ module Screen : sig
     val width : int
     val height : int
 
-    val draw_string_full : string -> int -> int -> bool -> Color.t -> Color.t -> unit
-    val draw_string : string -> int -> int -> unit
-    val draw_string_small : string -> int -> int -> unit
+    val print_full : string -> int -> int -> bool -> Color.t -> Color.t -> unit
+    val print : string -> int -> int -> unit
+    val print_small : string -> int -> int -> unit
 
     val fill_rect : Color.t -> int -> int -> int -> int -> unit
     val fill_screen : Color.t -> unit

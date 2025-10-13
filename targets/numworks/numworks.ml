@@ -43,16 +43,16 @@ module Screen = struct
   let width = 320
   let height = 240
 
-  external draw_string_full' : string -> int -> int -> bool -> (Color.t * Color.t) -> unit = "caml_display_draw_string_full" [@@noalloc]
+  external print_full' : string -> int -> int -> bool -> (Color.t * Color.t) -> unit = "caml_display_draw_string_full" [@@noalloc]
 
-  let draw_string_full text x y size tcolor bgcolor =
-    draw_string_full' text x y size (tcolor, bgcolor)
+  let print_full text x y size tcolor bgcolor =
+    print_full' text x y size (tcolor, bgcolor)
 
-  let draw_string s x y =
-    draw_string_full' s x y true (Color.black, Color.white)
+  let print s x y =
+    print_full' s x y true (Color.black, Color.white)
 
-  let draw_string_small s x y =
-    draw_string_full' s x y false (Color.black, Color.white)
+  let print_small s x y =
+    print_full' s x y false (Color.black, Color.white)
 
   external fill_rect : Color.t -> int -> int -> int -> int -> unit = "caml_display_push_rect_uniform" [@@noalloc]
 
@@ -69,7 +69,7 @@ end
 (***********************)
 
 let print_newline () =
-  Screen.draw_string "\n" !cursorX !cursorY;
+  Screen.print "\n" !cursorX !cursorY;
   cursorX := 0;
   cursorY := !cursorY + 16
 
@@ -78,10 +78,10 @@ let print_string s =
     match ss with
     | [] -> ()
     | [s] ->
-       Screen.draw_string s !cursorX !cursorY;
+       Screen.print s !cursorX !cursorY;
        cursorX := !cursorX + 10 * (String.length s)
     | s::tl ->
-       Screen.draw_string s !cursorX !cursorY;
+       Screen.print s !cursorX !cursorY;
        print_newline ();
        aux tl
   in aux (String.split_on_char '\n' s)
@@ -110,7 +110,7 @@ let prerr_newline () = print_newline ();;
 let erase_char () =
   if (!cursorX = 0) then failwith "TODO"
   else cursorX := !cursorX - 10;
-  Screen.draw_string " " !cursorX !cursorY
+  Screen.print " " !cursorX !cursorY
 
 (* TODO should be able to scroll screen *)
 
