@@ -57,6 +57,8 @@ let draw_cursor cx cy =
   Screen.fill_rect Color.red (cx * 10 + 6) (cy * 10 + 8) 4 2;
   Screen.fill_rect Color.red (cx * 10 + 8) (cy * 10 + 6) 2 4;;
 
+open Key
+
 let edit w =
   let rec loop cx cy =
     w#draw();

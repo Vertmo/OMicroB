@@ -217,240 +217,242 @@ let input ic s ofs len =
 (* Keys *)
 (********)
 
-type key =
-  | Key_left
-  | Key_up
-  | Key_down
-  | Key_right
-  | Key_ok
-  | Key_back
-  | Key_home
-  | Key_on_off
-  | Key_shift
-  | Key_alpha
-  | Key_xnt
-  | Key_var
-  | Key_toolbox
-  | Key_backspace
-  | Key_exp
-  | Key_ln
-  | Key_log
-  | Key_imaginary
-  | Key_comma
-  | Key_power
-  | Key_sine
-  | Key_cosine
-  | Key_tangent
-  | Key_pi
-  | Key_sqrt
-  | Key_square
-  | Key_seven
-  | Key_eight
-  | Key_nine
-  | Key_left_parenthesis
-  | Key_right_parenthesis
-  | Key_four
-  | Key_five
-  | Key_six
-  | Key_multiplication
-  | Key_division
-  | Key_one
-  | Key_two
-  | Key_three
-  | Key_plus
-  | Key_minus
-  | Key_zero
-  | Key_dot
-  | Key_ee
-  | Key_ans
-  | Key_exe
+module Key = struct
+  type t =
+    | Key_left
+    | Key_up
+    | Key_down
+    | Key_right
+    | Key_ok
+    | Key_back
+    | Key_home
+    | Key_on_off
+    | Key_shift
+    | Key_alpha
+    | Key_xnt
+    | Key_var
+    | Key_toolbox
+    | Key_backspace
+    | Key_exp
+    | Key_ln
+    | Key_log
+    | Key_imaginary
+    | Key_comma
+    | Key_power
+    | Key_sine
+    | Key_cosine
+    | Key_tangent
+    | Key_pi
+    | Key_sqrt
+    | Key_square
+    | Key_seven
+    | Key_eight
+    | Key_nine
+    | Key_left_parenthesis
+    | Key_right_parenthesis
+    | Key_four
+    | Key_five
+    | Key_six
+    | Key_multiplication
+    | Key_division
+    | Key_one
+    | Key_two
+    | Key_three
+    | Key_plus
+    | Key_minus
+    | Key_zero
+    | Key_dot
+    | Key_ee
+    | Key_ans
+    | Key_exe
 
-let key_of_char c =
-  match c with
-  | 'a' | 'A' -> Key_exp
-  | 'b' | 'B' -> Key_ln
-  | 'c' | 'C' -> Key_log
-  | 'd' | 'D' -> Key_imaginary
-  | 'e' | 'E' -> Key_comma
-  | 'f' | 'F' -> Key_power
-  | 'g' | 'G' -> Key_sine
-  | 'h' | 'H' -> Key_cosine
-  | 'i' | 'I' -> Key_tangent
-  | 'j' | 'J' -> Key_pi
-  | 'k' | 'K' -> Key_sqrt
-  | 'l' | 'L' -> Key_square
-  | 'm' | 'M' -> Key_seven
-  | 'n' | 'N' -> Key_eight
-  | 'o' | 'O' -> Key_nine
-  | 'p' | 'P' -> Key_left_parenthesis
-  | 'q' | 'Q' -> Key_right_parenthesis
-  | 'r' | 'R' -> Key_four
-  | 's' | 'S' -> Key_five
-  | 't' | 'T' -> Key_six
-  | 'u' | 'U' -> Key_multiplication
-  | 'v' | 'V' -> Key_division
-  | 'w' | 'W' -> Key_one
-  | 'x' | 'X' -> Key_two
-  | 'y' | 'Y' -> Key_three
-  | 'z' | 'Z' -> Key_plus
-  | ' ' -> Key_minus
-  | '?' -> Key_zero
-  | '!' -> Key_dot
-  | _ -> invalid_arg "key_of_char"
+  let of_char c =
+    match c with
+    | 'a' | 'A' -> Key_exp
+    | 'b' | 'B' -> Key_ln
+    | 'c' | 'C' -> Key_log
+    | 'd' | 'D' -> Key_imaginary
+    | 'e' | 'E' -> Key_comma
+    | 'f' | 'F' -> Key_power
+    | 'g' | 'G' -> Key_sine
+    | 'h' | 'H' -> Key_cosine
+    | 'i' | 'I' -> Key_tangent
+    | 'j' | 'J' -> Key_pi
+    | 'k' | 'K' -> Key_sqrt
+    | 'l' | 'L' -> Key_square
+    | 'm' | 'M' -> Key_seven
+    | 'n' | 'N' -> Key_eight
+    | 'o' | 'O' -> Key_nine
+    | 'p' | 'P' -> Key_left_parenthesis
+    | 'q' | 'Q' -> Key_right_parenthesis
+    | 'r' | 'R' -> Key_four
+    | 's' | 'S' -> Key_five
+    | 't' | 'T' -> Key_six
+    | 'u' | 'U' -> Key_multiplication
+    | 'v' | 'V' -> Key_division
+    | 'w' | 'W' -> Key_one
+    | 'x' | 'X' -> Key_two
+    | 'y' | 'Y' -> Key_three
+    | 'z' | 'Z' -> Key_plus
+    | ' ' -> Key_minus
+    | '?' -> Key_zero
+    | '!' -> Key_dot
+    | _ -> invalid_arg "key_of_char"
 
-let char_of_key k =
-  match k with
-  | Key_one -> '1'
-  | Key_two -> '2'
-  | Key_three -> '3'
-  | Key_four -> '4'
-  | Key_five -> '5'
-  | Key_six -> '6'
-  | Key_seven -> '7'
-  | Key_eight -> '8'
-  | Key_nine -> '9'
-  | Key_zero -> '0'
-  | Key_left_parenthesis -> '('
-  | Key_right_parenthesis -> ')'
-  | Key_multiplication -> '*'
-  | Key_division -> '/'
-  | Key_plus -> '+'
-  | Key_minus -> '-'
-  | Key_dot -> '.'
-  | Key_xnt
-  | Key_var
-  | Key_toolbox
-  | Key_backspace
-  | Key_exp
-  | Key_ln
-  | Key_log
-  | Key_imaginary
-  | Key_comma
-  | Key_power
-  | Key_sine
-  | Key_cosine
-  | Key_tangent
-  | Key_pi
-  | Key_sqrt
-  | Key_square
-  | Key_left
-  | Key_up
-  | Key_down
-  | Key_right
-  | Key_ok
-  | Key_back
-  | Key_home
-  | Key_on_off
-  | Key_shift
-  | Key_alpha
-  | Key_ee
-  | Key_ans
-  | Key_exe ->  invalid_arg "char_of_key"
+  let to_char k =
+    match k with
+    | Key_one -> '1'
+    | Key_two -> '2'
+    | Key_three -> '3'
+    | Key_four -> '4'
+    | Key_five -> '5'
+    | Key_six -> '6'
+    | Key_seven -> '7'
+    | Key_eight -> '8'
+    | Key_nine -> '9'
+    | Key_zero -> '0'
+    | Key_left_parenthesis -> '('
+    | Key_right_parenthesis -> ')'
+    | Key_multiplication -> '*'
+    | Key_division -> '/'
+    | Key_plus -> '+'
+    | Key_minus -> '-'
+    | Key_dot -> '.'
+    | Key_xnt
+    | Key_var
+    | Key_toolbox
+    | Key_backspace
+    | Key_exp
+    | Key_ln
+    | Key_log
+    | Key_imaginary
+    | Key_comma
+    | Key_power
+    | Key_sine
+    | Key_cosine
+    | Key_tangent
+    | Key_pi
+    | Key_sqrt
+    | Key_square
+    | Key_left
+    | Key_up
+    | Key_down
+    | Key_right
+    | Key_ok
+    | Key_back
+    | Key_home
+    | Key_on_off
+    | Key_shift
+    | Key_alpha
+    | Key_ee
+    | Key_ans
+    | Key_exe ->  invalid_arg "char_of_key"
 
-let shift_char_of_key k =
-  match k with
-  | Key_exp -> "["
-  | Key_ln -> "]"
-  | Key_log -> "{"
-  | Key_imaginary -> "}"
-  | Key_comma -> "_"
-  | Key_power -> "->"
-  | Key_pi -> "="
-  | Key_sqrt -> "<"
-  | Key_square -> ">"
-  | Key_seven
-  | Key_eight
-  | Key_nine
-  | Key_left_parenthesis
-  | Key_right_parenthesis
-  | Key_four
-  | Key_five
-  | Key_six
-  | Key_multiplication
-  | Key_division
-  | Key_one
-  | Key_two
-  | Key_three
-  | Key_plus
-  | Key_minus
-  | Key_zero
-  | Key_dot
-  | Key_left
-  | Key_up
-  | Key_down
-  | Key_right
-  | Key_ok
-  | Key_back
-  | Key_home
-  | Key_on_off
-  | Key_shift
-  | Key_alpha
-  | Key_ee
-  | Key_ans
-  | Key_exe
-  | Key_xnt
-  | Key_var
-  | Key_toolbox
-  | Key_backspace
-  | Key_sine
-  | Key_cosine
-  | Key_tangent -> invalid_arg "alpha_char_of_key"
+  let to_shift_char k =
+    match k with
+    | Key_exp -> "["
+    | Key_ln -> "]"
+    | Key_log -> "{"
+    | Key_imaginary -> "}"
+    | Key_comma -> "_"
+    | Key_power -> "->"
+    | Key_pi -> "="
+    | Key_sqrt -> "<"
+    | Key_square -> ">"
+    | Key_seven
+    | Key_eight
+    | Key_nine
+    | Key_left_parenthesis
+    | Key_right_parenthesis
+    | Key_four
+    | Key_five
+    | Key_six
+    | Key_multiplication
+    | Key_division
+    | Key_one
+    | Key_two
+    | Key_three
+    | Key_plus
+    | Key_minus
+    | Key_zero
+    | Key_dot
+    | Key_left
+    | Key_up
+    | Key_down
+    | Key_right
+    | Key_ok
+    | Key_back
+    | Key_home
+    | Key_on_off
+    | Key_shift
+    | Key_alpha
+    | Key_ee
+    | Key_ans
+    | Key_exe
+    | Key_xnt
+    | Key_var
+    | Key_toolbox
+    | Key_backspace
+    | Key_sine
+    | Key_cosine
+    | Key_tangent -> invalid_arg "alpha_char_of_key"
 
-let alpha_char_of_key k =
-  match k with
-  | Key_xnt -> ':'
-  | Key_var -> ';'
-  | Key_toolbox -> '"'
-  | Key_backspace -> '%'
-  | Key_exp -> 'a'
-  | Key_ln -> 'b'
-  | Key_log -> 'c'
-  | Key_imaginary -> 'd'
-  | Key_comma -> 'e'
-  | Key_power -> 'f'
-  | Key_sine -> 'g'
-  | Key_cosine -> 'h'
-  | Key_tangent -> 'i'
-  | Key_pi -> 'j'
-  | Key_sqrt -> 'k'
-  | Key_square -> 'l'
-  | Key_seven -> 'm'
-  | Key_eight -> 'n'
-  | Key_nine -> 'o'
-  | Key_left_parenthesis -> 'p'
-  | Key_right_parenthesis -> 'q'
-  | Key_four -> 'r'
-  | Key_five -> 's'
-  | Key_six -> 't'
-  | Key_multiplication -> 'u'
-  | Key_division -> 'v'
-  | Key_one -> 'w'
-  | Key_two -> 'x'
-  | Key_three -> 'y'
-  | Key_plus -> 'z'
-  | Key_minus -> ' '
-  | Key_zero -> '?'
-  | Key_dot -> '!'
-  | Key_left
-  | Key_up
-  | Key_down
-  | Key_right
-  | Key_ok
-  | Key_back
-  | Key_home
-  | Key_on_off
-  | Key_shift
-  | Key_alpha
-  | Key_ee
-  | Key_ans
-  | Key_exe -> invalid_arg "alpha_char_of_key"
+  let to_alpha_char k =
+    match k with
+    | Key_xnt -> ':'
+    | Key_var -> ';'
+    | Key_toolbox -> '"'
+    | Key_backspace -> '%'
+    | Key_exp -> 'a'
+    | Key_ln -> 'b'
+    | Key_log -> 'c'
+    | Key_imaginary -> 'd'
+    | Key_comma -> 'e'
+    | Key_power -> 'f'
+    | Key_sine -> 'g'
+    | Key_cosine -> 'h'
+    | Key_tangent -> 'i'
+    | Key_pi -> 'j'
+    | Key_sqrt -> 'k'
+    | Key_square -> 'l'
+    | Key_seven -> 'm'
+    | Key_eight -> 'n'
+    | Key_nine -> 'o'
+    | Key_left_parenthesis -> 'p'
+    | Key_right_parenthesis -> 'q'
+    | Key_four -> 'r'
+    | Key_five -> 's'
+    | Key_six -> 't'
+    | Key_multiplication -> 'u'
+    | Key_division -> 'v'
+    | Key_one -> 'w'
+    | Key_two -> 'x'
+    | Key_three -> 'y'
+    | Key_plus -> 'z'
+    | Key_minus -> ' '
+    | Key_zero -> '?'
+    | Key_dot -> '!'
+    | Key_left
+    | Key_up
+    | Key_down
+    | Key_right
+    | Key_ok
+    | Key_back
+    | Key_home
+    | Key_on_off
+    | Key_shift
+    | Key_alpha
+    | Key_ee
+    | Key_ans
+    | Key_exe -> invalid_arg "alpha_char_of_key"
+end
 
 module Keyboard = struct
 
   type keyboard_state
 
   external numworks_scan : unit -> keyboard_state = "caml_numworks_keyboard_scan"
-  external numworks_key_down : keyboard_state -> key -> bool = "caml_numworks_keyboard_key_down"
+  external numworks_key_down : keyboard_state -> Key.t -> bool = "caml_numworks_keyboard_key_down"
 
   let state = ref (numworks_scan ())
 
@@ -458,10 +460,8 @@ module Keyboard = struct
 
   let key_down key = numworks_key_down !state key
 
-  let all_keys : key list = List.init 46 (fun i -> Obj.magic i)
-
   (* Through events *)
-  external wait_key_press : unit -> key = "caml_numworks_get_event"
+  external wait_key_press : unit -> Key.t = "caml_numworks_get_event"
 end
 
 
