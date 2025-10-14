@@ -163,10 +163,8 @@ value caml_string_of_float(value v) {
   #ifdef __NUMWORKS__
   int l = snprintf(buf, sizeof(buf), "%ld.", (long)f);
   if (l < sizeof(buf)) {
-    // round to the nearest 10e-3
-    int dec_part = ((int)(f*10000))%10000;
-    if (dec_part % 10 < 5) dec_part = dec_part%1000;
-    else dec_part = dec_part%1000 + 1;
+    // round to 10e-3
+    int dec_part = ((int)(f*1000))%1000;
     snprintf(buf+l, sizeof(buf)-l, "%d", dec_part);
   }
   #else
