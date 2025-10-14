@@ -13,11 +13,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Format
+(* open Format *)
 
 (** Source code locations (ranges of positions), used in parsetree. *)
 
-type t = Warnings.loc = {
+type t = {
   loc_start: Lexing.position;
   loc_end: Lexing.position;
   loc_ghost: bool;

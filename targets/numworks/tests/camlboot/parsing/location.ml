@@ -19,7 +19,7 @@ let absname = ref false
     (* This reference should be in Clflags, but it would create an additional
        dependency and make bootstrapping Camlp4 more difficult. *)
 
-type t = Warnings.loc = { loc_start: position; loc_end: position; loc_ghost: bool };;
+type t = { loc_start: position; loc_end: position; loc_ghost: bool };;
 
 let in_file name =
   let loc = {
@@ -227,7 +227,7 @@ let num_loc_lines = ref 0 (* number of lines already printed after input *)
 
 (* Print the location in some way or another *)
 
-open Format
+(* open Format *)
 
 (* let rewrite_absolute_path = *)
 (*   let init = ref false in *)

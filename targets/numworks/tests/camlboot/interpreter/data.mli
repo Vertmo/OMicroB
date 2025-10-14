@@ -103,7 +103,7 @@ exception InternalException of value
 val unit : value_ Ptr.t
 val is_true : value_ Ptr.t -> bool
 (* val pp_print_value : Format.formatter -> value_ Ptr.t -> unit *)
-val pp_print_unit_id : Format.formatter -> module_unit_id -> unit
+(* val pp_print_unit_id : Format.formatter -> module_unit_id -> unit *)
 val string_of_value : value -> string
 val string_of_arg : value option -> string
 val print_value_to_stdout : value -> unit
