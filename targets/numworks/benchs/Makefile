@@ -10,15 +10,16 @@ HEAP_SIZE = 16000
 BENCHS = jdlv aQueens oDivE oNucleic
 NWAS = $(foreach var,$(BENCHS),$(var).nwa)
 ELFS = $(foreach var,$(BENCHS),$(var).elf)
+OMICROB_OPTS = -no-shortcut-initialization -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE)
 
 .PHONY: all
 all: $(NWAS) $(ELFS)
 
 %.elf: %.ml
-	$(BIN)/omicrob -v -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
+	$(BIN)/omicrob -v $(OMICROB_OPTS)  $^ -o $@
 
 %.hex: %.ml
-	$(BIN)/omicrob -v -stack-size $(STACK_SIZE) -heap-size $(HEAP_SIZE) -cxxopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -mlopt=-ccopt=-DEADK_APP_NAME=$(EADK_APP_NAME) -device=$(DEVICE) $^ -o $@
+	$(BIN)/omicrob -v $(OMICROB_OPTS) $^ -o $@
 
 %.nwa: %.hex
 	cp $^ $@
