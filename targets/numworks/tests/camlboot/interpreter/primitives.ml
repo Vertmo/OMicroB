@@ -504,6 +504,7 @@ let prims =
     (*     unwrap_int *)
     (*     id *)
     (*     wrap_unit ); *)
+    ("omicrob_millis", prim1 millis unwrap_unit wrap_int)
   ]
 
 let prims =

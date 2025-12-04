@@ -162,6 +162,10 @@ let epsilon_float = 2.22044604925031308e-16
 external print_string : string -> unit = "%print_string"
 external print_int : int -> unit = "%print_int"
 external print_float : float -> unit = "%print_float"
+
+(* OMicroB prims *)
+
+external millis : unit -> int = "omicrob_millis"
 |}
 
   and list = {|
@@ -398,6 +402,8 @@ let () =
   draw_bg ();
   print_endline "Camlboot for Numworks 1.0";
   print_endline "%use file.py;; to load a file";
+
+  let _ = eval stdlib_env "%use benchs/apply2.ml" in
 
   (* Loop in REP[L] *)
   let rec loop env =
