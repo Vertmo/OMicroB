@@ -378,6 +378,22 @@ let read () =
       with _ -> aux l
   in String.concat "" (aux [])
 
+let exc_to_string = function
+    | Parsing.Parse_error -> "Parse error"
+    | Syntaxerr.Error _ -> "Syntax error"
+    | Syntaxerr.Escape_error -> "Escape error"
+    | InternalException e -> "Internal Exn: " ^ (string_of_value e)
+    | Match_fail -> "Match Fail"
+    | No_module_data -> "No module data"
+    | Out_of_memory -> "Out of Memory"
+    | Stack_overflow -> "Stack overflow"
+    | Invalid_argument msg -> "Invalid argument " ^ msg
+    | Not_found -> "Not found"
+    | Data.Ptr.Null -> "Null Ptr"
+    | Data.Ptr.Full -> "Full Ptr"
+    | Failure msg -> "Failure " ^ msg
+    | _ -> "Unknown Exception"
+
 (* Eval in R[E]PL *)
 let eval env cmd =
     try
@@ -390,20 +406,14 @@ let eval env cmd =
         let exp = parse_string cmd in
         eval_structure Primitives.prims env exp
     with
-    | InternalException e ->
-      print_endline ("Internal Exn: " ^ (string_of_value e));
-      env
-    | Match_fail ->
-      print_endline "Match Fail";
-      env
-    | Not_found -> env
+    | e -> print_endline (exc_to_string e); env
 
 let () =
   draw_bg ();
   print_endline "Camlboot for Numworks 1.0";
   print_endline "%use file.py;; to load a file";
 
-  let _ = eval stdlib_env "%use benchs/apply2.ml" in
+  (* let _ = eval stdlib_env "%use bench.py" in *)
 
   (* Loop in REP[L] *)
   let rec loop env =

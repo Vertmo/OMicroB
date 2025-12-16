@@ -1,3 +1,18 @@
+(* Preamble: missing from stdlib *)
+
+module Random = struct
+  external int : int -> int = "caml_random_int"
+end
+
+module List = struct
+  let rec rev_append l1 l2 =
+    match l1 with
+    | [] -> l2
+    | a::l -> rev_append l (a::l2)
+end
+
+(* Code proper *)
+
 type 'a tree = Empty | Node of 'a * 'a tree * 'a tree
 
 let init n f =
@@ -29,8 +44,8 @@ let tree_sort l =
 
 let _ =
   let start = millis () in
-  for i = 1 to 10000 do
-    let l = init 100 (fun x -> Random.int x) in
+  for i = 1 to 10 (* *1000 to compare with OMicroB *) do
+    let l = init 30 (fun x -> Random.int x) in
     let _ = tree_sort l in ()
   done;
   let stop = millis () in

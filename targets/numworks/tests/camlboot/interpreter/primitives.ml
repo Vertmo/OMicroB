@@ -404,6 +404,8 @@ let prims =
         unwrap_int
         unwrap_int
         wrap_unit );
+    ("caml_array_make_matrix",
+     prim3 Array.make_matrix unwrap_int unwrap_int id (wrap_array wrap_array_id));
     (* ( "caml_array_append", *)
     (*   prim2 append_prim unwrap_array_id unwrap_array_id wrap_array_id ); *)
     (* Hashtbl *)
@@ -447,6 +449,8 @@ let prims =
     (* Random *)
     (* ( "caml_sys_random_seed", *)
     (*   prim1 random_seed unwrap_unit (wrap_array wrap_int) ); *)
+    ("caml_random_int",
+     prim1 Random.int unwrap_int wrap_int);
     (* Spacetime *)
     (* ( "caml_spacetime_enabled", *)
     (*   prim1 Prim.spacetime_enabled unwrap_unit wrap_bool ); *)
@@ -504,7 +508,10 @@ let prims =
     (*     unwrap_int *)
     (*     id *)
     (*     wrap_unit ); *)
-    ("omicrob_millis", prim1 millis unwrap_unit wrap_int)
+    ("omicrob_delay", prim1 delay unwrap_int wrap_unit);
+    ("omicrob_millis", prim1 millis unwrap_unit wrap_int);
+    ("numworks_screen_clear", prim1 Screen.clear unwrap_unit wrap_unit);
+    ("numworks_screen_print", prim3 Screen.print unwrap_string unwrap_int unwrap_int wrap_unit);
   ]
 
 let prims =
