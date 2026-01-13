@@ -28,11 +28,14 @@ let tree_sort l =
   to_list t
 
 let _ =
+  Screen.clear ();
   let start = millis () in
   for i = 1 to 10000 do
-    let l = init 100 (fun x -> Random.int x) in
+    let l = init 30 (fun x -> Random.int x) in
     ignore (tree_sort l)
   done;
   let stop = millis () in
+  print_int (stop-start);
+  print_newline ();
+  while true do () done
   (* Serial.write_string (string_of_int (stop-start)) *)
-  ()

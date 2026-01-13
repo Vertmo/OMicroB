@@ -4,8 +4,8 @@ DEVICE ?= numworks
 PROG = life
 EADK_APP_NAME = \"OMicroB-Life\"
 
-STACK_SIZE = 8192
-HEAP_SIZE = 10192
+STACK_SIZE = 120
+HEAP_SIZE = 4000
 
 TARGETS := $(PROG).elf $(PROG).hex
 

@@ -10,7 +10,7 @@ PROG = $(APP_NAME)-$(VERSION)
 DEVICE ?= numworks
 
 # FIXME: find what is the upper limit for these? Apparently above 16192 it doesn't get flashed on the NumWorks flashing website
-STACK_SIZE = 2500
+STACK_SIZE = 2000
 # STACK_SIZE = 16192
 # STACK_SIZE = 32384
 # STACK_SIZE = 64768
@@ -18,7 +18,7 @@ STACK_SIZE = 2500
 # HEAP_SIZE = 8192
 # HEAP_SIZE = 16192
 # HEAP_SIZE = 28000
-HEAP_SIZE = 34500
+HEAP_SIZE = 35000
 # HEAP_SIZE = 64768
 
 TARGETS := $(PROG).byte $(PROG).hex $(PROG).elf

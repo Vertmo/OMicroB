@@ -2,3 +2,4 @@
 *.cmo
 *.cmi
 *.byte
+bench.ml
