@@ -78,7 +78,7 @@ let docs_attr ds =
   let exp =
     { pexp_desc = Pexp_constant (Pconst_string(ds.ds_body, None));
       pexp_loc = ds.ds_loc;
-      pexp_loc_stack = [];
+      (* pexp_loc_stack = []; *)
       pexp_attributes = []; }
   in
   let item =
@@ -128,7 +128,7 @@ let text_attr ds =
   let exp =
     { pexp_desc = Pexp_constant (Pconst_string(ds.ds_body, None));
       pexp_loc = ds.ds_loc;
-      pexp_loc_stack = [];
+      (* pexp_loc_stack = []; *)
       pexp_attributes = []; }
   in
   let item =

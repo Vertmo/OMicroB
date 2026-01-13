@@ -9,7 +9,7 @@ let exp_of_desc loc desc =
   Parsetree.{
     pexp_desc = desc;
     pexp_loc = loc;
-    pexp_loc_stack = [loc];
+    (* pexp_loc_stack = [loc]; *)
     pexp_attributes = [];
   }
 
@@ -245,7 +245,7 @@ let prims =
     (*  prim2 caml_int64_format unwrap_string unwrap_int64 wrap_string); *)
     (* ("caml_nativeint_format", *)
     (*  prim2 caml_nativeint_format unwrap_string unwrap_nativeint wrap_string); *)
-    (* ("caml_int_of_string", prim1 int_of_string unwrap_string wrap_int); *)
+    ("caml_int_of_string", prim1 int_of_string unwrap_string wrap_int);
     (* ("caml_float_of_string", prim1 float_of_string unwrap_string wrap_float); *)
     (* ( "caml_output_value", *)
     (*   prim3 *)
@@ -512,6 +512,10 @@ let prims =
     ("omicrob_millis", prim1 millis unwrap_unit wrap_int);
     ("numworks_screen_clear", prim1 Screen.clear unwrap_unit wrap_unit);
     ("numworks_screen_print", prim3 Screen.print unwrap_string unwrap_int unwrap_int wrap_unit);
+    ("numworks_screen_fill_rect", prim5 Screen.fill_rect (fun c -> Obj.magic (unwrap_int c)) unwrap_int unwrap_int unwrap_int unwrap_int wrap_unit);
+    ("numworks_keyboard_wait_key_press", prim1 Keyboard.wait_key_press unwrap_unit (fun k -> wrap_int (Obj.magic k)));
+    ("numworks_keyboard_scan", prim1 Keyboard.scan unwrap_unit wrap_unit);
+    ("numworks_keyboard_key_down", prim1 Keyboard.key_down (fun c -> Obj.magic (unwrap_int c)) wrap_bool);
   ]
 
 let prims =

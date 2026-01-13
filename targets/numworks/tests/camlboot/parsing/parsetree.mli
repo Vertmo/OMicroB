@@ -79,7 +79,7 @@ and core_type =
     {
      ptyp_desc: core_type_desc;
      ptyp_loc: Location.t;
-     ptyp_loc_stack: Location.t list;
+     (* ptyp_loc_stack: Location.t list; *)
      ptyp_attributes: attributes; (* ... [@id1] [@id2] *)
     }
 
@@ -188,7 +188,7 @@ and pattern =
     {
      ppat_desc: pattern_desc;
      ppat_loc: Location.t;
-     ppat_loc_stack: Location.t list;
+     (* ppat_loc_stack: Location.t list; *)
      ppat_attributes: attributes; (* ... [@id1] [@id2] *)
     }
 
@@ -254,7 +254,7 @@ and expression =
     {
      pexp_desc: expression_desc;
      pexp_loc: Location.t;
-     pexp_loc_stack: Location.t list;
+     (* pexp_loc_stack: Location.t list; *)
      pexp_attributes: attributes; (* ... [@id1] [@id2] *)
     }
 

@@ -597,7 +597,7 @@ and eval_class_expr prims env class_expr =
         pexp_desc = exp_desc;
         pexp_loc = class_expr.pcl_loc;
         pexp_attributes = class_expr.pcl_attributes;
-        pexp_loc_stack = [class_expr.pcl_loc];
+        (* pexp_loc_stack = [class_expr.pcl_loc]; *)
     } in
   let new_ class_exp =
     (* The expression construction (new <class>) only accepts a class
@@ -618,7 +618,7 @@ and eval_class_expr prims env class_expr =
     let noloc = Location.mknoloc in
     let modname = "<class_exp_mod>" in
     let clname = "<class_exp>" in
-    let mk_exp d = { pexp_desc = d; pexp_loc = dloc; pexp_loc_stack = []; pexp_attributes = [] } in
+    let mk_exp d = { pexp_desc = d; pexp_loc = dloc; (* pexp_loc_stack = []; *) pexp_attributes = [] } in
     let mk_mod d = { pmod_desc = d; pmod_loc = dloc; pmod_attributes = [] } in
     let mk_str d = { pstr_desc = d; pstr_loc = dloc } in
     let mk_ci name expr = { pci_virt = Concrete; pci_params = []; pci_name = name; pci_expr = expr; pci_attributes = []; pci_loc = dloc } in
